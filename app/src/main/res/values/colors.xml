@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#009688</color>
+    <color name="colorPrimaryDark">#00796B</color>
+    <color name="colorPrimaryLight">#4DB6AC</color>
+    <color name="colorAccent">#000000</color>
+    <color name="textColorPrimary">#000000</color>
+
+    <color name="offStage">#006464</color>
+    <color name="onStage">#18ffff</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <color name="black_overlay">#66000000</color>
+</resources>

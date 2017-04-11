@@ -1,0 +1,67 @@
+<resources>
+    <string name="app_name">MorseLight</string>
+    <string name="unit_multiplier" translatable="false">Transmission speed</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+
+    <string name="nav_item_share">Share</string>
+    <string name="nav_item_multiplier">Transmission speed</string>
+    <string name="nav_item_rating">Rate This App</string>
+    <string name="nav_item_contact">Contact Us</string>
+    <string name="nav_item_user">User Details</string>
+    <string name="nav_item_morse">Morse Code Info</string>
+    <string name="nav_item_tutorial">Learn Decoding</string>
+    <string name="nav_item_purpose">Purpose</string>
+    <string name="nav_item_help">Help</string>
+
+    <!-- navigation drawer item labels  -->
+    <string-array name="nav_drawer_labels">
+        <item>@string/nav_item_user</item>
+        <item>@string/nav_item_purpose</item>
+        <item>@string/nav_item_morse</item>
+        <item>@string/nav_item_multiplier</item>
+        <item>@string/nav_item_tutorial</item>
+        <item>@string/nav_item_help</item>
+        <item>@string/nav_item_share</item>
+        <item>@string/nav_item_rating</item>
+        <item>@string/nav_item_contact</item>
+    </string-array>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="flash">Flash</string>
+    <string name="my_alphanumeric">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 </string>
+    <string name="purpose">Purpose of this app is to facilitate a communication between two operators
+        in a short range(depending upon the visibility of flashlight) specially when their is no cellular network available.
+        \n\nMainstream cypher language Morse is used for transmitting text information.
+        \n\nAn easy to use Morse Decoder is also provided so that unskilled observer can also decrypt the message.
+        \n\nMorse decoder is robust algorithm and it can manipulate human error to some extent.
+    </string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_purpose">Purpose</string>
+    <string name="title_activity_tutorial">Learn to Decode</string>
+
+    <string name="title_activity_introduction">Introduction</string>
+    <string name="morse_message_hint">Your message goes here.</string>
+    <string name="Information">1. Morse code is a method of transmitting text information as a series of on-off tones, lights, or clicks.
+        \n2. The Morse Code encodes the alphanumeric as sequences of short and long signals called \"dots\" and \"dashes\".
+        \n3. All Morse code elements depend on the dot length.
+        \n4. Since there no standard transmission speed is defined, it can be changed as preferred.
+    </string>
+    <string name="Introduction">
+        1. Morse code transmission speed can be changed in settings.
+        \n2. Facility of sending a short signal to let other user know when to start or stop is provided.
+        \n3. For decoding, one have to simulate incoming message to button pressed.
+        \n4. Learn more from the tutorial in settings.
+    </string>
+    <string name="tutorial_hint">
+        1. Press \'Start\' to simulate the message.
+        \n2. Press \'Next\' to change message.
+        \n3. Press &amp; hold receiver circle when you see an incoming flashlight message.
+        \n4. Repeat step 3 until you see \'Done\'.
+        \n5. Use \'Decode\' to decrypt the message.
+    </string>
+</resources>

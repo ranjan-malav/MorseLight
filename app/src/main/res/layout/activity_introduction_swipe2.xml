@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/activity_introduction_swipe2_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/flashlight_background_off" />
+
+    <ImageView
+        android:id="@+id/activity_introduction_swipe2_image_overlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:src="@drawable/swipe2_overlay" />
+
+    <ImageView
+        android:id="@+id/activity_introduction_swipe2_image_pointer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/activity_introduction_swipe2_image_overlay"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/swipe2_pointer" />
+
+    <pl.droidsonroids.gif.GifTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/flashlight_centre_gif" />
+
+    <TextView
+        android:id="@+id/activity_introduction_swipe2_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/activity_introduction_swipe2_image"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
+        android:text="Tap to switch flashlight on/off" />
+
+
+</RelativeLayout>

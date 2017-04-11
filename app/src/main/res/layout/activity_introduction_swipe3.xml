@@ -1,0 +1,139 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/linearLayoutTop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:paddingBottom="5dp"
+        android:paddingEnd="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@color/white"
+            android:editable="false"
+            android:inputType="none"
+            android:text="Write Your Message Here."
+            android:textColor="@color/textColorPrimary"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayoutBot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:paddingEnd="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingStart="16dp">
+
+        <Button
+            android:id="@+id/button_start_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_weight="1"
+            android:background="#FFF"
+            android:clickable="false"
+            android:text="Signal"
+            android:textColor="@color/black_overlay" />
+
+        <Button
+            android:id="@+id/button_sos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginRight="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_weight="1"
+            android:background="#FFF"
+            android:clickable="false"
+            android:text="SOS"
+            android:textColor="@color/black_overlay" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_above="@id/linearLayoutBot">
+
+        <ImageView
+            android:id="@+id/activity_introduction_swipe3_image_pointer3"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="12dp"
+            android:layout_marginStart="12dp"
+            android:rotation="180"
+            android:src="@drawable/swipe2_pointer" />
+
+        <ImageView
+            android:id="@+id/activity_introduction_swipe3_image_pointer4"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
+            android:rotation="180"
+            android:src="@drawable/swipe2_pointer" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/activity_introduction_swipe3_image_pointer3"
+            android:layout_alignLeft="@+id/activity_introduction_swipe3_image_pointer3"
+            android:layout_alignStart="@+id/activity_introduction_swipe3_image_pointer3"
+            android:text="Send a signal to receiver" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/activity_introduction_swipe3_image_pointer4"
+            android:layout_alignEnd="@+id/activity_introduction_swipe3_image_pointer4"
+            android:layout_alignRight="@+id/activity_introduction_swipe3_image_pointer4"
+            android:text="Shortcut for SOS signal" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/relativeLayout1"
+        android:layout_below="@id/linearLayoutTop">
+
+
+        <ImageView
+            android:id="@+id/morse_send_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:alpha="0.5"
+            android:scaleType="fitCenter"
+            android:src="@drawable/intro_generator" />
+
+
+    </RelativeLayout>
+
+</RelativeLayout>

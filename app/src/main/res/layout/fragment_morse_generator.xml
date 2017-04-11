@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/radial_background"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/linearLayoutTop"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp">
+        <EditText
+            android:id="@+id/morse_message"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="#FFF"
+            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
+            android:hint="Your message goes here."
+            android:inputType="textNoSuggestions"
+            android:maxLines="1"
+            android:paddingLeft="4dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="0dp"
+            android:paddingRight="0dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayoutBot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_start_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:text="Signal"
+            android:textColor="@color/textColorPrimary" />
+
+        <Button
+            android:id="@+id/button_sos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="SOS"
+            android:textColor="@color/textColorPrimary" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/linearLayoutBot"
+        android:layout_below="@id/linearLayoutTop"
+        android:padding="5dp">
+
+        <ImageView
+            android:id="@+id/morse_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/morse_generator_off"
+            android:scaleType="fitCenter"
+            android:onClick="onTouch" />
+
+        <ImageView
+            android:id="@+id/morse_send_background"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:src="@drawable/background_mask"
+            android:scaleType="fitCenter"
+            android:layout_gravity="center"
+             />
+    </FrameLayout>
+
+</RelativeLayout>
