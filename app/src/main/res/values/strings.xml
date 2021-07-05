@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MorseLight2</string>
+    <string name="send">Send</string>
+    <string name="receive">Receive</string>
+    <string name="learn">Learn</string>
+    <string name="flashlight">Flashlight</string>
+</resources>

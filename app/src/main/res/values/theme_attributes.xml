@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="containerBorderColor" format="reference|color" />
+    <attr name="containerLabelColor" format="reference|color" />
+    <attr name="buttonBackground" format="reference|color" />
+    <attr name="chipCheckedBackground" format="reference|color" />
+    <attr name="chipUncheckedBackground" format="reference|color" />
+    <attr name="chipUncheckedTextColor" format="reference|color" />
+    <attr name="textPrimaryOnPrimary" format="reference|color" />
+    <attr name="backgroundColor16e" format="reference|color" />
+    <attr name="statusBarColor" format="reference|color" />
+</resources>

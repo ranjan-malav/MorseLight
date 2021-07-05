@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<font-family xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <font app:font="@font/nunito_sans_200" />
+    <font app:font="@font/nunito_sans_200_italic" />
+    <font app:font="@font/nunito_sans_300" />
+    <font app:font="@font/nunito_sans_300_italic" />
+    <font app:font="@font/nunito_sans_400" />
+    <font app:font="@font/nunito_sans_400_italic" />
+    <font app:font="@font/nunito_sans_600" />
+    <font app:font="@font/nunito_sans_600_italic" />
+    <font app:font="@font/nunito_sans_700" />
+    <font app:font="@font/nunito_sans_700_italic" />
+    <font app:font="@font/nunito_sans_800" />
+    <font app:font="@font/nunito_sans_800_italic" />
+    <font app:font="@font/nunito_sans_900" />
+    <font app:font="@font/nunito_sans_900_italic" />
+
+</font-family>

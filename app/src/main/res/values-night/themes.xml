@@ -1,0 +1,56 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.MorseLight2" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/teal_800</item>
+        <item name="colorPrimaryVariant">@color/teal_800_dark</item>
+        <item name="colorPrimaryDark">@color/teal_800_dark</item>
+        <item name="backgroundColor">@color/dark</item>
+        <item name="backgroundColor16e">@color/dark15pWhiteOverlay</item>
+        <item name="statusBarColor">@color/dark</item>
+        <item name="colorSurface">@color/dark</item>
+        <item name="colorAccent">@color/teal_a700</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_a700</item>
+        <item name="colorSecondaryVariant">@color/teal_a700_light</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="errorTextColor">@color/error_color_dark_theme</item>
+
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorOnBackground">@color/white</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorOnError">@color/black</item>
+
+        <item name="containerBorderColor">@color/white38p</item>
+        <item name="containerLabelColor">@color/white60p</item>
+        <item name="buttonBackground">@color/teal_800_50p</item>
+        <item name="chipCheckedBackground">@color/teal_800_10p</item>
+        <item name="chipUncheckedBackground">@color/white10p</item>
+        <item name="chipUncheckedTextColor">@color/white87p</item>
+        <item name="textPrimaryOnPrimary">@color/teal_800_light</item>
+
+        <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.AppBarLayout.Surface</item>
+        <item name="navigationIconTint">?colorOnBackground</item>
+
+        <item name="textAppearanceCaption">@style/TextLabel</item>
+        <item name="textAppearanceSubtitle1">@style/TextHeading3</item>
+        <item name="textAppearanceHeadline6">@style/AppbarTitle</item>
+
+        <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
+
+        <item name="linearProgressIndicatorStyle">@style/Widget.App.LinearProgressIndicator</item>
+    </style>
+
+    <style name="Widget.App.LinearProgressIndicator" parent="Widget.MaterialComponents.LinearProgressIndicator">
+        <item name="indicatorColor">@color/teal_a700_light</item>
+        <item name="android:indeterminate">true</item>
+    </style>
+
+    <style name="Theme.MorseLight.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:textColor">?colorOnBackground</item>
+    </style>
+
+</resources>

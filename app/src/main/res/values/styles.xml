@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Widget.App.Text" parent="Widget.MaterialComponents.TextView">
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="fontFamily">@font/nunito_sans_400</item>
+    </style>
+
+    <!-- Onboarding Title -->
+    <style name="OnboardingTitle" parent="Widget.App.Text">
+        <item name="android:textSize">@dimen/font_24</item>
+        <item name="fontFamily">@font/nunito_sans_700</item>
+    </style>
+
+    <!-- Appbar Title -->
+    <style name="AppbarTitle" parent="Widget.App.Text">
+        <item name="android:textSize">@dimen/font_20</item>
+        <item name="fontFamily">@font/nunito_sans_700</item>
+    </style>
+
+    <!-- TextHeading1 -->
+    <style name="TextHeading1" parent="Widget.App.Text">
+        <item name="android:textSize">@dimen/font_18</item>
+        <item name="fontFamily">@font/nunito_sans_700</item>
+    </style>
+
+    <!-- TextHeading2 -->
+    <style name="TextHeading2" parent="Widget.App.Text">
+        <item name="android:textSize">@dimen/font_16</item>
+        <item name="fontFamily">@font/nunito_sans_700</item>
+    </style>
+
+    <!-- TextHeading3 -->
+    <style name="TextHeading3" parent="Widget.App.Text">
+        <item name="android:textSize">@dimen/font_16</item>
+        <item name="fontFamily">@font/nunito_sans_600</item>
+    </style>
+
+    <!-- TextHeading4 -->
+    <style name="TextHeading4" parent="Widget.App.Text">
+        <item name="android:textSize">@dimen/font_16</item>
+        <item name="fontFamily">@font/nunito_sans_400</item>
+    </style>
+
+    <style name="TextHeading4.Primary" parent="TextHeading4">
+        <item name="android:textColor">?textPrimaryOnPrimary</item>
+    </style>
+
+    <!-- TextSubHeading1 -->
+    <style name="TextSubHeading1" parent="Widget.App.Text">
+        <item name="android:textSize">@dimen/font_14</item>
+        <item name="fontFamily">@font/nunito_sans_700</item>
+    </style>
+
+    <!-- TextSubHeading2 -->
+    <style name="TextSubHeading2" parent="Widget.App.Text">
+        <item name="android:textSize">@dimen/font_14</item>
+        <item name="fontFamily">@font/nunito_sans_600</item>
+    </style>
+
+    <!-- TextBody1 -->
+    <style name="TextBody1" parent="Widget.App.Text">
+        <item name="android:textSize">@dimen/font_14</item>
+        <item name="fontFamily">@font/nunito_sans_600</item>
+    </style>
+
+    <!-- TextBody2 -->
+    <style name="TextBody2" parent="Widget.App.Text">
+        <item name="android:textSize">@dimen/font_14</item>
+        <item name="fontFamily">@font/nunito_sans_400</item>
+    </style>
+
+    <!-- TextLabel -->
+    <style name="TextLabel" parent="Widget.App.Text">
+        <item name="android:textSize">@dimen/font_12</item>
+        <item name="fontFamily">@font/nunito_sans_400</item>
+    </style>
+
+    <style name="TextLabel2" parent="Widget.App.Text">
+        <item name="android:textSize">@dimen/font_12</item>
+        <item name="fontFamily">@font/nunito_sans_600</item>
+    </style>
+
+
+    <style name="TextAppearance.App.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="fontFamily">@font/nunito_sans_600</item>
+        <item name="android:fontFamily">@font/nunito_sans_600</item>
+    </style>
+
+</resources>

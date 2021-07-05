@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorAccent">#00AF9C</color>
+    <color name="colorPrimary">#00695C</color>
+    <color name="colorPrimaryDark">#003D33</color>
+    <color name="teal_800">#00695C</color>
+    <color name="teal_800_light">#4DB6AD</color>
+    <color name="teal_a700">#00AF9C</color>
+    <color name="teal_a700_light">#00BFA5</color>
+    <color name="teal_800_dark">#003D33</color>
+    <color name="teal_800_10p">#1900695C</color>
+    <color name="teal_800_20p">#3300695C</color>
+    <color name="teal_800_50p">#8000695C</color>
+    <color name="teal_500">#009688</color>
+    <color name="dark">#121212</color>
+    <color name="dark15pWhiteOverlay">#353535</color>
+    <color name="dark9pWhiteOverlay">#272727</color>
+    <color name="black">#FF000000</color>
+    <color name="black10p">#19000000</color>
+    <color name="black38p">#61000000</color>
+    <color name="black60p">#99000000</color>
+    <color name="black87p">#DE000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="white10p">#19FFFFFF</color>
+    <color name="white38p">#61FFFFFF</color>
+    <color name="white60p">#99FFFFFF</color>
+    <color name="white87p">#DEFFFFFF</color>
+    <color name="grey300">#E0E0E0</color>
+    <color name="grey500">#9E9E9E</color>
+    <color name="error_color_light_theme">#B00020</color>
+    <color name="error_color_light_theme_24p">#3DB00020</color>
+    <color name="error_color_dark_theme">#CF6679</color>
+    <color name="error_color_dark_theme_24p">#3DCF6679</color>
+    <color name="red">#FF0000</color>
+    <color name="red_20p">#33FF0000</color>
+    <color name="maroon">#C10000</color>
+    <color name="maroon_20p">#33C10000</color>
+    <color name="amber">#FABD20</color>
+
+    <color name="group_type_default">#FABD20</color>
+    <color name="group_type_other">#E3D449</color>
+
+    <color name="food_easy">#00E676</color>
+    <color name="food_medium">#FFEA00</color>
+    <color name="food_expert">#FF9100</color>
+
+    <color name="meal_color_1">#FF80AB</color>
+    <color name="meal_color_2">#EA80FC</color>
+    <color name="meal_color_3">#8C9EFF</color>
+    <color name="meal_color_4">#84FFFF</color>
+    <color name="meal_color_5">#A7FFEB</color>
+    <color name="meal_color_6">#FFFF8D</color>
+    <color name="meal_color_7">#FFD180</color>
+    <color name="meal_color_8">#FFFFFF</color>
+
+    <color name="errorColor">#C14543</color>
+    <color name="infoColor">#4F8AC8</color>
+    <color name="successColor">#6A9C72</color>
+</resources>
