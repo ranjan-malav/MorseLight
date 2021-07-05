@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/account_option_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:elevation="1dp"
+    android:focusable="true"
+    app:cardElevation="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/padding_l"
+            android:paddingTop="@dimen/padding_xs"
+            android:paddingEnd="@dimen/padding_l"
+            android:paddingBottom="@dimen/padding_xs">
+
+            <FrameLayout
+                android:id="@+id/account_option_icon_container"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/ripple_background_36dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/account_option_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    tools:srcCompat="@drawable/ic_outline_email_24" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/account_option_title"
+                style="@style/TextHeading3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                tools:text="Contact Us" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/account_option_next"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                app:srcCompat="@drawable/ic_outline_navigate_next_24"
+                app:tint="?colorPrimary" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="72dp"
+            android:background="?containerLabelColor" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

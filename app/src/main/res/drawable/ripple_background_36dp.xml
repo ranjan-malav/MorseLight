@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:color="@color/white"
+    tools:targetApi="lollipop">
+    <item>
+        <selector>
+            <item
+                android:drawable="@drawable/circle_background_36dp"
+                android:state_enabled="true" />
+            <item
+                android:drawable="@drawable/button_background_36dp_disabled"
+                android:state_enabled="false" />
+        </selector>
+    </item>
+</ripple>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MorseLight2</string>
+    <string name="app_name">MorseLight</string>
     <string name="send">Send</string>
     <string name="receive">Receive</string>
     <string name="learn">Learn</string>
@@ -11,4 +11,18 @@
     <string name="sos">SOS</string>
     <string name="start">Start</string>
     <string name="morse_code">Morse Code</string>
+    <string name="manual">Manual</string>
+    <string name="auto">Auto</string>
+    <string name="about_morse_code">About Morse Code</string>
+    <string name="learn_decoding">Learn Decoding</string>
+    <string name="rate_this_app">Rate this app</string>
+    <string name="contact_developer">Contact Developer</string>
+    <string name="share">Share</string>
+    <string name="off">Off</string>
+    <string name="press_hold">Press &amp; Hold</string>
+    <string name="decode">Decode</string>
+    <string name="reset">Reset</string>
+    <string name="incoming_message_timings">Incoming Message Timings</string>
+    <string name="decoded_message">Decoded Message</string>
+    <string name="camera_capture_hint">Keep incoming flashlight inside the rect in the camera preview</string>
 </resources>
