@@ -4,4 +4,11 @@
     <string name="receive">Receive</string>
     <string name="learn">Learn</string>
     <string name="flashlight">Flashlight</string>
+    <string name="slow">Slow</string>
+    <string name="fast">Fast</string>
+    <string name="type_your_message">Type your message</string>
+    <string name="signal">Signal</string>
+    <string name="sos">SOS</string>
+    <string name="start">Start</string>
+    <string name="morse_code">Morse Code</string>
 </resources>

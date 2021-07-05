@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,7 +12,8 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/plan_toolbar"
+            android:id="@+id/send_toolbar"
+            style="@style/Widget.MaterialComponents.Toolbar.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:menu="@menu/main_menu"
@@ -22,6 +24,194 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <com.ranjan.malav.morselight_flashlightwithmorsecode.utils.LabelledContainer
+        android:id="@+id/transmission_speed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_m"
+        android:paddingStart="@dimen/padding_xs"
+        android:paddingEnd="@dimen/padding_xs"
+        app:borderColor="@drawable/border_gray_4dp"
+        app:label="Transmission Speed"
+        app:labelColor="?colorOnBackground"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_l"
+            android:layout_marginBottom="@dimen/margin_s"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/padding_s"
+            android:paddingEnd="@dimen/padding_s"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/slow" />
+
+            <com.google.android.material.slider.Slider
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/margin_m"
+                android:layout_marginEnd="@dimen/margin_m"
+                android:layout_weight="1"
+                android:stepSize="2.0"
+                android:valueFrom="0.0"
+                android:valueTo="10.0" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/fast" />
+
+        </LinearLayout>
+
+    </com.ranjan.malav.morselight_flashlightwithmorsecode.utils.LabelledContainer>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/flash_status_view"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:scaleType="fitCenter"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@id/current_char_details"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/transmission_speed"
+        app:srcCompat="@drawable/ic_torch" />
+
+    <com.ranjan.malav.morselight_flashlightwithmorsecode.utils.LabelledContainer
+        android:id="@+id/current_char_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_m"
+        android:paddingStart="@dimen/padding_xs"
+        android:paddingEnd="@dimen/padding_xs"
+        app:borderColor="@drawable/border_gray_4dp"
+        app:label="Currently Transmitting"
+        app:labelColor="?colorOnBackground"
+        app:layout_constraintBottom_toTopOf="@id/morse_message">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/current_char"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_m"
+            android:layout_marginBottom="@dimen/margin_s"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/current_char_morse"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="W = " />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/current_char_morse"
+            style="@style/OnboardingTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_m"
+            android:layout_marginBottom="@dimen/margin_s"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/current_char"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text=". --" />
+
+    </com.ranjan.malav.morselight_flashlightwithmorsecode.utils.LabelledContainer>
+
+    <com.ranjan.malav.morselight_flashlightwithmorsecode.utils.LabelledContainer
+        android:id="@+id/morse_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_m"
+        android:paddingStart="@dimen/padding_xs"
+        android:paddingEnd="@dimen/padding_xs"
+        app:borderColor="@drawable/border_gray_4dp"
+        app:label="@string/morse_code"
+        app:labelColor="?colorOnBackground"
+        app:layout_constraintBottom_toTopOf="@id/message_input">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            style="@style/OnboardingTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_m"
+            android:layout_marginBottom="@dimen/margin_s"
+            android:ellipsize="marquee"
+            android:maxLines="5"
+            android:minLines="2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text=".... . .-.. .-.. --- / .-- --- .-. .-.. -.. -.-.--" />
+
+    </com.ranjan.malav.morselight_flashlightwithmorsecode.utils.LabelledContainer>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/message_input"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_xs"
+        android:layout_marginEnd="@dimen/margin_xs"
+        android:layout_marginBottom="@dimen/margin_m"
+        android:hint="@string/type_your_message"
+        app:layout_constraintBottom_toTopOf="@id/buttons_container">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
+            android:maxLines="5"
+            android:minLines="3" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/buttons_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_xs"
+        android:layout_marginEnd="@dimen/margin_xs"
+        android:layout_marginBottom="@dimen/margin_xs"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/signal_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/signal"
+            app:backgroundTint="#FFAB40"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/start"
+            app:layout_constraintEnd_toStartOf="@id/sos_button"
+            app:layout_constraintStart_toEndOf="@id/signal_button"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/sos_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#D32F2F"
+            android:text="@string/sos"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

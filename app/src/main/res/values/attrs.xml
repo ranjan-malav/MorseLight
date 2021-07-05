@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="LabelledContainer">
+        <attr name="label" format="string" />
+        <attr name="labelColor" format="color|reference" />
+        <attr name="borderColor" format="color|reference" />
+        <attr name="labelBgColor" format="color|reference" />
+    </declare-styleable>
+    <declare-styleable name="AccountOption">
+        <attr name="title" format="string" />
+        <attr name="titleColor" format="color|reference" />
+        <attr name="icon" format="reference" />
+        <attr name="iconTint" format="color|reference" />
+        <attr name="iconBackgroundTint" format="enum">
+            <enum name="NORMAL" value="0" />
+            <enum name="DANGER" value="1" />
+            <enum name="MAYDAY" value="2" />
+        </attr>
+        <attr name="showNewTag" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="SyncStatusView">
+        <attr name="tableName" format="string" />
+    </declare-styleable>
+</resources>
