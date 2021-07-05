@@ -2,17 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_plan"
+        android:id="@+id/navigation_send"
         android:icon="@drawable/ic_send"
         android:title="@string/send" />
 
     <item
-        android:id="@+id/navigation_explore"
+        android:id="@+id/navigation_receive"
         android:icon="@drawable/ic_receive"
         android:title="@string/receive" />
 
     <item
-        android:id="@+id/navigation_food"
+        android:id="@+id/navigation_learn"
         android:icon="@drawable/ic_learn"
         android:title="@string/learn" />
 
