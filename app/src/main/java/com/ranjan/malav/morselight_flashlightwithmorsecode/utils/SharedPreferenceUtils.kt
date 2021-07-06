@@ -24,10 +24,10 @@ class SharedPreferenceUtils(val context: Context) {
             .getBoolean(key, defaultBool)
     }
 
-    fun setBool(key: String, value: Boolean) {
+    fun setInt(key: String, value: Int) {
         val editor: SharedPreferences.Editor =
             context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE).edit()
-        editor.putBoolean(key, value)
+        editor.putInt(key, value)
         editor.apply()
     }
 

@@ -39,9 +39,11 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
     private lateinit var cameraExecutor: ExecutorService
     private var cam: Camera? = null
     private var isFlashOn = false
+    private var transmissionSpeed: Int = 6
 
     companion object {
         private const val TAG = "SendFragment"
+        private const val SPEED = "speed"
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
@@ -51,6 +53,13 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
         (requireActivity() as AppCompatActivity).setSupportActionBar(send_toolbar)
         setHasOptionsMenu(true)
         cameraExecutor = Executors.newSingleThreadExecutor()
+        transmissionSpeed = sharedPref.getInt(SPEED, 6)
+        speed_slider.value = transmissionSpeed.toFloat()
+
+        speed_slider.addOnChangeListener { _, value, _ ->
+            transmissionSpeed = value.toInt()
+            sharedPref.setInt(SPEED, transmissionSpeed)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

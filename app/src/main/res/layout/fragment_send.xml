@@ -53,6 +53,7 @@
                 android:text="@string/slow" />
 
             <com.google.android.material.slider.Slider
+                android:id="@+id/speed_slider"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
