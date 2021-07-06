@@ -13,8 +13,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
-import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.LuminosityAnalyzer
-import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.SharedPreferenceUtils
+import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.*
 import kotlinx.android.synthetic.main.fragment_auto_decode.*
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
@@ -45,12 +44,10 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
 
         outputDirectory = getOutputDirectory()
 
-        if (allPermissionsGranted()) {
-            startCamera()
-        } else {
-            requestPermissions(
-                REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
-            )
+        checkForCameraPermission()
+
+        grant_permission_button.setOnClickListener {
+            startInstalledAppDetailsActivity(activity)
         }
     }
 
@@ -62,6 +59,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
             if (allPermissionsGranted()) {
                 startCamera()
             } else {
+                grant_permission_button.visible()
                 Toast.makeText(
                     context,
                     R.string.camera_permission_no_granted,
@@ -88,7 +86,30 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
         ContextCompat.checkSelfPermission(requireContext(), it) == PackageManager.PERMISSION_GRANTED
     }
 
+    private fun checkForCameraPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                startCamera()
+            }
+            shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) -> {
+                Toast.makeText(context, R.string.why_permission_required, Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                requestCameraPermission()
+            }
+        }
+    }
+
+    private fun requestCameraPermission() {
+        requestPermissions(
+            REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
+        )
+    }
+
     private fun startCamera() {
+        grant_permission_button.gone()
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
         cameraProviderFuture.addListener({

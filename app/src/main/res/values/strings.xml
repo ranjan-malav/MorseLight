@@ -26,4 +26,6 @@
     <string name="decoded_message">Decoded Message</string>
     <string name="camera_capture_hint">Keep incoming flashlight centered in the camera preview</string>
     <string name="camera_permission_no_granted">Permissions not granted by the user.</string>
+    <string name="grant_permission">Grant permission</string>
+    <string name="why_permission_required">Camera permission is required to use auto decoding feature.</string>
 </resources>
