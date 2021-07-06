@@ -92,6 +92,20 @@
         app:tint="?colorOnBackground" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/flash_manual_hint"
+        style="@style/TextBody2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_xs"
+        android:layout_marginBottom="@dimen/margin_s"
+        android:maxLines="5"
+        android:text="Tap &amp; hold icon to transmit manually"
+        app:layout_constraintBottom_toBottomOf="@id/flash_status_view"
+        app:layout_constraintEnd_toStartOf="@id/flash_status_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/flash_status_view" />
+
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/flash_status_text"
         style="@style/TextBody2"
         android:layout_width="wrap_content"

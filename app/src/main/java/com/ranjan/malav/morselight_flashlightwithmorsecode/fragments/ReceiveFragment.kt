@@ -23,7 +23,6 @@ class ReceiveFragment : Fragment(R.layout.fragment_receive), KoinComponent {
 
 
         receive_viewpager.adapter = DecodePagerAdapter(requireActivity())
-        receive_viewpager.offscreenPageLimit = 2
 
         TabLayoutMediator(tabs, receive_viewpager) { tab, position ->
             when (position) {
