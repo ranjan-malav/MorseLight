@@ -19,6 +19,8 @@
     <string name="contact_developer">Contact Developer</string>
     <string name="share">Share</string>
     <string name="off">Off</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
     <string name="press_hold">Press &amp; Hold</string>
     <string name="decode">Decode</string>
     <string name="reset">Reset</string>
@@ -28,4 +30,10 @@
     <string name="camera_permission_no_granted">Permissions not granted by the user.</string>
     <string name="grant_permission">Grant permission</string>
     <string name="why_permission_required">Camera permission is required to use auto decoding feature.</string>
+    <string name="why_permission_required_flash">Camera permission is required to use flashlight.</string>
+    <string name="manual_send_hint">Tap &amp; hold icon to transmit manually</string>
+    <string name="permdesc_flashlight">Required to turn flash on</string>
+    <string name="no_flash">Flash is not available on this phone</string>
+    <string name="open_settings_message">Grant camera permission in app settings. This is an open source software, we really don\'t use any of your existing photos/videos.</string>
+    <string name="open_settings_title">Camera permission required</string>
 </resources>

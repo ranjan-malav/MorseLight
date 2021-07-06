@@ -16,11 +16,9 @@
             style="@style/Widget.MaterialComponents.Toolbar.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:menu="@menu/main_menu"
-            app:title="MorseLight"
-            app:titleCentered="true">
-
-        </com.google.android.material.appbar.MaterialToolbar>
+            app:contentInsetStart="0dp"
+            app:title="@string/app_name"
+            app:titleCentered="true" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -99,7 +97,7 @@
         android:layout_marginStart="@dimen/margin_xs"
         android:layout_marginBottom="@dimen/margin_s"
         android:maxLines="5"
-        android:text="Tap &amp; hold icon to transmit manually"
+        android:text="@string/manual_send_hint"
         app:layout_constraintBottom_toBottomOf="@id/flash_status_view"
         app:layout_constraintEnd_toStartOf="@id/flash_status_view"
         app:layout_constraintStart_toStartOf="parent"
