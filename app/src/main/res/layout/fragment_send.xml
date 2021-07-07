@@ -60,8 +60,8 @@
                 android:layout_marginStart="@dimen/margin_m"
                 android:layout_marginEnd="@dimen/margin_m"
                 android:layout_weight="1"
-                android:stepSize="2.0"
-                android:valueFrom="0.0"
+                android:stepSize="1.0"
+                android:valueFrom="1.0"
                 android:valueTo="10.0" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -129,6 +129,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/current_char"
+            style="@style/TextBody2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_m"
@@ -168,6 +169,7 @@
         app:layout_constraintBottom_toTopOf="@id/message_input">
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/encoded_morse_code"
             style="@style/OnboardingTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
