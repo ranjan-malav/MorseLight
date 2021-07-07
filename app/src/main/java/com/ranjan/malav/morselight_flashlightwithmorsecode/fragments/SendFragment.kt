@@ -22,6 +22,7 @@ import kotlinx.android.synthetic.main.fragment_send.*
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -33,22 +34,30 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
     private lateinit var cameraExecutor: ExecutorService
     private var cam: Camera? = null
     private var isFlashOn = false
+    private var ignoreClicks = false
     private var transmissionSpeed: Int = 3
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val handler2 = Handler(Looper.getMainLooper())
-    private val handler3 = Handler(Looper.getMainLooper())
+    private val handler = Handler()
+    private val handler2 = Handler()
+    private val handler3 = Handler()
 
     private val offRunnable = Runnable {
-        switchFlashOff()
+        cam?.let { switchFlashOff(it) }
     }
 
     private val onRunnable = Runnable {
-        switchFlashOn()
+        cam?.let { switchFlashOn(it) }
     }
 
     private val cleanUpRunnable = Runnable {
-
+        ignoreClicks = false
+        cam?.let { switchFlashOff(it) }
+        start_stop_button.text = getString(R.string.start)
+        sos_button.isEnabled = true
+        signal_button.isEnabled = true
+        current_char.text = ""
+        current_char_morse.text = ""
+        activity?.invalidateOptionsMenu()
     }
 
     companion object {
@@ -68,36 +77,73 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
         transmissionSpeed = sharedPref.getInt(SPEED, 3)
         speed_slider.value = transmissionSpeed.toFloat()
 
+        // Start camera if we have the permission
+        if (allPermissionsGranted()) {
+            startCamera(false)
+        } else {
+            if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
+                requireContext().showSettingsOpenDialog()
+            } else {
+                requestPermissions(
+                    REQUIRED_PERMISSIONS, REQ_CODE_WO_IMMEDIATE_ACTION
+                )
+            }
+        }
+
         speed_slider.addOnChangeListener { _, value, _ ->
             removeHandlerCallbacks()
             transmissionSpeed = value.toInt()
             sharedPref.setInt(SPEED, transmissionSpeed)
+            ignoreClicks = false
         }
 
         flash_status_view.setOnTouchListener { _, event ->
+            if (ignoreClicks) return@setOnTouchListener false
             removeHandlerCallbacks()
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                switchFlashOn()
-            }
-            if (event.action == MotionEvent.ACTION_UP) {
-                switchFlashOff()
+            cam?.let {
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    switchFlashOn(it)
+                }
+                if (event.action == MotionEvent.ACTION_UP) {
+                    switchFlashOff(it)
+                }
             }
             return@setOnTouchListener true
         }
 
         sos_button.setOnClickListener {
+            if (ignoreClicks) return@setOnClickListener
             removeHandlerCallbacks()
             val charMessage = arrayListOf('S', 'O', 'S')
-            if (allPermissionsGranted()) {
-                playWithFlash(charMessage, transmissionSpeed, "SOS", true)
+            playWithFlash(charMessage, transmissionSpeed, "SOS", true)
+        }
+
+        signal_button.setOnClickListener {
+            if (ignoreClicks) return@setOnClickListener
+            removeHandlerCallbacks()
+            val charMessage = arrayListOf('E', 'E', 'E')
+            playWithFlash(charMessage, 3, "EEE", false)
+        }
+
+        start_stop_button.setOnClickListener {
+            if (ignoreClicks) {
+                removeHandlerCallbacks()
+                cleanUpRunnable.run()
             } else {
-                if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                    requireContext().showSettingsOpenDialog()
-                } else {
-                    requestPermissions(
-                        REQUIRED_PERMISSIONS, REQ_CODE_WO_IMMEDIATE_ACTION
-                    )
+                val charMessage = message_input.editText?.text.toString().trim()
+                if (charMessage.isNullOrBlank()) {
+                    Toast.makeText(
+                        requireContext(), R.string.no_message_to_transmit, Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
                 }
+                val charArray = arrayListOf<Char>()
+                charMessage.toCharArray().forEach {
+                    charArray.add(it)
+                }
+                playWithFlash(
+                    charArray, transmissionSpeed, charMessage, true
+                )
             }
         }
     }
@@ -130,48 +176,48 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
         ContextCompat.checkSelfPermission(requireContext(), it) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun switchFlashOn() {
-        if (requireContext().doesHaveCameraPermission()) {
-            if (cam == null) {
-                startCamera(true)
-            } else {
-                if (cam!!.cameraInfo.hasFlashUnit()) {
-                    Log.d(TAG, "Switch flash on")
-                    cam!!.cameraControl.enableTorch(true)
-                    isFlashOn = true
-                    setTorchOnImageView()
-                }
-            }
-        } else {
-            // See if we can show rationale message
-            if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                requireContext().showSettingsOpenDialog()
-            } else {
-                requestPermissions(
-                    REQUIRED_PERMISSIONS, REQ_CODE_W_IMMEDIATE_ACTION
-                )
-            }
+    // Do not call this before checking permissions and getting camera initiated
+    // We don't wanna perform those operations here because it messes up the timings then.
+    private fun switchFlashOn(cam: Camera) {
+        if (cam.cameraInfo.hasFlashUnit()) {
+             Log.d(TAG, "Switch flash on")
+            cam.cameraControl.enableTorch(true)
+            isFlashOn = true
+            setTorchOnImageView()
         }
     }
 
-    private fun switchFlashOff() {
-        cam?.let {
-            if (it.cameraInfo.hasFlashUnit()) {
-                Log.d(TAG, "Switch flash off")
-                it.cameraControl.enableTorch(false)
-                isFlashOn = false
-                setTorchOffImageView()
-            }
+    private fun switchFlashOff(cam: Camera) {
+        if (cam.cameraInfo.hasFlashUnit()) {
+             Log.d(TAG, "Switch flash off")
+            cam.cameraControl.enableTorch(false)
+            isFlashOn = false
+            setTorchOffImageView()
         }
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        val item = menu.findItem(R.id.action_flash)
+        if (ignoreClicks) {
+            item.isEnabled = false
+            item.icon.alpha = 130
+        } else {
+            item.isEnabled = true
+            item.icon.alpha = 255
+        }
+        super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_flash -> {
-                if (isFlashOn) {
-                    switchFlashOff()
-                } else {
-                    switchFlashOn()
+                if (ignoreClicks) return false
+                cam?.let {
+                    if (isFlashOn) {
+                        switchFlashOff(it)
+                    } else {
+                        switchFlashOn(it)
+                    }
                 }
                 return true
             }
@@ -204,7 +250,7 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
                 cam = cameraProvider.bindToLifecycle(this, cameraSelector, imageAnalyzer)
                 if (immediatelySwitchTorch && cam!!.cameraInfo.hasFlashUnit()) {
                     isFlashOn = true
-                    Log.d(TAG, "Switch flash on")
+                    // Log.d(TAG, "Switch flash on")
                     cam!!.cameraControl.enableTorch(true)
                     setTorchOnImageView()
                 }
@@ -243,14 +289,24 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
             handler2.removeCallbacksAndMessages(
                 null
             )
+            handler3.removeCallbacksAndMessages(
+                null
+            )
         } catch (npe: NullPointerException) {
-            Log.d(TAG, npe.localizedMessage)
+            Log.d(TAG, "Error: ${npe.localizedMessage}")
         }
     }
 
     private fun playWithFlash(
         charMessage: ArrayList<Char>, speed: Int, message: String, shouldUpdateCurrentChar: Boolean
     ) {
+        // Setup, remove click listeners
+        ignoreClicks = true
+        start_stop_button.text = getString(R.string.stop)
+        sos_button.isEnabled = false
+        signal_button.isEnabled = false
+        activity?.invalidateOptionsMenu()
+
         // Speed can be from 1 to 10, 3 means 1 unit = 3/3 sec, 10 means 1 unit = 3/10 sec
         // 1 means 1 unit = 3/1 sec. Default speed is 3 which means 1 sec = 1 unit.
         val transmissionSpeed: Float = 3f / speed
@@ -275,17 +331,19 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
         for (i in timeUnits.indices) {
             val unit = timeUnits[i].toString().toInt()
             if (!isFlashOn) {
+                Log.d(TAG, "Delay on: ${(delay * 1000 * transmissionSpeed).toLong()}")
+                isFlashOn = true
                 handler.postDelayed(
                     onRunnable,
                     (delay * 1000 * transmissionSpeed).toLong()
                 )
-                isFlashOn = true
             } else {
+                isFlashOn = false
+                Log.d(TAG, "Delay off: ${(delay * 1000 * transmissionSpeed).toLong()}")
                 handler2.postDelayed(
                     offRunnable,
                     (delay * 1000 * transmissionSpeed).toLong()
                 )
-                isFlashOn = false
             }
             delay += unit
         }

@@ -37,4 +37,6 @@
     <string name="open_settings_message">Grant camera permission in app settings. This is an open source software, we really don\'t use any of your existing photos/videos.</string>
     <string name="open_settings_title">Camera permission required</string>
     <string name="on">On</string>
+    <string name="stop">Stop</string>
+    <string name="no_message_to_transmit">Please enter a message first.</string>
 </resources>
