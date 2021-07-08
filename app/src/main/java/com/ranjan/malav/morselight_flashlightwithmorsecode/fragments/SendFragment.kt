@@ -28,21 +28,12 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
     private var isFlashOn = false
     private var ignoreClicks = false
     private var transmissionSpeed: Int = 3
-    private var callback: Callback? = null
+    private var callback: FragmentCallbacks? = null
     private val viewModel: MainViewModel by activityViewModels()
 
     companion object {
         private const val TAG = "SendFragment"
         private const val SPEED = "speed"
-    }
-
-    interface Callback {
-        fun switchTorch(torchOn: Boolean)
-        fun removeHandlers()
-        fun playWithFlash(
-            onOffDelays: ArrayList<Long>, charUnits: ArrayList<Int>, characters: ArrayList<Char>,
-            speed: Int, shouldSetCharChangeHandler: Boolean, finalOffDelay: Long
-        )
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -124,7 +115,7 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         try {
-            callback = context as Callback
+            callback = context as FragmentCallbacks
         } catch (castException: ClassCastException) {
             throw ClassCastException("Context does not implement $TAG callback")
         }

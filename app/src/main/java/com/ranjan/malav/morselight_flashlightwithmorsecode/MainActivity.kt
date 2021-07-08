@@ -16,11 +16,12 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.ranjan.malav.morselight_flashlightwithmorsecode.fragments.SendFragment
+import com.ranjan.malav.morselight_flashlightwithmorsecode.fragments.FragmentCallbacks
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.LuminosityAnalyzer
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.showSettingsOpenDialog
 import kotlinx.android.synthetic.main.activity_main.*
@@ -31,9 +32,13 @@ import java.util.concurrent.Executors
 
 
 @KoinApiExtension
-class MainActivity : AppCompatActivity(R.layout.activity_main), SendFragment.Callback {
+class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallbacks {
 
     private lateinit var cameraExecutor: ExecutorService
+    private lateinit var controller: NavController
+    private var navListener = NavController.OnDestinationChangedListener { _, _, _ ->
+        removeHandlers()
+    }
     private var cam: Camera? = null
     private var isFlashOn = false
     private var ignoreClicks = false
@@ -71,13 +76,13 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), SendFragment.Cal
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
+        controller = navHostFragment.navController
         AppBarConfiguration(
             setOf(
                 R.id.navigation_send, R.id.navigation_receive, R.id.navigation_learn,
             )
         )
-        navView.setupWithNavController(navController)
+        navView.setupWithNavController(controller)
 
         setSupportActionBar(toolbar)
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -98,6 +103,16 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), SendFragment.Cal
         } else {
             startCamera(false)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        controller.addOnDestinationChangedListener(navListener)
+    }
+
+    override fun onPause() {
+        controller.removeOnDestinationChangedListener(navListener)
+        super.onPause()
     }
 
     override fun onRequestPermissionsResult(
@@ -282,7 +297,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), SendFragment.Cal
         }
     }
 
-    @KoinApiExtension
     override fun switchTorch(torchOn: Boolean) {
         if (torchOn) {
             cam?.let { switchFlashOn(it) }
@@ -295,5 +309,4 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), SendFragment.Cal
         removeHandlerCallbacks()
         cleanUpRunnable.run()
     }
-
 }

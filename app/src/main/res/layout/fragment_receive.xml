@@ -4,29 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/send_toolbar"
-            style="@style/Widget.MaterialComponents.Toolbar.Primary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:title="MorseLight"
-            app:titleCentered="true">
-
-        </com.google.android.material.appbar.MaterialToolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
