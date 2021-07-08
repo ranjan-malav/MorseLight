@@ -1,25 +1,17 @@
 package com.ranjan.malav.morselight_flashlightwithmorsecode.fragments
 
-import android.Manifest
-import android.content.pm.PackageManager
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.Toast
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import com.ranjan.malav.morselight_flashlightwithmorsecode.MainViewModel
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.*
 import kotlinx.android.synthetic.main.fragment_auto_decode.*
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 typealias LumaListener = (luma: Double) -> Unit
 
@@ -27,92 +19,107 @@ typealias LumaListener = (luma: Double) -> Unit
 class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponent {
 
     private val sharedPref: SharedPreferenceUtils by inject()
-    private lateinit var cameraExecutor: ExecutorService
+    private var isFlashOn = false
+    private var ignoreClicks = false
+    private var transmissionSpeed: Int = 3
+    private var callback: FragmentCallbacks? = null
+    private val viewModel: MainViewModel by activityViewModels()
 
     companion object {
-        private const val TAG = "AutoDecodeFragment"
-        private const val REQUEST_CODE_PERMISSIONS = 10
-        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+        private const val TAG = "AutoDecode"
+        private const val SPEED = "speed"
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        cameraExecutor = Executors.newSingleThreadExecutor()
+        transmissionSpeed = sharedPref.getInt(SPEED, 3)
 
-        checkForCameraPermission(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS, ::startCamera)
-
-        grant_permission_button.setOnClickListener {
-            startInstalledAppDetailsActivity(activity)
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults:
-        IntArray
-    ) {
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) {
-                startCamera()
+        start_stop_button.setOnClickListener {
+            if (ignoreClicks) {
+                runCleanUp()
+                callback?.removeHandlers()
             } else {
-                grant_permission_button.visible()
-                Toast.makeText(
-                    context,
-                    R.string.camera_permission_no_granted,
-                    Toast.LENGTH_SHORT
-                ).show()
+
             }
+        }
+
+        signal_button.setOnClickListener {
+            if (ignoreClicks) return@setOnClickListener
+            val charMessage = arrayListOf('E', 'E', 'E')
+            playWithFlash(charMessage, 20)
+        }
+
+        sos_button.setOnClickListener {
+            if (ignoreClicks) {
+                runCleanUp()
+                callback?.removeHandlers()
+            } else {
+                val charMessage = arrayListOf('S', 'O', 'S')
+                playWithFlash(charMessage, transmissionSpeed)
+            }
+        }
+
+        viewModel.cleanRunFlag.observe(viewLifecycleOwner, {
+            runCleanUp()
+        })
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            callback = context as FragmentCallbacks
+        } catch (castException: ClassCastException) {
+            throw ClassCastException("Context does not implement $TAG callback")
         }
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        cameraExecutor.shutdown()
+    private fun runCleanUp() {
+        ignoreClicks = false
+        sos_button.text = getString(R.string.sos)
+        start_stop_button.text = getString(R.string.start)
+        signal_button.isEnabled = true
     }
 
-    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(requireContext(), it) == PackageManager.PERMISSION_GRANTED
-    }
+    private fun playWithFlash(charMessage: ArrayList<Char>, speed: Int) {
+        // Setup, remove click listeners
+        ignoreClicks = true
+        sos_button.text = getString(R.string.stop)
+        start_stop_button.text = getString(R.string.stop)
+        signal_button.isEnabled = false
 
-    private fun startCamera() {
-        grant_permission_button.gone()
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-
-        cameraProviderFuture.addListener({
-            // Used to bind the lifecycle of cameras to the lifecycle owner
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-            // Preview
-            val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(camera_preview.surfaceProvider)
-                }
-
-            val imageAnalyzer = ImageAnalysis.Builder()
-                .build()
-                .also {
-                    it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
-                        Log.d(TAG, "Average luminosity: $luma")
-                    })
-                }
-
-            // Select back camera as a default
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-            try {
-                // Unbind use cases before rebinding
-                cameraProvider.unbindAll()
-
-                // Bind use cases to camera
-                cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageAnalyzer
-                )
-
-            } catch (exc: Exception) {
-                Log.e(TAG, "Use case binding failed", exc)
+        // Speed can be from 1 to 10, 3 means 1 unit = 3/3 sec, 10 means 1 unit = 3/10 sec
+        // 1 means 1 unit = 3/1 sec. Default speed is 3 which means 1 sec = 1 unit.
+        val transmissionSpeed: Float = 3f / speed
+        val timeUnits = StringBuilder()
+        val morseCode = StringBuilder()
+        val charUnits = arrayListOf<Int>()
+        val characters = arrayListOf<Char>()
+        // Add character morse timings to string builder
+        for (char in charMessage) {
+            timeUnits.append(charToUnits[char])
+            morseCode.append(charToMorse[char])
+            if (charUnits.isNotEmpty()) {
+                charUnits.add(charToTotalUnits[char]!! + 3)
+            } else {
+                charUnits.add(charToTotalUnits[char]!!)
             }
+        }
+        // Remove last character because we have added 3 units for space after every character
+        timeUnits.replace(timeUnits.length - 1, timeUnits.length, "")
 
-        }, ContextCompat.getMainExecutor(requireContext()))
+        var delay = 0L
+        val onOffDelays = arrayListOf<Long>()
+        for (i in timeUnits.indices) {
+            onOffDelays.add((delay * 1000 * transmissionSpeed).toLong())
+            val unit = timeUnits[i].toString().toInt()
+            delay += unit
+        }
+
+        isFlashOn = false
+        callback?.playWithFlash(
+            onOffDelays, charUnits, characters, speed,
+            false, (delay * 1000 * transmissionSpeed).toLong()
+        )
     }
 }

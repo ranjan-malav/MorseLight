@@ -131,6 +131,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/tap_and_hold_button"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:backgroundTint="@color/colorAccent"

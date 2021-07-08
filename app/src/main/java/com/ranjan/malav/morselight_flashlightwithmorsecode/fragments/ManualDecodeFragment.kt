@@ -32,7 +32,7 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
     private val viewModel: MainViewModel by activityViewModels()
 
     companion object {
-        private const val TAG = "SendFragment"
+        private const val TAG = "ManualDecode"
         private const val SPEED = "speed"
     }
 
@@ -40,6 +40,15 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
         super.onViewCreated(view, savedInstanceState)
 
         transmissionSpeed = sharedPref.getInt(SPEED, 3)
+
+        tap_and_hold_button.setOnClickListener {
+            if (ignoreClicks) {
+                runCleanUp()
+                callback?.removeHandlers()
+            } else {
+
+            }
+        }
 
         signal_button.setOnClickListener {
             if (ignoreClicks) return@setOnClickListener
@@ -102,6 +111,7 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
     private fun runCleanUp() {
         ignoreClicks = false
         sos_button.text = getString(R.string.sos)
+        tap_and_hold_button.text = getString(R.string.press_hold)
         signal_button.isEnabled = true
     }
 
@@ -109,6 +119,7 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
         // Setup, remove click listeners
         ignoreClicks = true
         sos_button.text = getString(R.string.stop)
+        tap_and_hold_button.text = getString(R.string.stop)
         signal_button.isEnabled = false
 
         // Speed can be from 1 to 10, 3 means 1 unit = 3/3 sec, 10 means 1 unit = 3/10 sec
