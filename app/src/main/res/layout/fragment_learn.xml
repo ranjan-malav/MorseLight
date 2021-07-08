@@ -4,31 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/send_toolbar"
-            style="@style/Widget.MaterialComponents.Toolbar.Primary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:title="MorseLight"
-            app:titleCentered="true">
-
-        </com.google.android.material.appbar.MaterialToolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
     <com.ranjan.malav.morselight_flashlightwithmorsecode.utils.AccountOptionView
         android:id="@+id/learn_about"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_m"
         app:icon="@drawable/ic_outline_info_24"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintTop_toTopOf="parent"
         app:title="@string/about_morse_code" />
 
     <com.ranjan.malav.morselight_flashlightwithmorsecode.utils.AccountOptionView
@@ -66,6 +48,15 @@
         app:icon="@drawable/ic_baseline_share_24"
         app:layout_constraintTop_toBottomOf="@id/learn_contact"
         app:title="@string/share" />
+
+    <com.ranjan.malav.morselight_flashlightwithmorsecode.utils.AccountOptionView
+        android:id="@+id/learn_source"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_xs"
+        app:icon="@drawable/ic_outline_source_24"
+        app:layout_constraintTop_toBottomOf="@id/learn_contact"
+        app:title="@string/source_code" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/learn_donate"

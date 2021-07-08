@@ -2,12 +2,14 @@ package com.ranjan.malav.morselight_flashlightwithmorsecode.utils
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import android.view.View
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
@@ -202,3 +204,47 @@ var charToMorse = hashMapOf(
     '9' to "----. ",
     ' ' to "/ ",
 )
+
+fun Context.shareApp(): Intent {
+    val shareIntent = Intent(Intent.ACTION_SEND)
+    shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+    shareIntent.type = "text/plain"
+    shareIntent.putExtra(
+        Intent.EXTRA_TEXT,
+        "Hey! Check out this awesome app!!" +
+                "https://play.google.com/store/apps/details?id=" + applicationContext.packageName
+    )
+    return shareIntent
+}
+
+fun Context.rateApp() {
+    val uri = Uri.parse("market://details?id=" + applicationContext.packageName)
+    val goToMarket = Intent(Intent.ACTION_VIEW, uri)
+    goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+    try {
+        startActivity(goToMarket)
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(this, getString(R.string.no_play_store), Toast.LENGTH_LONG).show()
+    }
+}
+
+fun Context.contactMail() {
+    val i = Intent(Intent.ACTION_SENDTO)
+    i.type = "message/rfc822"
+    i.data = Uri.parse("mailto:ranjan2192@gmail.com")
+    val mailer = Intent.createChooser(i, getString(R.string.send_mail))
+    try {
+        startActivity(mailer)
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(this, getString(R.string.no_email_app), Toast.LENGTH_LONG).show()
+    }
+}
+
+fun Context.launchWeb(uri: Uri) {
+    try {
+        val browserIntent = Intent(Intent.ACTION_VIEW, uri)
+        startActivity(browserIntent)
+    } catch (ex: ActivityNotFoundException) {
+        Toast.makeText(this, R.string.no_browser_app, Toast.LENGTH_SHORT).show()
+    }
+}

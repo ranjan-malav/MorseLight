@@ -39,4 +39,10 @@
     <string name="on">On</string>
     <string name="stop">Stop</string>
     <string name="no_message_to_transmit">Please enter a message first.</string>
+    <string name="source_code">Source code</string>
+    <string name="morse_code_info_hint">Detailed information about morse code can be found here - \nhttps://en.wikipedia.org/wiki/Morse_code</string>
+    <string name="no_play_store">Play Store app is not installed.</string>
+    <string name="no_email_app">Email app is not installed.</string>
+    <string name="no_browser_app">Browser app is not installed.</string>
+    <string name="send_mail">Send mail..</string>
 </resources>
