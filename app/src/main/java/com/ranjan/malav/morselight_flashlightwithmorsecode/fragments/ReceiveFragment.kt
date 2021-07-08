@@ -6,17 +6,10 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayoutMediator
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecodePagerAdapter
-import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.SharedPreferenceUtils
 import kotlinx.android.synthetic.main.fragment_receive.*
-import org.koin.core.component.KoinApiExtension
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 
-@OptIn(KoinApiExtension::class)
-class ReceiveFragment : Fragment(R.layout.fragment_receive), KoinComponent {
-
-    private val sharedPref: SharedPreferenceUtils by inject()
+class ReceiveFragment : Fragment(R.layout.fragment_receive) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
