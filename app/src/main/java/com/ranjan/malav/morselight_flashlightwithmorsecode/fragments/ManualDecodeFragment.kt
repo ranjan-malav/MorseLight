@@ -182,6 +182,9 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
                 }
             }
         }
+        if (timings.size == 1) {
+            decoded_message.text = ""
+        }
         incoming_message.text = sb.toString().trim()
     }
 
