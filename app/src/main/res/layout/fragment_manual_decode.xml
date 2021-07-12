@@ -63,13 +63,15 @@
         android:layout_marginBottom="@dimen/margin_xs"
         android:background="@drawable/border_gray_4dp"
         android:ellipsize="marquee"
+        android:gravity="bottom"
         android:maxLines="3"
         android:minLines="3"
         android:padding="@dimen/padding_xs"
+        android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@id/decode_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text="0.5s    3s     0.78s     2.4s" />
+        tools:text="0.5s    3s     0.78s     2.4s 0.5s    3s     0.78s     2.4s 0.5s    3s     0.78s     2.4s 0.5s    3s     0.78s     2.4s 0.5s    3s     0.78s     2.4s 0.5s    3s     0.78s     2.4s 0.5s    3s     0.78s     2.4s 0.5s    3s     0.78s     2.4s" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/decode_title"
