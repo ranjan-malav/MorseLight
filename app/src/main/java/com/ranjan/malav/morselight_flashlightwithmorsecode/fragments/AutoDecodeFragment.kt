@@ -2,6 +2,7 @@ package com.ranjan.malav.morselight_flashlightwithmorsecode.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -12,11 +13,13 @@ import kotlinx.android.synthetic.main.fragment_auto_decode.*
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.*
 
 typealias LumaListener = (luma: Double) -> Unit
 
 @KoinApiExtension
-class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponent {
+class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponent,
+    ImageAnalysisListener {
 
     private val sharedPref: SharedPreferenceUtils by inject()
     private var isFlashOn = false
@@ -63,6 +66,8 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
         viewModel.cleanRunFlag.observe(viewLifecycleOwner, {
             runCleanUp()
         })
+
+        callback?.bindPreview(camera_preview, this)
     }
 
     override fun onAttach(context: Context) {
@@ -121,5 +126,9 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
             onOffDelays, charUnits, characters, speed,
             false, (delay * 1000 * transmissionSpeed).toLong()
         )
+    }
+
+    override fun listenLuminosity(luminosity: Double) {
+        Log.d(TAG, "Average luminosity: $luminosity")
     }
 }

@@ -14,7 +14,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -22,6 +24,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ranjan.malav.morselight_flashlightwithmorsecode.fragments.FragmentCallbacks
+import com.ranjan.malav.morselight_flashlightwithmorsecode.fragments.ImageAnalysisListener
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.LuminosityAnalyzer
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.showSettingsOpenDialog
 import kotlinx.android.synthetic.main.activity_main.*
@@ -36,6 +39,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
 
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var controller: NavController
+    private var preview: Preview? = null
+    private var imageAnalyzer: ImageAnalysis? = null
+    private var imageAnalysisListener: ImageAnalysisListener? = null
     private var navListener = NavController.OnDestinationChangedListener { _, _, _ ->
         removeHandlers()
     }
@@ -208,15 +214,19 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
                 // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
 
+                preview = Preview.Builder().build()
+
                 // Bind use cases to camera
-                val imageAnalyzer = ImageAnalysis.Builder()
+                imageAnalyzer = ImageAnalysis.Builder()
                     .build()
                     .also {
-                        it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
-                            // Log.d(TAG, "Average luminosity: $luma")
+                        it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luminosity ->
+                            imageAnalysisListener?.listenLuminosity(luminosity)
                         })
                     }
-                cam = cameraProvider.bindToLifecycle(this, cameraSelector, imageAnalyzer)
+                cam = cameraProvider.bindToLifecycle(
+                    this, cameraSelector, preview, imageAnalyzer
+                )
                 if (immediatelySwitchTorch && cam!!.cameraInfo.hasFlashUnit()) {
                     switchFlashOn(cam!!)
                 }
@@ -289,6 +299,14 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
                 charDelay += unit
             }
         }
+    }
+
+    override fun bindPreview(
+        cameraPreview: PreviewView,
+        imageAnalysisListener: ImageAnalysisListener
+    ) {
+        preview?.setSurfaceProvider(cameraPreview.surfaceProvider)
+        this.imageAnalysisListener = imageAnalysisListener
     }
 
     inner class CharSetRunnable(private val char: Char) : Runnable {

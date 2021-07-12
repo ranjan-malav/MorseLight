@@ -36,6 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_xs"
             android:text="@string/grant_permission"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/camera_preview"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
