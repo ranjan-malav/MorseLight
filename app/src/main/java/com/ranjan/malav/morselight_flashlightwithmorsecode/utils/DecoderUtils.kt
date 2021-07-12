@@ -31,15 +31,42 @@ object DecoderUtils {
         val smallerUnits = arrayListOf<Long>()
         val biggerUnits = arrayListOf<Long>()
         var switchToBiggerUnits = false
+        var movingAverage = 0L
+        var addedCount = 0
         timings.forEachIndexed { index, timing ->
-            if (switchToBiggerUnits) {
-                biggerUnits.add(timing)
+            movingAverage = if (movingAverage > 0) {
+                (movingAverage * addedCount + timing) / (addedCount + 1)
             } else {
-                smallerUnits.add(timing)
+                timing
             }
+            addedCount++
             try {
-                if (percentageDiffs[index] > 100 && !switchToBiggerUnits) {
-                    switchToBiggerUnits = true
+                // Compare it with moving average
+                val diffFromMovingAvg: Float = if (movingAverage == 0L) {
+                    0F
+                } else {
+                    (timing - movingAverage).toFloat() / movingAverage * 100
+                }
+                Log.d("ManualDecode", "Diff from moving Avg: $diffFromMovingAvg")
+                when {
+                    switchToBiggerUnits -> {
+                        biggerUnits.add(timing)
+                    }
+                    diffFromMovingAvg > 50 -> {
+                        switchToBiggerUnits = true
+                        biggerUnits.add(timing)
+                        movingAverage = 0L
+                        addedCount = 0
+                    }
+                    else -> {
+                        movingAverage = if (movingAverage > 0) {
+                            (movingAverage * addedCount + timing) / (addedCount + 1)
+                        } else {
+                            timing
+                        }
+                        addedCount++
+                        smallerUnits.add(timing)
+                    }
                 }
             } catch (ex: IndexOutOfBoundsException) {
 
@@ -71,25 +98,45 @@ object DecoderUtils {
         val biggerUnits = arrayListOf<Long>()
         var switchToMediumUnits = false
         var switchToBiggerUnits = false
+        var movingAverage = 0L
+        var addedCount = 0
         timings.forEachIndexed { index, timing ->
-            when {
-                switchToBiggerUnits -> {
-                    biggerUnits.add(timing)
-                }
-                switchToMediumUnits -> {
-                    mediumUnits.add(timing)
-                }
-                else -> {
-                    smallerUnits.add(timing)
-                }
-            }
             try {
-                if (percentageDiffs[index] > 100 && !switchToMediumUnits) {
-                    switchToMediumUnits = true
-                } else if (switchToMediumUnits &&
-                    percentageDiffs[index] > 100 && !switchToBiggerUnits
-                ) {
+                // Compare it with moving average
+                val diffFromMovingAvg: Float = if (movingAverage == 0L) {
+                    0F
+                } else {
+                    (timing - movingAverage).toFloat() / movingAverage * 100
+                }
+                Log.d("ManualDecode", "Diff from moving Avg: $diffFromMovingAvg")
+                if (switchToBiggerUnits) {
+                    biggerUnits.add(timing)
+                } else if (switchToMediumUnits && diffFromMovingAvg > 50) {
                     switchToBiggerUnits = true
+                    biggerUnits.add(timing)
+                    movingAverage = 0L
+                    addedCount = 0
+                } else if (switchToMediumUnits) {
+                    movingAverage = if (movingAverage > 0) {
+                        (movingAverage * addedCount + timing) / (addedCount + 1)
+                    } else {
+                        timing
+                    }
+                    addedCount++
+                    mediumUnits.add(timing)
+                } else if (diffFromMovingAvg > 50) {
+                    switchToMediumUnits = true
+                    mediumUnits.add(timing)
+                    movingAverage = 0L
+                    addedCount = 0
+                } else {
+                    movingAverage = if (movingAverage > 0) {
+                        (movingAverage * addedCount + timing) / (addedCount + 1)
+                    } else {
+                        timing
+                    }
+                    addedCount++
+                    smallerUnits.add(timing)
                 }
             } catch (ex: IndexOutOfBoundsException) {
 

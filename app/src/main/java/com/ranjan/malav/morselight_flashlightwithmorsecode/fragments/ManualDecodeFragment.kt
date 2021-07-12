@@ -136,7 +136,7 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
                             message.append(" ")
                         }
                         bigOffTimings!!.contains(diff) -> {
-                            message.append("/")
+                            message.append(" / ")
                         }
                     }
                 }
