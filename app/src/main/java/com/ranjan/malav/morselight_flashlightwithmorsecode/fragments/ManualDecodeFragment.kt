@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
-import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
@@ -15,10 +14,8 @@ import androidx.fragment.app.activityViewModels
 import com.ranjan.malav.morselight_flashlightwithmorsecode.MainViewModel
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.*
-import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecoderUtils.BIG_UNITS
-import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecoderUtils.MEDIUM_UNITS
-import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecoderUtils.SMALL_UNITS
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecoderUtils.decryptMorse
+import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecoderUtils.findMorseFromTimings
 import kotlinx.android.synthetic.main.fragment_manual_decode.*
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
@@ -93,57 +90,10 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
         }
 
         decode_button.setOnClickListener {
-            if (timings.isNotEmpty()) {
-                val onTimings = arrayListOf<Long>()
-                val offTimings = arrayListOf<Long>()
-                for (i in diffTimings.indices) {
-                    if (i % 2 == 0) {
-                        onTimings.add(diffTimings[i])
-                    } else {
-                        offTimings.add(diffTimings[i])
-                    }
-                }
-                val onTimingsString = StringBuilder()
-                onTimings.forEach {
-                    onTimingsString.append(it).append(" * ")
-                }
-                Log.d(TAG, "On timing Diffs: $onTimingsString")
-                val onDecodedMap = DecoderUtils.findNaturalBreakOnTimings(onTimings)
-                val smallOnTimings = onDecodedMap[SMALL_UNITS]
-                val bigOnTimings = onDecodedMap[BIG_UNITS]
-
-                val offTimingsString = StringBuilder()
-                offTimings.forEach {
-                    offTimingsString.append(it).append(" * ")
-                }
-                Log.d(TAG, "Off timing Diffs: $offTimingsString")
-                val offDecodedMap = DecoderUtils.findNaturalBreakOffTimings(offTimings)
-                val mediumOffTimings = offDecodedMap[MEDIUM_UNITS]
-                val bigOffTimings = offDecodedMap[BIG_UNITS]
-
-                val message = StringBuilder()
-                timings.forEachIndexed { index, _ ->
-                    if (index == 0) return@forEachIndexed
-                    val diff = timings[index] - timings[index - 1]
-                    when {
-                        smallOnTimings!!.contains(diff) -> {
-                            message.append(".")
-                        }
-                        bigOnTimings!!.contains(diff) -> {
-                            message.append("-")
-                        }
-                        mediumOffTimings!!.contains(diff) -> {
-                            message.append(" ")
-                        }
-                        bigOffTimings!!.contains(diff) -> {
-                            message.append(" / ")
-                        }
-                    }
-                }
-                incoming_message.text = message.toString()
-                decoded_message.text = decryptMorse(message.toString())
-                timings.clear()
-                diffTimings.clear()
+            val morseMessage = findMorseFromTimings(timings, diffTimings)
+            if (morseMessage.isNotBlank()) {
+                incoming_message.text = morseMessage
+                decoded_message.text = decryptMorse(morseMessage)
             }
         }
 

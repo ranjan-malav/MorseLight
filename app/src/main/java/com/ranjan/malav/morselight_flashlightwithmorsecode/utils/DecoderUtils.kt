@@ -1,19 +1,20 @@
 package com.ranjan.malav.morselight_flashlightwithmorsecode.utils
 
 import android.util.Log
+import kotlinx.android.synthetic.main.fragment_manual_decode.*
 
 
 object DecoderUtils {
-    const val SMALL_UNITS = "small_units"
-    const val MEDIUM_UNITS = "medium_units"
-    const val BIG_UNITS = "big_units"
+    private const val SMALL_UNITS = "small_units"
+    private const val MEDIUM_UNITS = "medium_units"
+    private const val BIG_UNITS = "big_units"
 
     /*
         Divide the differences by the smaller of the numbers it's a difference between to
         get a percentage change. Set a threshold and when the change exceeds that threshold,
         start a new "cluster".
      */
-    fun findNaturalBreakOnTimings(timings: ArrayList<Long>): HashMap<String, ArrayList<Long>> {
+    private fun findNaturalBreakOnTimings(timings: ArrayList<Long>): HashMap<String, ArrayList<Long>> {
         timings.sort()
         val percentageDiffs = arrayListOf<Float>()
         timings.forEachIndexed { index, timing ->
@@ -33,7 +34,7 @@ object DecoderUtils {
         var switchToBiggerUnits = false
         var movingAverage = 0L
         var addedCount = 0
-        timings.forEachIndexed { index, timing ->
+        timings.forEachIndexed { _, timing ->
             movingAverage = if (movingAverage > 0) {
                 (movingAverage * addedCount + timing) / (addedCount + 1)
             } else {
@@ -78,7 +79,7 @@ object DecoderUtils {
         )
     }
 
-    fun findNaturalBreakOffTimings(timings: ArrayList<Long>): HashMap<String, ArrayList<Long>> {
+    private fun findNaturalBreakOffTimings(timings: ArrayList<Long>): HashMap<String, ArrayList<Long>> {
         timings.sort()
         val percentageDiffs = arrayListOf<Float>()
         timings.forEachIndexed { index, timing ->
@@ -100,7 +101,7 @@ object DecoderUtils {
         var switchToBiggerUnits = false
         var movingAverage = 0L
         var addedCount = 0
-        timings.forEachIndexed { index, timing ->
+        timings.forEachIndexed { _, timing ->
             try {
                 // Compare it with moving average
                 val diffFromMovingAvg: Float = if (movingAverage == 0L) {
@@ -161,6 +162,61 @@ object DecoderUtils {
             }
         }
         return show.toString()
+    }
+
+    fun findMorseFromTimings(
+        timings: ArrayList<Long>, diffTimings: ArrayList<Long>
+    ): String {
+        if (timings.isNotEmpty()) {
+            val onTimings = arrayListOf<Long>()
+            val offTimings = arrayListOf<Long>()
+            for (i in diffTimings.indices) {
+                if (i % 2 == 0) {
+                    onTimings.add(diffTimings[i])
+                } else {
+                    offTimings.add(diffTimings[i])
+                }
+            }
+            val onTimingsString = StringBuilder()
+            onTimings.forEach {
+                onTimingsString.append(it).append(" * ")
+            }
+            val onDecodedMap = findNaturalBreakOnTimings(onTimings)
+            val smallOnTimings = onDecodedMap[SMALL_UNITS]
+            val bigOnTimings = onDecodedMap[BIG_UNITS]
+
+            val offTimingsString = StringBuilder()
+            offTimings.forEach {
+                offTimingsString.append(it).append(" * ")
+            }
+            val offDecodedMap = findNaturalBreakOffTimings(offTimings)
+            val mediumOffTimings = offDecodedMap[MEDIUM_UNITS]
+            val bigOffTimings = offDecodedMap[BIG_UNITS]
+
+            val message = StringBuilder()
+            timings.forEachIndexed { index, _ ->
+                if (index == 0) return@forEachIndexed
+                val diff = timings[index] - timings[index - 1]
+                when {
+                    smallOnTimings!!.contains(diff) -> {
+                        message.append(".")
+                    }
+                    bigOnTimings!!.contains(diff) -> {
+                        message.append("-")
+                    }
+                    mediumOffTimings!!.contains(diff) -> {
+                        message.append(" ")
+                    }
+                    bigOffTimings!!.contains(diff) -> {
+                        message.append(" / ")
+                    }
+                }
+            }
+            timings.clear()
+            diffTimings.clear()
+            return message.toString()
+        }
+        return ""
     }
 }
 

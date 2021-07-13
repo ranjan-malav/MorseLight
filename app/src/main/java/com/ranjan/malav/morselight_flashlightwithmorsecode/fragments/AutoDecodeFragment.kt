@@ -56,6 +56,8 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                 if (!startCapturing) {
                     // Start capturing high luminosity to on flash timings and lows to off flash timings
                     startCapturing = true
+                    incoming_message.text = ""
+                    decoded_message.text = ""
                     start_stop_button.text = getString(R.string.stop)
                     sos_button.isEnabled = false
                     signal_button.isEnabled = false
@@ -69,6 +71,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                     sos_button.isEnabled = true
                     signal_button.isEnabled = true
                     start_stop_button.text = getString(R.string.start)
+                    start_timer.text = ""
                     isFlashOn = false
                     flash_status_view.gone()
                     avgLowLuminosity = 0.0
@@ -117,58 +120,30 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
     }
 
     private fun decodeNotedTimings() {
-        if (timings.isNotEmpty()) {
-            val onTimings = arrayListOf<Long>()
-            val offTimings = arrayListOf<Long>()
-            for (i in diffTimings.indices) {
-                if (i % 2 == 0) {
-                    onTimings.add(diffTimings[i])
-                } else {
-                    offTimings.add(diffTimings[i])
-                }
-            }
-            val onTimingsString = StringBuilder()
-            onTimings.forEach {
-                onTimingsString.append(it).append(" * ")
-            }
-            Log.d(TAG, "On timing Diffs: $onTimingsString")
-            val onDecodedMap = DecoderUtils.findNaturalBreakOnTimings(onTimings)
-            val smallOnTimings = onDecodedMap[DecoderUtils.SMALL_UNITS]
-            val bigOnTimings = onDecodedMap[DecoderUtils.BIG_UNITS]
+        val morseMessage = DecoderUtils.findMorseFromTimings(timings, diffTimings)
+        if (morseMessage.isNotBlank()) {
+            incoming_message.text = morseMessage
+            decoded_message.text = DecoderUtils.decryptMorse(morseMessage)
+        }
+    }
 
-            val offTimingsString = StringBuilder()
-            offTimings.forEach {
-                offTimingsString.append(it).append(" * ")
-            }
-            Log.d(TAG, "Off timing Diffs: $offTimingsString")
-            val offDecodedMap = DecoderUtils.findNaturalBreakOffTimings(offTimings)
-            val mediumOffTimings = offDecodedMap[DecoderUtils.MEDIUM_UNITS]
-            val bigOffTimings = offDecodedMap[DecoderUtils.BIG_UNITS]
-
-            val message = StringBuilder()
+    private fun updateTimingViews() {
+        val sb = StringBuilder()
+        if (timings.size > 1) {
             timings.forEachIndexed { index, _ ->
                 if (index == 0) return@forEachIndexed
                 val diff = timings[index] - timings[index - 1]
-                when {
-                    smallOnTimings!!.contains(diff) -> {
-                        message.append(".")
-                    }
-                    bigOnTimings!!.contains(diff) -> {
-                        message.append("-")
-                    }
-                    mediumOffTimings!!.contains(diff) -> {
-                        message.append(" ")
-                    }
-                    bigOffTimings!!.contains(diff) -> {
-                        message.append(" / ")
-                    }
+                if (index % 2 == 0) {
+                    sb.append("${String.format("%.1f", (diff / 1000f))}s(off)  ")
+                } else {
+                    sb.append("${String.format("%.1f", (diff / 1000f))}s(on)  ")
                 }
             }
-            incoming_message.text = message.toString()
-            decoded_message.text = DecoderUtils.decryptMorse(message.toString())
-            timings.clear()
-            diffTimings.clear()
         }
+        if (timings.size == 1) {
+            decoded_message.text = ""
+        }
+        incoming_message.text = sb.toString().trim()
     }
 
     private fun removeHandlerCallbacks() {
@@ -185,6 +160,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
         ignoreClicks = false
         sos_button.text = getString(R.string.sos)
         start_stop_button.text = getString(R.string.start)
+        sos_button.isEnabled = true
         signal_button.isEnabled = true
         timings.clear()
         diffTimings.clear()
@@ -193,6 +169,11 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
         avgLowLuminosity = 0.0
         avgHighLuminosity = 0.0
         avgCounter = 0
+        startCapturing = false
+        stopCapturingLowLuminosity = false
+        start_timer.text = ""
+        isFlashOn = false
+        flash_status_view.gone()
     }
 
     private fun playWithFlash(charMessage: ArrayList<Char>, speed: Int) {
@@ -259,9 +240,6 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
             } else {
                 avgCounter = 0
                 if (luminosity > avgLowLuminosity * 5 && !isFlashOn) {
-                    activity?.let {
-                        it.runOnUiThread { flash_status_view.visible() }
-                    }
                     isFlashOn = true
                     avgHighLuminosity =
                         (avgHighLuminosity * avgCounter + luminosity) / (avgCounter + 1)
@@ -270,14 +248,23 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                     if (timings.size > 1) {
                         diffTimings.add(timings[timings.size - 1] - timings[timings.size - 2])
                     }
-                } else if (luminosity * 5 < avgHighLuminosity && isFlashOn) {
                     activity?.let {
-                        it.runOnUiThread { flash_status_view.gone() }
+                        it.runOnUiThread {
+                            flash_status_view.visible()
+                            updateTimingViews()
+                        }
                     }
+                } else if (luminosity * 5 < avgHighLuminosity && isFlashOn) {
                     isFlashOn = false
                     timings.add(System.currentTimeMillis())
                     if (timings.size > 1) {
                         diffTimings.add(timings[timings.size - 1] - timings[timings.size - 2])
+                    }
+                    activity?.let {
+                        it.runOnUiThread {
+                            flash_status_view.gone()
+                            updateTimingViews()
+                        }
                     }
                 }
             }
