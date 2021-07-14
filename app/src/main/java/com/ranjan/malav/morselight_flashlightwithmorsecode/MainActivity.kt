@@ -11,10 +11,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.Camera
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
@@ -39,12 +36,14 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
 
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var controller: NavController
+    private lateinit var cameraProvider: ProcessCameraProvider
     private var preview: Preview? = null
     private var imageAnalyzer: ImageAnalysis? = null
     private var imageAnalysisListener: ImageAnalysisListener? = null
     private var navListener = NavController.OnDestinationChangedListener { _, _, _ ->
         removeHandlers()
     }
+    private val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var cam: Camera? = null
     private var isFlashOn = false
     private var ignoreClicks = false
@@ -74,6 +73,8 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
         private const val REQ_CODE_W_IMMEDIATE_ACTION = 10
         private const val REQ_CODE_WO_IMMEDIATE_ACTION = 20
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+        private const val RATIO_4_3_VALUE = 4.0 / 3.0
+        private const val RATIO_16_9_VALUE = 16.0 / 9.0
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -205,27 +206,23 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
 
         cameraProviderFuture.addListener({
             // Used to bind the lifecycle of cameras to the lifecycle owner
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-            // Select back camera as a default
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            cameraProvider = cameraProviderFuture.get()
 
             try {
                 // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
-
-                preview = Preview.Builder().build()
 
                 // Bind use cases to camera
                 imageAnalyzer = ImageAnalysis.Builder()
                     .build()
                     .also {
                         it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luminosity ->
+                            Log.d(TAG, "luma: $luminosity")
                             imageAnalysisListener?.listenLuminosity(luminosity)
                         })
                     }
                 cam = cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageAnalyzer
+                    this, cameraSelector, imageAnalyzer
                 )
                 if (immediatelySwitchTorch && cam!!.cameraInfo.hasFlashUnit()) {
                     switchFlashOn(cam!!)
@@ -305,8 +302,34 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
         cameraPreview: PreviewView,
         imageAnalysisListener: ImageAnalysisListener
     ) {
-        preview?.setSurfaceProvider(cameraPreview.surfaceProvider)
-        this.imageAnalysisListener = imageAnalysisListener
+        try {
+            val aspectRatio = aspectRatio(cameraPreview.width, cameraPreview.height)
+            cameraProvider.unbindAll()
+            preview = Preview.Builder().setTargetAspectRatio(aspectRatio).build()
+            preview?.setSurfaceProvider(cameraPreview.surfaceProvider)
+            this.imageAnalysisListener = imageAnalysisListener
+            cam = cameraProvider.bindToLifecycle(
+                this, cameraSelector, imageAnalyzer, preview
+            )
+        } catch (ex: ArithmeticException) {
+            Toast.makeText(this, R.string.layout_problem, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun resetCameraBinds() {
+        cameraProvider.unbindAll()
+        cam = cameraProvider.bindToLifecycle(
+            this, cameraSelector, imageAnalyzer
+        )
+    }
+
+    private fun aspectRatio(width: Int, height: Int): Int {
+        val previewRatio =
+            kotlin.math.max(width, height).toDouble() / kotlin.math.min(width, height)
+        if (kotlin.math.abs(previewRatio - RATIO_4_3_VALUE) <= kotlin.math.abs(previewRatio - RATIO_16_9_VALUE)) {
+            return AspectRatio.RATIO_4_3
+        }
+        return AspectRatio.RATIO_16_9
     }
 
     inner class CharSetRunnable(private val char: Char) : Runnable {

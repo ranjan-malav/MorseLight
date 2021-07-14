@@ -45,4 +45,5 @@
     <string name="no_email_app">Email app is not installed.</string>
     <string name="no_browser_app">Browser app is not installed.</string>
     <string name="send_mail">Send mail..</string>
+    <string name="layout_problem">Some problem occured while trying to show camera preview.</string>
 </resources>

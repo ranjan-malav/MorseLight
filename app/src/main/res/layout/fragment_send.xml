@@ -183,7 +183,8 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
+            android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
+            android:inputType="textCapCharacters"
             android:maxLines="5"
             android:minLines="3" />
 

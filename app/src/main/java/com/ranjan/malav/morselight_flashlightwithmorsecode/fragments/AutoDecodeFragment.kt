@@ -17,6 +17,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
 
+
 typealias LumaListener = (luma: Double) -> Unit
 
 @KoinApiExtension
@@ -106,8 +107,6 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
         viewModel.cleanRunFlag.observe(viewLifecycleOwner, {
             runCleanUp()
         })
-
-        callback?.bindPreview(camera_preview, this)
     }
 
     override fun onAttach(context: Context) {
@@ -117,6 +116,16 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
         } catch (castException: ClassCastException) {
             throw ClassCastException("Context does not implement $TAG callback")
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        callback?.bindPreview(camera_preview, this@AutoDecodeFragment)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        callback?.resetCameraBinds()
     }
 
     private fun decodeNotedTimings() {

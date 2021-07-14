@@ -9,8 +9,8 @@ interface FragmentCallbacks {
         onOffDelays: ArrayList<Long>, charUnits: ArrayList<Int>, characters: ArrayList<Char>,
         speed: Int, shouldSetCharChangeHandler: Boolean, finalOffDelay: Long
     )
-
     fun bindPreview(cameraPreview: PreviewView, imageAnalysisListener: ImageAnalysisListener)
+    fun resetCameraBinds()
 }
 
 interface ImageAnalysisListener {
