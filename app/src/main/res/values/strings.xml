@@ -45,5 +45,8 @@
     <string name="no_email_app">Email app is not installed.</string>
     <string name="no_browser_app">Browser app is not installed.</string>
     <string name="send_mail">Send mail..</string>
-    <string name="layout_problem">Some problem occured while trying to show camera preview.</string>
+    <string name="layout_problem">Some problem occurred while trying to show camera preview.</string>
+    <string name="perceptibility">Perceptibility (Keep High in dark, low in day light)</string>
+    <string name="low">Low</string>
+    <string name="high">High</string>
 </resources>

@@ -34,6 +34,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
     private var avgLowLuminosity = 0.0
     private var avgHighLuminosity = 0.0
     private var avgCounter = 0
+    private var perceptibility = 5
     private val handler = Handler(Looper.getMainLooper())
     private val viewModel: MainViewModel by activityViewModels()
     private val timings = arrayListOf<Long>()
@@ -82,6 +83,12 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                     removeHandlerCallbacks()
                 }
             }
+        }
+
+        perceptibility_title.isSelected = true
+
+        perceptibility_slider.addOnChangeListener { _, value, _ ->
+            perceptibility = value.toInt()
         }
 
         signal_button.setOnClickListener {
@@ -248,7 +255,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                 avgCounter++
             } else {
                 avgCounter = 0
-                if (luminosity > avgLowLuminosity * 5 && !isFlashOn) {
+                if (luminosity > avgLowLuminosity * perceptibility && !isFlashOn) {
                     isFlashOn = true
                     avgHighLuminosity =
                         (avgHighLuminosity * avgCounter + luminosity) / (avgCounter + 1)
@@ -263,7 +270,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                             updateTimingViews()
                         }
                     }
-                } else if (luminosity * 5 < avgHighLuminosity && isFlashOn) {
+                } else if (luminosity * perceptibility < avgHighLuminosity && isFlashOn) {
                     isFlashOn = false
                     timings.add(System.currentTimeMillis())
                     if (timings.size > 1) {

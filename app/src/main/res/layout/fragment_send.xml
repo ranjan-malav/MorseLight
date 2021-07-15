@@ -43,9 +43,9 @@
                 android:layout_marginStart="@dimen/margin_m"
                 android:layout_marginEnd="@dimen/margin_m"
                 android:layout_weight="1"
-                android:stepSize="1.0"
-                android:valueFrom="1.0"
-                android:valueTo="10.0" />
+                android:stepSize="1"
+                android:valueFrom="1"
+                android:valueTo="10" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 style="@style/TextBody2"
