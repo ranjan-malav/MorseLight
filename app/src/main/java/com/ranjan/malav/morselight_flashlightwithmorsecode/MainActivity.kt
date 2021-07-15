@@ -190,8 +190,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
                 removeHandlerCallbacks()
                 cam?.let {
                     if (isFlashOn) {
+                        item.icon =
+                            ContextCompat.getDrawable(this, R.drawable.ic_baseline_flash_on_24)
                         switchFlashOff(it)
                     } else {
+                        item.icon =
+                            ContextCompat.getDrawable(this, R.drawable.ic_baseline_flash_off_24)
                         switchFlashOn(it)
                     }
                 }
