@@ -49,4 +49,8 @@
     <string name="perceptibility">Perceptibility (Keep High in dark, low in day light)</string>
     <string name="low">Low</string>
     <string name="high">High</string>
+    <string name="message">Message</string>
+    <string name="next">Next</string>
+    <string name="sample_morse">... --- ...</string>
+    <string name="decoding_hint"><![CDATA[Press & hold when mocked flashlight is on]]></string>
 </resources>

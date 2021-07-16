@@ -45,7 +45,8 @@
                 android:ellipsize="marquee"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:text="@string/perceptibility" />
+                android:text="@string/perceptibility"
+                android:textColor="@color/white" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -58,7 +59,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="@dimen/margin_xs"
-                    android:text="@string/low" />
+                    android:text="@string/low"
+                    android:textColor="@color/white" />
 
                 <com.google.android.material.slider.Slider
                     android:id="@+id/perceptibility_slider"
@@ -78,7 +80,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginEnd="@dimen/margin_xs"
-                    android:text="@string/high" />
+                    android:text="@string/high"
+                    android:textColor="@color/white" />
 
             </LinearLayout>
 

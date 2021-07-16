@@ -7,6 +7,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.screens.MorseDetailActivity
+import com.ranjan.malav.morselight_flashlightwithmorsecode.screens.MorseTutorialActivity
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.contactMail
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.launchWeb
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.rateApp
@@ -24,7 +25,7 @@ class LearnFragment : Fragment(R.layout.fragment_learn) {
         }
 
         learn_decode.setOnClickListener {
-
+            startActivity(Intent(requireContext(), MorseTutorialActivity::class.java))
         }
 
         learn_contact.setOnClickListener { requireContext().contactMail() }

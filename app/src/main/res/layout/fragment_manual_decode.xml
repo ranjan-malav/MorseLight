@@ -9,8 +9,6 @@
         android:id="@+id/flash_status_view"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
         android:scaleType="fitCenter"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@id/flash_status_text"

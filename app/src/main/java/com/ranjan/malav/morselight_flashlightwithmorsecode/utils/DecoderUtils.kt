@@ -218,5 +218,13 @@ object DecoderUtils {
         }
         return ""
     }
+
+    fun getMorseForMessage(charMessage: ArrayList<Char>): String {
+        val morseCode = StringBuilder()
+        for (char in charMessage) {
+            morseCode.append(charToMorse[char])
+        }
+        return morseCode.toString()
+    }
 }
 

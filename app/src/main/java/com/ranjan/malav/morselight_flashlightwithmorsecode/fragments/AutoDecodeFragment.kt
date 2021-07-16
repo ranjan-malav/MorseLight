@@ -164,9 +164,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
 
     private fun removeHandlerCallbacks() {
         try {
-            handler.removeCallbacksAndMessages(
-                null
-            )
+            handler.removeCallbacksAndMessages(null)
         } catch (npe: NullPointerException) {
             Log.d(TAG, "Error: ${npe.localizedMessage}")
         }
