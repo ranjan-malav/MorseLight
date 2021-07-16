@@ -18,7 +18,6 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecoderUtils
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecoderUtils.getMorseForMessage
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.charToMorse
-import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.charToTotalUnits
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.charToUnits
 import kotlinx.android.synthetic.main.activity_morse_tutorial.*
 import java.util.*
@@ -40,6 +39,7 @@ class MorseTutorialActivity : AppCompatActivity() {
     }
     private val cleanUpRunnable = Runnable {
         runCleanUp()
+        start_timer.text = getString(R.string.finished)
     }
     var messages = arrayOf(
         "NICE", "GOOD JOB", "OK", "SOS", "HELLO",
@@ -159,17 +159,14 @@ class MorseTutorialActivity : AppCompatActivity() {
             val transmissionSpeed: Float = 3f / speed
             val timeUnits = StringBuilder()
             val morseCode = StringBuilder()
-            val charUnits = arrayListOf<Int>()
 
             // Add character morse timings to string builder
             for (char in charMessage) {
+                if (char == ' ') {
+                    timeUnits.replace(timeUnits.length - 1, timeUnits.length, "")
+                }
                 timeUnits.append(charToUnits[char])
                 morseCode.append(charToMorse[char])
-                if (charUnits.isNotEmpty()) {
-                    charUnits.add(charToTotalUnits[char]!! + 3)
-                } else {
-                    charUnits.add(charToTotalUnits[char]!!)
-                }
             }
             // Remove last character because we have added 3 units for space after every character
             timeUnits.replace(timeUnits.length - 1, timeUnits.length, "")
@@ -253,6 +250,7 @@ class MorseTutorialActivity : AppCompatActivity() {
     private fun runCleanUp() {
         ignoreClicks = false
         isFlashOn = false
+        setTorchOffImageView()
         next_button.isEnabled = true
         start_stop_button.text = getString(R.string.start)
         removeHandlerCallbacks()

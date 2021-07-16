@@ -11,6 +11,8 @@ import androidx.camera.core.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import com.ranjan.malav.morselight_flashlightwithmorsecode.MainViewModel
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.*
@@ -88,6 +90,8 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
                     ).show()
                     return@setOnClickListener
                 }
+                val param = Bundle().apply { putString("message", charMessage) }
+                Firebase.analytics.logEvent("entered_message", param)
                 val charArray = arrayListOf<Char>()
                 charMessage.toCharArray().forEach {
                     charArray.add(it)
