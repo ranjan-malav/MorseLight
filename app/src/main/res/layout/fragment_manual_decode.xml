@@ -92,6 +92,19 @@
         app:layout_constraintBottom_toTopOf="@id/decoded_message"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/report_button"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_xs"
+        android:text="@string/report"
+        android:textColor="#FFAB40"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/decoded_message"
+        app:layout_constraintEnd_toStartOf="@id/decode_button"
+        app:strokeColor="@color/amber" />
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/decoded_message"
         style="@style/TextSubHeading1"

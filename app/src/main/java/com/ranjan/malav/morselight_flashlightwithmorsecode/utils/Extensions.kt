@@ -1,17 +1,24 @@
 package com.ranjan.malav.morselight_flashlightwithmorsecode.utils
 
 import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Bundle
 import android.provider.Settings
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 
 
@@ -287,4 +294,53 @@ fun Context.launchWeb(uri: Uri) {
     } catch (ex: ActivityNotFoundException) {
         Toast.makeText(this, R.string.no_browser_app, Toast.LENGTH_SHORT).show()
     }
+}
+
+fun Activity.askIfDecryptedCorrectly(message: String, timings: ArrayList<Long>) {
+    val builder = AlertDialog.Builder(this)
+    val inflater: LayoutInflater = this.layoutInflater
+    val dialogView: View = inflater.inflate(R.layout.feedback_dialog, null)
+    builder.setView(dialogView)
+    val messageInput: TextInputLayout = dialogView.findViewById(R.id.message_input)
+    val reportButton: MaterialButton = dialogView.findViewById(R.id.negative_button)
+    val positiveButton: MaterialButton = dialogView.findViewById(R.id.positive_button)
+    val dialog = builder.create()
+    messageInput.editText?.setText(message)
+
+    reportButton.setOnClickListener {
+        val param = Bundle().apply {
+            putString("message", messageInput.editText?.text.toString())
+            putString("timings", getTimingsString(timings))
+        }
+        Firebase.analytics.logEvent("negative_decode", param)
+        dialog.dismiss()
+    }
+
+    positiveButton.setOnClickListener {
+        val param = Bundle().apply {
+            putString("message", messageInput.editText?.text.toString())
+            putString("timings", getTimingsString(timings))
+
+        }
+        Firebase.analytics.logEvent("positive_decode", param)
+        dialog.dismiss()
+    }
+
+    dialog.show()
+}
+
+private fun getTimingsString(timings: ArrayList<Long>): String {
+    val sb = StringBuilder()
+    if (timings.size > 1) {
+        timings.forEachIndexed { index, _ ->
+            if (index == 0) return@forEachIndexed
+            val diff = timings[index] - timings[index - 1]
+            if (index % 2 == 0) {
+                sb.append("${String.format("%.1f", (diff / 1000f))}s ")
+            } else {
+                sb.append("${String.format("%.1f", (diff / 1000f))}s ")
+            }
+        }
+    }
+    return sb.toString()
 }

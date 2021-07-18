@@ -51,6 +51,7 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
                 runCleanUp()
                 callback?.removeHandlers()
             } else {
+                report_button.gone()
                 if (event.action == MotionEvent.ACTION_DOWN
                     || event.action == MotionEvent.ACTION_UP
                 ) {
@@ -85,26 +86,35 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
         reset_button.setOnClickListener {
             timings.clear()
             diffTimings.clear()
+            report_button.gone()
             incoming_message.text = ""
             decoded_message.text = ""
         }
 
         decode_button.setOnClickListener {
+            val timingsCopy = arrayListOf<Long>()
+            timingsCopy.addAll(timings)
             val morseMessage = findMorseFromTimings(timings, diffTimings)
             if (morseMessage.isNotBlank()) {
-                if (!morseMessage.contains("-")) {
+                val decryptedMessage = if (!morseMessage.contains("-")) {
                     // All the units are of same size, it could be . or -
                     val dashedMessage = morseMessage.replace(".", "-")
                     incoming_message.text = getString(
                         R.string.dot_message_or_dash_message, morseMessage, dashedMessage
                     )
-                    decoded_message.text = getString(
+                    getString(
                         R.string.dot_message_or_dash_message,
                         decryptMorse(morseMessage), decryptMorse(dashedMessage)
                     )
                 } else {
                     incoming_message.text = morseMessage
-                    decoded_message.text = decryptMorse(morseMessage)
+                    decryptMorse(morseMessage)
+                }
+                incoming_message.text = morseMessage
+                decoded_message.text = decryptedMessage
+                report_button.visible()
+                report_button.setOnClickListener {
+                    activity?.askIfDecryptedCorrectly(decryptedMessage, timingsCopy)
                 }
             }
         }
@@ -172,6 +182,7 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
 
     private fun runCleanUp() {
         ignoreClicks = false
+        report_button.gone()
         sos_button.text = getString(R.string.sos)
         tap_and_hold_button.text = getString(R.string.press_hold)
         signal_button.isEnabled = true
@@ -180,6 +191,7 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
     private fun playWithFlash(charMessage: ArrayList<Char>, speed: Int) {
         // Setup, remove click listeners
         ignoreClicks = true
+        report_button.gone()
         sos_button.text = getString(R.string.stop)
         tap_and_hold_button.text = getString(R.string.stop)
         signal_button.isEnabled = false

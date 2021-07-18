@@ -55,4 +55,9 @@
     <string name="decoding_hint"><![CDATA[Press & hold when mocked flashlight is on]]></string>
     <string name="finished">Finished</string>
     <string name="dot_message_or_dash_message">%1$s OR %2$s</string>
+    <string name="decoded_correctly">Did it decode correctly?</string>
+    <string name="yes">Yes</string>
+    <string name="actual_message">What was the actual message?</string>
+    <string name="no_report">No, Report</string>
+    <string name="report">Report</string>
 </resources>

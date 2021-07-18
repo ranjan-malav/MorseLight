@@ -36,24 +36,4 @@
     <color name="maroon">#C10000</color>
     <color name="maroon_20p">#33C10000</color>
     <color name="amber">#FABD20</color>
-
-    <color name="group_type_default">#FABD20</color>
-    <color name="group_type_other">#E3D449</color>
-
-    <color name="food_easy">#00E676</color>
-    <color name="food_medium">#FFEA00</color>
-    <color name="food_expert">#FF9100</color>
-
-    <color name="meal_color_1">#FF80AB</color>
-    <color name="meal_color_2">#EA80FC</color>
-    <color name="meal_color_3">#8C9EFF</color>
-    <color name="meal_color_4">#84FFFF</color>
-    <color name="meal_color_5">#A7FFEB</color>
-    <color name="meal_color_6">#FFFF8D</color>
-    <color name="meal_color_7">#FFD180</color>
-    <color name="meal_color_8">#FFFFFF</color>
-
-    <color name="errorColor">#C14543</color>
-    <color name="infoColor">#4F8AC8</color>
-    <color name="successColor">#6A9C72</color>
 </resources>
