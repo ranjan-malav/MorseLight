@@ -12,6 +12,14 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.MainViewModel
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.*
 import kotlinx.android.synthetic.main.fragment_auto_decode.*
+import kotlinx.android.synthetic.main.fragment_auto_decode.decoded_message
+import kotlinx.android.synthetic.main.fragment_auto_decode.flash_status_view
+import kotlinx.android.synthetic.main.fragment_auto_decode.incoming_message
+import kotlinx.android.synthetic.main.fragment_auto_decode.report_button
+import kotlinx.android.synthetic.main.fragment_auto_decode.reset_button
+import kotlinx.android.synthetic.main.fragment_auto_decode.signal_button
+import kotlinx.android.synthetic.main.fragment_auto_decode.sos_button
+import kotlinx.android.synthetic.main.fragment_manual_decode.*
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -58,6 +66,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                 if (!startCapturing) {
                     // Start capturing high luminosity to on flash timings and lows to off flash timings
                     startCapturing = true
+                    report_button.gone()
                     incoming_message.text = ""
                     decoded_message.text = ""
                     start_stop_button.text = getString(R.string.stop)
@@ -136,22 +145,29 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
     }
 
     private fun decodeNotedTimings() {
+        val timingsCopy = arrayListOf<Long>()
+        timingsCopy.addAll(timings)
         val morseMessage = DecoderUtils.findMorseFromTimings(timings, diffTimings)
         if (morseMessage.isNotBlank()) {
-            if (!morseMessage.contains("-")) {
+            val decryptedMessage = if (!morseMessage.contains("-")) {
                 // All the units are of same size, it could be . or -
                 val dashedMessage = morseMessage.replace(".", "-")
                 incoming_message.text = getString(
                     R.string.dot_message_or_dash_message, morseMessage, dashedMessage
                 )
-                decoded_message.text = getString(
+                getString(
                     R.string.dot_message_or_dash_message,
                     DecoderUtils.decryptMorse(morseMessage),
                     DecoderUtils.decryptMorse(dashedMessage)
                 )
             } else {
                 incoming_message.text = morseMessage
-                decoded_message.text = DecoderUtils.decryptMorse(morseMessage)
+                DecoderUtils.decryptMorse(morseMessage)
+            }
+            decoded_message.text = decryptedMessage
+            report_button.visible()
+            report_button.setOnClickListener {
+                activity?.askIfDecryptedCorrectly(decryptedMessage, timingsCopy)
             }
         }
     }
@@ -189,6 +205,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
         start_stop_button.text = getString(R.string.start)
         sos_button.isEnabled = true
         signal_button.isEnabled = true
+        report_button.gone()
         timings.clear()
         diffTimings.clear()
         incoming_message.text = ""
@@ -206,6 +223,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
     private fun playWithFlash(charMessage: ArrayList<Char>, speed: Int) {
         // Setup, remove click listeners
         ignoreClicks = true
+        report_button.gone()
         sos_button.text = getString(R.string.stop)
         start_stop_button.text = getString(R.string.stop)
         signal_button.isEnabled = false
