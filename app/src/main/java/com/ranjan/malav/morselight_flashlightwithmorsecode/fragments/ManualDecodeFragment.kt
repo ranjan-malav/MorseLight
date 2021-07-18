@@ -92,8 +92,20 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
         decode_button.setOnClickListener {
             val morseMessage = findMorseFromTimings(timings, diffTimings)
             if (morseMessage.isNotBlank()) {
-                incoming_message.text = morseMessage
-                decoded_message.text = decryptMorse(morseMessage)
+                if (!morseMessage.contains("-")) {
+                    // All the units are of same size, it could be . or -
+                    val dashedMessage = morseMessage.replace(".", "-")
+                    incoming_message.text = getString(
+                        R.string.dot_message_or_dash_message, morseMessage, dashedMessage
+                    )
+                    decoded_message.text = getString(
+                        R.string.dot_message_or_dash_message,
+                        decryptMorse(morseMessage), decryptMorse(dashedMessage)
+                    )
+                } else {
+                    incoming_message.text = morseMessage
+                    decoded_message.text = decryptMorse(morseMessage)
+                }
             }
         }
 

@@ -41,7 +41,7 @@ class MorseTutorialActivity : AppCompatActivity() {
         runCleanUp()
         start_timer.text = getString(R.string.finished)
     }
-    var messages = arrayOf(
+    private var messages = arrayOf(
         "NICE", "GOOD JOB", "OK", "SOS", "HELLO",
         "LETS GO", "NEED HELP", "HOW ARE YOU", "I AM FINE", "THIS IS AWESOME"
     )
@@ -129,8 +129,21 @@ class MorseTutorialActivity : AppCompatActivity() {
         decode_button.setOnClickListener {
             val morseMessage = DecoderUtils.findMorseFromTimings(timings, diffTimings)
             if (morseMessage.isNotBlank()) {
-                incoming_message.text = morseMessage
-                decoded_message.text = DecoderUtils.decryptMorse(morseMessage)
+                if (!morseMessage.contains("-")) {
+                    // All the units are of same size, it could be . or -
+                    val dashedMessage = morseMessage.replace(".", "-")
+                    incoming_message.text = getString(
+                        R.string.dot_message_or_dash_message, morseMessage, dashedMessage
+                    )
+                    decoded_message.text = getString(
+                        R.string.dot_message_or_dash_message,
+                        DecoderUtils.decryptMorse(morseMessage),
+                        DecoderUtils.decryptMorse(dashedMessage)
+                    )
+                } else {
+                    incoming_message.text = morseMessage
+                    decoded_message.text = DecoderUtils.decryptMorse(morseMessage)
+                }
             }
         }
     }
