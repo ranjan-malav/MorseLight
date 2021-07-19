@@ -264,13 +264,13 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
     }
 
     private val timer3Sec = Runnable {
-        start_timer.text = "3"
+        start_timer.text = getString(R.string.learning_low_luminosity, "3")
     }
     private val timer2Sec = Runnable {
-        start_timer.text = "2"
+        start_timer.text = getString(R.string.learning_low_luminosity, "2")
     }
     private val timer1Sec = Runnable {
-        start_timer.text = "1"
+        start_timer.text = getString(R.string.learning_low_luminosity, "1")
     }
     private val timer0Sec = Runnable {
         start_timer.text = ""
@@ -279,6 +279,15 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
 
     override fun listenLuminosity(luminosity: Double) {
         if (startCapturing) {
+            activity?.let {
+                it.runOnUiThread {
+                    avg_luminosity.text = getString(
+                        R.string.average_current_luminosity,
+                        String.format("%.1f", avgLowLuminosity),
+                        String.format("%.1f", luminosity)
+                    )
+                }
+            }
             if (!stopCapturingLowLuminosity) {
                 avgLowLuminosity = (avgLowLuminosity * avgCounter + luminosity) / (avgCounter + 1)
                 avgCounter++
@@ -311,6 +320,13 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                             updateTimingViews()
                         }
                     }
+                }
+            }
+        } else {
+            activity?.let {
+                it.runOnUiThread {
+                    avg_luminosity.text =
+                        getString(R.string.average_luminosity, String.format("%.1f", luminosity))
                 }
             }
         }

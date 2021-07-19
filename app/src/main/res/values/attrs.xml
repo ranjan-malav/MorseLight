@@ -18,7 +18,4 @@
         </attr>
         <attr name="showNewTag" format="boolean" />
     </declare-styleable>
-    <declare-styleable name="SyncStatusView">
-        <attr name="tableName" format="string" />
-    </declare-styleable>
 </resources>

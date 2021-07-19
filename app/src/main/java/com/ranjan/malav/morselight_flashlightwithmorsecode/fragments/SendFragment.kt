@@ -103,8 +103,13 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
         }
 
         viewModel.currentlyTransmittingChar.observe(viewLifecycleOwner, {
-            current_char.text = "$it = "
-            current_char_morse.text = charToMorse[it]
+            if (it == ' ') {
+                current_char.text = ""
+                current_char_morse.text = ""
+            } else {
+                current_char.text = "$it = "
+                current_char_morse.text = charToMorse[it]
+            }
         })
 
         viewModel.isFlashOn.observe(viewLifecycleOwner, {
@@ -176,10 +181,17 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
         val characters = arrayListOf<Char>()
         // Add character morse timings to string builder
         for (char in charMessage) {
+            if (char == ' ') {
+                timeUnits.replace(timeUnits.length - 1, timeUnits.length, "")
+            }
             timeUnits.append(charToUnits[char])
             morseCode.append(charToMorse[char])
             if (charUnits.isNotEmpty()) {
-                charUnits.add(charToTotalUnits[char]!! + 3)
+                if (char == ' ') {
+                    charUnits.add(charToTotalUnits[char]!!)
+                } else {
+                    charUnits.add(charToTotalUnits[char]!! + 3)
+                }
             } else {
                 charUnits.add(charToTotalUnits[char]!!)
             }

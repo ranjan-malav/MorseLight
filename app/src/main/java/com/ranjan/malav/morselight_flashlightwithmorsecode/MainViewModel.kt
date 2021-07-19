@@ -6,10 +6,6 @@ import androidx.lifecycle.ViewModel
 
 
 class MainViewModel : ViewModel() {
-    companion object {
-        private val TAG = MainViewModel::class.java.simpleName
-    }
-
     private val _cleanRunFlag = MutableLiveData<Boolean>()
     val cleanRunFlag: LiveData<Boolean> = _cleanRunFlag
 

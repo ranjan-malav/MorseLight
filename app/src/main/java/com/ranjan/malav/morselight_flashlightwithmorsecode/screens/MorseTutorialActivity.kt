@@ -122,7 +122,7 @@ class MorseTutorialActivity : AppCompatActivity() {
                 charMessage.toCharArray().forEach {
                     charArray.add(it)
                 }
-                playWithFlash(charArray, 3)
+                playWithFlash(charArray)
             }
         }
 
@@ -155,7 +155,7 @@ class MorseTutorialActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun playWithFlash(charMessage: ArrayList<Char>, speed: Int) {
+    private fun playWithFlash(charMessage: ArrayList<Char>) {
         // Setup, remove click listeners
         ignoreClicks = true
         incoming_message.text = ""
@@ -169,7 +169,7 @@ class MorseTutorialActivity : AppCompatActivity() {
         handler.postDelayed({
             // Speed can be from 1 to 10, 3 means 1 unit = 3/3 sec, 10 means 1 unit = 3/10 sec
             // 1 means 1 unit = 3/1 sec. Default speed is 3 which means 1 sec = 1 unit.
-            val transmissionSpeed: Float = 3f / speed
+            val transmissionSpeed = 1f
             val timeUnits = StringBuilder()
             val morseCode = StringBuilder()
 

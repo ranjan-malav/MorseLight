@@ -60,4 +60,7 @@
     <string name="actual_message">What was the actual message?</string>
     <string name="no_report">No, Report</string>
     <string name="report">Report</string>
+    <string name="average_luminosity">Current luminosity: %1$s</string>
+    <string name="average_current_luminosity">Avg off luminosity: %1$s\nCurrent luminosity: %2$s</string>
+    <string name="learning_low_luminosity">Learning low luminosity: %1$s</string>
 </resources>

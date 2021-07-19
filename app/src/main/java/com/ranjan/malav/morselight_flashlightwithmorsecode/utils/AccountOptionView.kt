@@ -4,8 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.RotateAnimation
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -22,9 +20,6 @@ class AccountOptionView(context: Context, attrs: AttributeSet) : LinearLayout(co
         .inflate(R.layout.account_option_view, this, true)
 
     private val icon: AppCompatImageView = view.findViewById(R.id.account_option_icon)
-
-    private val ROTATE_FROM = 0.0f
-    private val ROTATE_TO = -10.0f * 360.0f
 
     init {
         context.theme.obtainStyledAttributes(
@@ -63,20 +58,5 @@ class AccountOptionView(context: Context, attrs: AttributeSet) : LinearLayout(co
                 recycle()
             }
         }
-    }
-
-    fun startAnimation() {
-        val r = RotateAnimation(
-            ROTATE_FROM, ROTATE_TO,
-            Animation.RELATIVE_TO_SELF, 0.5f,
-            Animation.RELATIVE_TO_SELF, 0.5f
-        )
-        r.duration = 2.toLong() * 1500
-        r.repeatCount = Animation.INFINITE
-        icon.startAnimation(r)
-    }
-
-    fun stopAnimation() {
-        icon.clearAnimation()
     }
 }

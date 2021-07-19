@@ -102,6 +102,19 @@
             app:layout_constraintTop_toTopOf="@id/camera_preview"
             tools:text="3 2 1" />
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/avg_luminosity"
+            style="@style/TextLabel2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_xs"
+            android:layout_marginBottom="@dimen/margin_s"
+            android:maxLines="2"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="@id/camera_preview"
+            app:layout_constraintTop_toTopOf="@id/camera_preview"
+            tools:text="Avg off luminosity: 150\nCurrent luminosity: 120" />
+
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/flash_status_view"
             android:layout_width="100dp"
