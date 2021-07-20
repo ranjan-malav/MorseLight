@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -37,6 +38,8 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var controller: NavController
     private lateinit var cameraProvider: ProcessCameraProvider
+    private var pm: PowerManager? = null
+    private var wakeLock: PowerManager.WakeLock? = null
     private var preview: Preview? = null
     private var imageAnalyzer: ImageAnalysis? = null
     private var imageAnalysisListener: ImageAnalysisListener? = null
@@ -71,6 +74,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
         cam?.let { switchFlashOff(it) }
         invalidateOptionsMenu()
         viewModel.runCleanUps()
+        releaseWakeLock()
     }
 
     companion object {
@@ -84,6 +88,8 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        pm = getSystemService(POWER_SERVICE) as PowerManager
 
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
         val navHostFragment = supportFragmentManager
@@ -124,6 +130,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
 
     override fun onPause() {
         controller.removeOnDestinationChangedListener(navListener)
+        releaseWakeLock()
         super.onPause()
     }
 
@@ -254,6 +261,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
         }
     }
 
+    private fun getWakeLock() {
+        wakeLock = pm?.run {
+            newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "$TAG::FlashLock")
+        }
+    }
+
     override fun playWithFlash(
         onOffDelays: ArrayList<Long>,
         charUnits: ArrayList<Int>,
@@ -262,6 +275,8 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
     ) {
         // Setup, remove click listeners
         removeHandlerCallbacks()
+        getWakeLock()
+        wakeLock?.acquire(10 * 60 * 1000L /*10 minutes*/)
         ignoreClicks = true
         isFlashOn = false
         invalidateOptionsMenu()
@@ -333,6 +348,23 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
 
     override fun updateRectAreaPerc(percentage: Int) {
         luminosityAnalyzer.updateConsiderableArea(percentage)
+    }
+
+    override fun acquireWakeLock() {
+        if (wakeLock == null) {
+            getWakeLock()
+        }
+        wakeLock?.acquire(10 * 60 * 1000L /*10 minutes*/)
+    }
+
+    override fun releaseWakeLock() {
+        try {
+            wakeLock?.let {
+                if (it.isHeld) it.release()
+            }
+        } catch (ex: Exception) {
+
+        }
     }
 
     private fun aspectRatio(width: Int, height: Int): Int {

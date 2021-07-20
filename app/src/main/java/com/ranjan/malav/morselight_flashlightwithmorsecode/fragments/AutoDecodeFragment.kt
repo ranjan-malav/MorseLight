@@ -76,6 +76,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
             } else {
                 if (!startCapturing) {
                     // Start capturing high luminosity to on flash timings and lows to off flash timings
+                    callback?.acquireWakeLock()
                     startCapturing = true
                     report_button.gone()
                     incoming_message.text = ""
@@ -88,6 +89,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                     handler.postDelayed(timer1Sec, 2000)
                     handler.postDelayed(timer0Sec, 2950)
                 } else {
+                    callback?.releaseWakeLock()
                     startCapturing = false
                     stopCapturingLowLuminosity = false
                     sos_button.isEnabled = true
@@ -164,6 +166,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
         super.onPause()
         callback?.removeImageListener()
         callback?.resetCameraBinds()
+        callback?.releaseWakeLock()
     }
 
     private fun decodeNotedTimings() {

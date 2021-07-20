@@ -13,6 +13,8 @@ interface FragmentCallbacks {
     fun removeImageListener()
     fun resetCameraBinds()
     fun updateRectAreaPerc(percentage: Int)
+    fun acquireWakeLock()
+    fun releaseWakeLock()
 }
 
 interface ImageAnalysisListener {
