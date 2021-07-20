@@ -134,6 +134,11 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        callback?.releaseWakeLock()
+    }
+
     private fun setTorchOffImageView() {
         val typedValue = TypedValue()
         val theme = requireActivity().theme

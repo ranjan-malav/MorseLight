@@ -149,8 +149,8 @@ class MorseTutorialActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.home) {
-            onBackPressed()
+        if (item.itemId == android.R.id.home) {
+            super.onBackPressed()
         }
         return super.onOptionsItemSelected(item)
     }

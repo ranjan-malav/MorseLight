@@ -1,5 +1,6 @@
 package com.ranjan.malav.morselight_flashlightwithmorsecode.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -10,6 +11,8 @@ import kotlinx.android.synthetic.main.fragment_receive.*
 
 
 class ReceiveFragment : Fragment(R.layout.fragment_receive) {
+
+    private var callback: FragmentCallbacks? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -23,5 +26,21 @@ class ReceiveFragment : Fragment(R.layout.fragment_receive) {
                 1 -> tab.text = resources.getString(R.string.auto)
             }
         }.attach()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            callback = context as FragmentCallbacks
+        } catch (castException: ClassCastException) {
+            throw ClassCastException("Context does not implement ReceiveFragment callback")
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        callback?.removeImageListener()
+        callback?.resetCameraBinds()
+        callback?.releaseWakeLock()
     }
 }
