@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/padding_l"
+    android:paddingTop="20dp"
+    android:paddingEnd="@dimen/padding_l"
+    android:paddingBottom="20dp">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/close_button"
+        style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        app:icon="@drawable/ic_baseline_close_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/dialog_title"
+        style="@style/TextHeading1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="@string/manual_decode_info"
+        app:layout_constraintBottom_toBottomOf="@id/close_button"
+        app:layout_constraintStart_toEndOf="@id/close_button"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/close_button">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/flash_status_view"
+                android:layout_width="wrap_content"
+                android:layout_height="100dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/margin_m"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_torch"
+                app:tint="?colorOnBackground" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/image_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="Image shows current status of the flash. It reacts to PRESS &amp; HOLD button." />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/timings_title"
+                style="@style/TextHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_m"
+                android:text="@string/incoming_message_timings" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/timings_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="Incoming timings notes for how long flash was on or off depending on how long the Press &amp; Hold button was hold or released." />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/reset_title"
+                style="@style/TextHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_m"
+                android:text="@string/reset" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/reset_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="Reset button clears noted timings. In case you want to start again." />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/decoded_title"
+                style="@style/TextHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_m"
+                android:text="@string/decoded_message" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/decoded_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="This shows decoded message based on the noted timings. Use decode button to decode messages." />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/decode_title"
+                style="@style/TextHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_m"
+                android:text="@string/decode" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/decode_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="Use decode button to decode incoming morse encoded messages." />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/signal_title"
+                style="@style/TextHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_m"
+                android:text="@string/signal" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/signal_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="Signal can be useful when you want to notify someone that you'll be starting the transmission soon. It is a short message transmitted at very high speed." />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/press_hold_title"
+                style="@style/TextHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_m"
+                android:text="@string/start" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/press_hold_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="Press and hold this button when you see incoming flashlight as on and release when it's off." />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/sos_title"
+                style="@style/TextHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_m"
+                android:text="@string/sos" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/sos_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="SOS button sends SOS morse code message." />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="100dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

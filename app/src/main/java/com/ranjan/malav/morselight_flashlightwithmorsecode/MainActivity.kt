@@ -23,6 +23,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ranjan.malav.morselight_flashlightwithmorsecode.fragments.FragmentCallbacks
 import com.ranjan.malav.morselight_flashlightwithmorsecode.fragments.ImageAnalysisListener
+import com.ranjan.malav.morselight_flashlightwithmorsecode.fragments.InfoDialog
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.LuminosityAnalyzer
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.showSettingsOpenDialog
 import kotlinx.android.synthetic.main.activity_main.*
@@ -56,6 +57,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
     private var ignoreClicks = false
     private var log = false
     private val viewModel: MainViewModel by viewModels()
+    private var currentFragment = "Send"
 
     private val handler = Handler(Looper.getMainLooper())
     private val handler2 = Handler(Looper.getMainLooper())
@@ -213,6 +215,26 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
                 }
                 return true
             }
+            R.id.action_info -> {
+                when (currentFragment) {
+                    "Send" -> {
+                        InfoDialog.newInstance(R.layout.fragment_send_info)
+                            .show(supportFragmentManager, "SendInfo")
+                    }
+                    "Manual" -> {
+                        InfoDialog.newInstance(R.layout.fragment_manual_info)
+                            .show(supportFragmentManager, "ManualInfo")
+                    }
+                    "Auto" -> {
+                        InfoDialog.newInstance(R.layout.fragment_auto_info)
+                            .show(supportFragmentManager, "AutoInfo")
+                    }
+                    "Learn" -> {
+                        InfoDialog.newInstance(R.layout.fragment_learn_info)
+                            .show(supportFragmentManager, "LearnInfo")
+                    }
+                }
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -365,6 +387,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
         } catch (ex: Exception) {
 
         }
+    }
+
+    override fun setCurrentFragment(fragment: String) {
+        currentFragment = fragment
     }
 
     private fun aspectRatio(width: Int, height: Int): Int {

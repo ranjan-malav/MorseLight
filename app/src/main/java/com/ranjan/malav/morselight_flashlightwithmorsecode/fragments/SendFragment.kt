@@ -75,7 +75,10 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
         signal_button.setOnClickListener {
             if (ignoreClicks) return@setOnClickListener
             val charMessage = arrayListOf('E', 'E', 'E')
-            playWithFlash(charMessage, 20, "EEE", false)
+            playWithFlash(
+                charMessage, 20, "EEE",
+                false, isOnlySignal = true
+            )
         }
 
         start_stop_button.setOnClickListener {
@@ -129,6 +132,7 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
         super.onAttach(context)
         try {
             callback = context as FragmentCallbacks
+            callback?.setCurrentFragment("Send")
         } catch (castException: ClassCastException) {
             throw ClassCastException("Context does not implement $TAG callback")
         }
@@ -169,7 +173,8 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
     }
 
     private fun playWithFlash(
-        charMessage: ArrayList<Char>, speed: Int, message: String, shouldUpdateCurrentChar: Boolean
+        charMessage: ArrayList<Char>, speed: Int, message: String, shouldUpdateCurrentChar: Boolean,
+        isOnlySignal: Boolean = false,
     ) {
         // Setup, remove click listeners
         ignoreClicks = true
@@ -209,8 +214,10 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
 
         var delay = 0L
         val onOffDelays = arrayListOf<Long>()
-        encoded_morse_code.text = morseCode.toString()
-        message_input.editText?.setText(message)
+        if (!isOnlySignal) {
+            encoded_morse_code.text = morseCode.toString()
+            message_input.editText?.setText(message)
+        }
         for (i in timeUnits.indices) {
             onOffDelays.add((delay * 1000 * transmissionSpeed).toLong())
             val unit = timeUnits[i].toString().toInt()

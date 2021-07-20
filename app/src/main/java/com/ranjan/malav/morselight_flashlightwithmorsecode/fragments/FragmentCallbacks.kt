@@ -15,6 +15,7 @@ interface FragmentCallbacks {
     fun updateRectAreaPerc(percentage: Int)
     fun acquireWakeLock()
     fun releaseWakeLock()
+    fun setCurrentFragment(fragment: String)
 }
 
 interface ImageAnalysisListener {

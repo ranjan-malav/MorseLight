@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/padding_l"
+    android:paddingTop="20dp"
+    android:paddingEnd="@dimen/padding_l"
+    android:paddingBottom="20dp">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/close_button"
+        style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        app:icon="@drawable/ic_baseline_close_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/dialog_title"
+        style="@style/TextHeading1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="@string/app_info"
+        app:layout_constraintBottom_toBottomOf="@id/close_button"
+        app:layout_constraintStart_toEndOf="@id/close_button"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/close_button">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/transmission_title"
+                style="@style/TextHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_xl"
+                android:text="@string/about_app" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/transmission_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="I started this app as a fun project to learn Android development while doing something interesting. I hope it can be useful for someone who wants to learn encoding and decoding morse code. This is free to use app without ads.\nThis is an open source project and code is available on Github. The same code is also stored in The GitHub Arctic Code Vault for hundreds of years :D" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="100dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

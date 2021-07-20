@@ -136,6 +136,7 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
         super.onAttach(context)
         try {
             callback = context as FragmentCallbacks
+            callback?.setCurrentFragment("Manual")
         } catch (castException: ClassCastException) {
             throw ClassCastException("Context does not implement $TAG callback")
         }

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/padding_l"
+    android:paddingTop="20dp"
+    android:paddingEnd="@dimen/padding_l"
+    android:paddingBottom="20dp">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/close_button"
+        style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        app:icon="@drawable/ic_baseline_close_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/dialog_title"
+        style="@style/TextHeading1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="@string/sending_morse_info"
+        app:layout_constraintBottom_toBottomOf="@id/close_button"
+        app:layout_constraintStart_toEndOf="@id/close_button"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintTop_toBottomOf="@id/close_button">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/transmission_title"
+                style="@style/TextHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_xl"
+                android:text="@string/transmission_speed" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/transmission_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="Use transmission speed to control how fast flashlight is blinked." />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/flash_status_view"
+                android:layout_width="wrap_content"
+                android:layout_height="100dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/margin_m"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_torch"
+                app:tint="?colorOnBackground" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/image_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="Image shows current status of the flash. Also, you can tap and hold to manually transmit any morse code." />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/current_char_title"
+                style="@style/TextHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_m"
+                android:text="@string/currently_transmitting" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/current_char_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="Currently transmitting info shows which character is in transmission with it's morse code." />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/morse_code_title"
+                style="@style/TextHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_m"
+                android:text="@string/morse_code" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/morse_code_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="Morse code of the currently entered message. It appears when you start transmitting the message." />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/message_input_title"
+                style="@style/TextHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_m"
+                android:text="@string/type_your_message" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/message_input_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="Enter message that you want to transmit via flashlight." />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/signal_title"
+                style="@style/TextHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_m"
+                android:text="@string/signal" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/signal_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="Signal can be useful when you want to notify someone that you'll be starting the transmission soon. It is a short message transmitted at very high speed." />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/start_title"
+                style="@style/TextHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_m"
+                android:text="@string/start" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/start_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="Use start button to start transmitting your message. Same button can be used to stop the transmission." />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/sos_title"
+                style="@style/TextHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_m"
+                android:text="@string/sos" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/sos_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xxs"
+                android:text="SOS button sends SOS morse code message." />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="100dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

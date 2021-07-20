@@ -1,5 +1,6 @@
 package com.ranjan.malav.morselight_flashlightwithmorsecode.fragments
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -16,6 +17,8 @@ import kotlinx.android.synthetic.main.fragment_learn.*
 
 
 class LearnFragment : Fragment(R.layout.fragment_learn) {
+
+    private var callback: FragmentCallbacks? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -44,6 +47,16 @@ class LearnFragment : Fragment(R.layout.fragment_learn) {
             requireContext().launchWeb(
                 Uri.parse("https://ko-fi.com/ranjan")
             )
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            callback = context as FragmentCallbacks
+            callback?.setCurrentFragment("Learn")
+        } catch (castException: ClassCastException) {
+            throw ClassCastException("Context does not implement LearnFragment callback")
         }
     }
 }

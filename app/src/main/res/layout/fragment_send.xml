@@ -13,7 +13,7 @@
         android:paddingStart="@dimen/padding_xs"
         android:paddingEnd="@dimen/padding_xs"
         app:borderColor="@drawable/border_gray_4dp"
-        app:label="Transmission Speed"
+        app:label="@string/transmission_speed"
         app:labelColor="?colorOnBackground"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -106,7 +106,7 @@
         android:paddingStart="@dimen/padding_xs"
         android:paddingEnd="@dimen/padding_xs"
         app:borderColor="@drawable/border_gray_4dp"
-        app:label="Currently Transmitting"
+        app:label="@string/currently_transmitting"
         app:labelColor="?colorOnBackground"
         app:layout_constraintBottom_toTopOf="@id/morse_message">
 

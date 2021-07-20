@@ -152,6 +152,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
         super.onAttach(context)
         try {
             callback = context as FragmentCallbacks
+            callback?.setCurrentFragment("Auto")
         } catch (castException: ClassCastException) {
             throw ClassCastException("Context does not implement $TAG callback")
         }
