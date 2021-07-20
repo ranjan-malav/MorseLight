@@ -14,6 +14,7 @@ import android.widget.Toast
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 
@@ -271,11 +272,10 @@ fun Activity.askIfDecryptedCorrectly(message: String, timings: ArrayList<Long>) 
     messageInput.editText?.setText(message)
 
     reportButton.setOnClickListener {
-        val param = Bundle().apply {
-            putString("message", messageInput.editText?.text.toString())
-            putString("timings", getTimingsString(timings))
-        }
-        Firebase.analytics.logEvent("negative_decode", param)
+        val finalMessage = messageInput.editText?.text.toString()
+        FirebaseCrashlytics.getInstance()
+            .log("Message: $finalMessage; Timings: ${getTimingsString(timings)}")
+        FirebaseCrashlytics.getInstance().recordException(Throwable("Wrong decoding"))
         dialog.dismiss()
     }
 

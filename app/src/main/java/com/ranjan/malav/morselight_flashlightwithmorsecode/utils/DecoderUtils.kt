@@ -115,8 +115,8 @@ object DecoderUtils {
                 } else if (switchToMediumUnits && diffFromMovingAvg > 50) {
                     switchToBiggerUnits = true
                     biggerUnits.add(timing)
-                    movingAverage = 0L
-                    addedCount = 0
+                    movingAverage = timing
+                    addedCount = 1
                 } else if (switchToMediumUnits) {
                     movingAverage = if (movingAverage > 0) {
                         (movingAverage * addedCount + timing) / (addedCount + 1)
@@ -128,8 +128,8 @@ object DecoderUtils {
                 } else if (diffFromMovingAvg > 50) {
                     switchToMediumUnits = true
                     mediumUnits.add(timing)
-                    movingAverage = 0L
-                    addedCount = 0
+                    movingAverage = timing
+                    addedCount = 1
                 } else {
                     movingAverage = if (movingAverage > 0) {
                         (movingAverage * addedCount + timing) / (addedCount + 1)

@@ -11,6 +11,7 @@ interface FragmentCallbacks {
     )
     fun bindPreview(cameraPreview: PreviewView, imageAnalysisListener: ImageAnalysisListener)
     fun resetCameraBinds()
+    fun updateRectAreaPerc(percentage: Int)
 }
 
 interface ImageAnalysisListener {

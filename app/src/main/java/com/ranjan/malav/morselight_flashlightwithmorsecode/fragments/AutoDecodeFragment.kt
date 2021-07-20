@@ -4,8 +4,10 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.ranjan.malav.morselight_flashlightwithmorsecode.MainViewModel
@@ -42,7 +44,8 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
     private var avgLowLuminosity = 0.0
     private var avgHighLuminosity = 0.0
     private var avgCounter = 0
-    private var perceptibility = 5
+    private var perceptibility = 30
+    private var percentageRectSize = 50
     private val handler = Handler(Looper.getMainLooper())
     private val viewModel: MainViewModel by activityViewModels()
     private val timings = arrayListOf<Long>()
@@ -95,9 +98,23 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
         }
 
         perceptibility_title.isSelected = true
+        rect_size_title.isSelected = true
+        incoming_message.movementMethod = ScrollingMovementMethod()
 
         perceptibility_slider.addOnChangeListener { _, value, _ ->
             perceptibility = value.toInt()
+        }
+
+        size_slider.addOnChangeListener { _, value, _ ->
+            percentageRectSize = (value * 100).toInt()
+            when (value) {
+                0.1f -> setGuidePercentage(0.45f, 0.55f)
+                0.2f -> setGuidePercentage(0.4f, 0.6f)
+                0.3f -> setGuidePercentage(0.35f, 0.65f)
+                0.4f -> setGuidePercentage(0.3f, 0.7f)
+                0.5f -> setGuidePercentage(0.25f, 0.75f)
+            }
+            callback?.updateRectAreaPerc(percentageRectSize)
         }
 
         signal_button.setOnClickListener {
@@ -293,7 +310,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                 avgCounter++
             } else {
                 avgCounter = 0
-                if (luminosity > avgLowLuminosity * perceptibility && !isFlashOn) {
+                if (luminosity > avgLowLuminosity * (1 + perceptibility / 100f) && !isFlashOn) {
                     isFlashOn = true
                     avgHighLuminosity =
                         (avgHighLuminosity * avgCounter + luminosity) / (avgCounter + 1)
@@ -308,7 +325,18 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                             updateTimingViews()
                         }
                     }
-                } else if (luminosity * perceptibility < avgHighLuminosity && isFlashOn) {
+                }
+                /*
+                    Choosing 50% decrement to be considered as flash off change.
+                    Consider this case, avgLowLuminosity = 100, if perceptibility is set to 30%
+                    when luminosity is 130, we consider it flash on. Suppose avgHighLuminosity
+                    slightly decreases from 130 and becomes 128.
+                    When flash goes off, luminosity will return to near 100
+                    If we compare it with (1 + perceptibility%), required luminosity to call flash
+                    off becomes 98.46, that means low luminosity has to drop further than what it was
+                    when we started.
+                 */
+                else if (luminosity * (1 + perceptibility / 200f) <= avgHighLuminosity && isFlashOn) {
                     isFlashOn = false
                     timings.add(System.currentTimeMillis())
                     if (timings.size > 1) {
@@ -330,5 +358,20 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                 }
             }
         }
+    }
+
+    private fun setGuidePercentage(leftTopPerc: Float, rightBottomPerc: Float) {
+        val leftParams = guide_left.layoutParams as ConstraintLayout.LayoutParams
+        leftParams.guidePercent = leftTopPerc
+        guide_left.layoutParams = leftParams
+        val topParams = guide_top.layoutParams as ConstraintLayout.LayoutParams
+        topParams.guidePercent = leftTopPerc
+        guide_top.layoutParams = topParams
+        val rightParams = guide_right.layoutParams as ConstraintLayout.LayoutParams
+        rightParams.guidePercent = rightBottomPerc
+        guide_right.layoutParams = rightParams
+        val bottomParams = guide_bottom.layoutParams as ConstraintLayout.LayoutParams
+        bottomParams.guidePercent = rightBottomPerc
+        guide_bottom.layoutParams = bottomParams
     }
 }

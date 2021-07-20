@@ -43,10 +43,15 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
     private var navListener = NavController.OnDestinationChangedListener { _, _, _ ->
         removeHandlers()
     }
+    private var luminosityAnalyzer = LuminosityAnalyzer({ luminosity ->
+        Log.d(TAG, "luma: $luminosity")
+        imageAnalysisListener?.listenLuminosity(luminosity)
+    }, 50)
     private val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var cam: Camera? = null
     private var isFlashOn = false
     private var ignoreClicks = false
+    private var log = false
     private val viewModel: MainViewModel by viewModels()
 
     private val handler = Handler(Looper.getMainLooper())
@@ -219,12 +224,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
                 // Bind use cases to camera
                 imageAnalyzer = ImageAnalysis.Builder()
                     .build()
-                    .also {
-                        it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luminosity ->
-                            Log.d(TAG, "luma: $luminosity")
-                            imageAnalysisListener?.listenLuminosity(luminosity)
-                        })
-                    }
+                    .also { it.setAnalyzer(cameraExecutor, luminosityAnalyzer) }
                 cam = cameraProvider.bindToLifecycle(
                     this, cameraSelector, imageAnalyzer
                 )
@@ -325,6 +325,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
         cam = cameraProvider.bindToLifecycle(
             this, cameraSelector, imageAnalyzer
         )
+    }
+
+    override fun updateRectAreaPerc(percentage: Int) {
+        luminosityAnalyzer.updateConsiderableArea(percentage)
     }
 
     private fun aspectRatio(width: Int, height: Int): Int {

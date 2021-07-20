@@ -29,12 +29,110 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/camera_hint" />
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.25" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.25" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.75" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.75" />
+
+        <View
+            android:id="@+id/rect_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/border_red"
+            app:layout_constraintBottom_toBottomOf="@id/guide_bottom"
+            app:layout_constraintEnd_toEndOf="@id/guide_right"
+            app:layout_constraintStart_toStartOf="@id/guide_left"
+            app:layout_constraintTop_toTopOf="@id/guide_top" />
+
         <LinearLayout
+            android:id="@+id/size_settings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#B3FFFFFF"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="@id/camera_preview">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/rect_size_title"
+                style="@style/TextBody1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_xs"
+                android:ellipsize="marquee"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:text="@string/analyzed_rect_size"
+                android:textColor="@color/white" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextBody2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="@dimen/margin_xs"
+                    android:text="@string/small"
+                    android:textColor="@color/white" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/size_slider"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_xs"
+                    android:layout_marginEnd="@dimen/margin_xs"
+                    android:layout_weight="1"
+                    android:stepSize="0.1"
+                    android:value="0.5"
+                    android:valueFrom="0.1"
+                    android:valueTo="0.5" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextBody2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="@dimen/margin_xs"
+                    android:text="@string/big"
+                    android:textColor="@color/white" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/perceptibility_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#B3FFFFFF"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="@id/camera_preview">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/perceptibility_title"
@@ -69,10 +167,10 @@
                     android:layout_marginStart="@dimen/margin_xs"
                     android:layout_marginEnd="@dimen/margin_xs"
                     android:layout_weight="1"
-                    android:stepSize="1"
-                    android:value="5"
-                    android:valueFrom="2"
-                    android:valueTo="10" />
+                    android:stepSize="10"
+                    android:value="30"
+                    android:valueFrom="10"
+                    android:valueTo="50" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     style="@style/TextBody2"
@@ -112,7 +210,7 @@
             android:maxLines="2"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="@id/camera_preview"
-            app:layout_constraintTop_toTopOf="@id/camera_preview"
+            app:layout_constraintTop_toBottomOf="@id/perceptibility_settings"
             tools:text="Avg off luminosity: 150\nCurrent luminosity: 120" />
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -127,19 +225,6 @@
             app:layout_constraintEnd_toEndOf="@id/camera_preview"
             app:srcCompat="@drawable/ic_torch"
             app:tint="@color/white" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/grant_permission_button"
-            style="@style/Widget.MaterialComponents.Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_xs"
-            android:text="@string/grant_permission"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/camera_preview"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/camera_preview" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -175,9 +260,11 @@
         android:layout_marginBottom="@dimen/margin_xs"
         android:background="@drawable/border_gray_4dp"
         android:ellipsize="marquee"
+        android:gravity="bottom"
         android:maxLines="3"
         android:minLines="3"
         android:padding="@dimen/padding_xs"
+        android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@id/decode_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

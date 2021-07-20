@@ -46,7 +46,7 @@
     <string name="no_browser_app">Browser app is not installed.</string>
     <string name="send_mail">Send mail..</string>
     <string name="layout_problem">Some problem occurred while trying to show camera preview.</string>
-    <string name="perceptibility">Perceptibility (Keep High in dark, low in day light)</string>
+    <string name="perceptibility">Perceptibility (Keep low when source is far away, high when close)</string>
     <string name="low">Low</string>
     <string name="high">High</string>
     <string name="message">Message</string>
@@ -63,4 +63,7 @@
     <string name="average_luminosity">Current luminosity: %1$s</string>
     <string name="average_current_luminosity">Avg off luminosity: %1$s\nCurrent luminosity: %2$s</string>
     <string name="learning_low_luminosity">Learning low luminosity: %1$s</string>
+    <string name="big">Big</string>
+    <string name="small">Small</string>
+    <string name="analyzed_rect_size">Size of analyzed square(Keep small when source is far away, big when close)</string>
 </resources>
