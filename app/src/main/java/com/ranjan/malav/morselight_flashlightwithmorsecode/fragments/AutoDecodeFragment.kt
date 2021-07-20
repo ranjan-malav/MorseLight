@@ -162,6 +162,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
 
     override fun onPause() {
         super.onPause()
+        callback?.removeImageListener()
         callback?.resetCameraBinds()
     }
 

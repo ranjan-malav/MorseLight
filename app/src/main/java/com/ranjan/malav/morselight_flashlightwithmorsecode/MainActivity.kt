@@ -320,6 +320,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
         }
     }
 
+    override fun removeImageListener() {
+        imageAnalysisListener = null
+    }
+
     override fun resetCameraBinds() {
         cameraProvider.unbindAll()
         cam = cameraProvider.bindToLifecycle(

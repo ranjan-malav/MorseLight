@@ -10,6 +10,7 @@ interface FragmentCallbacks {
         speed: Int, shouldSetCharChangeHandler: Boolean, finalOffDelay: Long
     )
     fun bindPreview(cameraPreview: PreviewView, imageAnalysisListener: ImageAnalysisListener)
+    fun removeImageListener()
     fun resetCameraBinds()
     fun updateRectAreaPerc(percentage: Int)
 }
