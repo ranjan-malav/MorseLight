@@ -54,12 +54,20 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
     companion object {
         private const val TAG = "AutoDecode"
         private const val SPEED = "speed"
+        private const val REACT_SIZE = "react_size"
+        private const val PERCEPTIBILITY = "perceptibility"
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         transmissionSpeed = sharedPref.getInt(SPEED, 3)
+        percentageRectSize = sharedPref.getInt(REACT_SIZE, 50)
+        perceptibility = sharedPref.getInt(PERCEPTIBILITY, 30)
+
+        size_slider.value = percentageRectSize / 100f
+        perceptibility_slider.value = perceptibility.toFloat()
+        setRectConstraints(percentageRectSize / 100f)
 
         start_stop_button.setOnClickListener {
             if (ignoreClicks) {
@@ -103,17 +111,13 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
 
         perceptibility_slider.addOnChangeListener { _, value, _ ->
             perceptibility = value.toInt()
+            sharedPref.setInt(PERCEPTIBILITY, perceptibility)
         }
 
         size_slider.addOnChangeListener { _, value, _ ->
             percentageRectSize = (value * 100).toInt()
-            when (value) {
-                0.1f -> setGuidePercentage(0.45f, 0.55f)
-                0.2f -> setGuidePercentage(0.4f, 0.6f)
-                0.3f -> setGuidePercentage(0.35f, 0.65f)
-                0.4f -> setGuidePercentage(0.3f, 0.7f)
-                0.5f -> setGuidePercentage(0.25f, 0.75f)
-            }
+            sharedPref.setInt(REACT_SIZE, percentageRectSize)
+            setRectConstraints(value)
             callback?.updateRectAreaPerc(percentageRectSize)
         }
 
@@ -357,6 +361,16 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                         getString(R.string.average_luminosity, String.format("%.1f", luminosity))
                 }
             }
+        }
+    }
+
+    private fun setRectConstraints(value: Float) {
+        when (value) {
+            0.1f -> setGuidePercentage(0.45f, 0.55f)
+            0.2f -> setGuidePercentage(0.4f, 0.6f)
+            0.3f -> setGuidePercentage(0.35f, 0.65f)
+            0.4f -> setGuidePercentage(0.3f, 0.7f)
+            0.5f -> setGuidePercentage(0.25f, 0.75f)
         }
     }
 
