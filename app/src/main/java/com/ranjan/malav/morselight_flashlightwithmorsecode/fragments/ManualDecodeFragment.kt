@@ -204,14 +204,24 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
         val charUnits = arrayListOf<Int>()
         val characters = arrayListOf<Char>()
         // Add character morse timings to string builder
+        var index = 0
         for (char in charMessage) {
+            if (char == ' ') {
+                timeUnits.replace(timeUnits.length - 1, timeUnits.length, "")
+            }
             timeUnits.append(charToUnits[char])
             morseCode.append(charToMorse[char])
             if (charUnits.isNotEmpty()) {
-                charUnits.add(charToTotalUnits[char]!! + 3)
+                if (char == ' ') {
+                    charUnits.add(charToTotalUnits[char]!!)
+                } else {
+                    charUnits[index - 1] = charUnits[index - 1] + 3
+                    charUnits.add(charToTotalUnits[char]!!)
+                }
             } else {
                 charUnits.add(charToTotalUnits[char]!!)
             }
+            index++
         }
         // Remove last character because we have added 3 units for space after every character
         timeUnits.replace(timeUnits.length - 1, timeUnits.length, "")

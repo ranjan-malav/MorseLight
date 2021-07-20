@@ -133,7 +133,7 @@ var charToTotalUnits = hashMapOf(
     '7' to 13,
     '8' to 15,
     '9' to 17,
-    ' ' to 7,
+    ' ' to 4,
 )
 
 var charToMorse = hashMapOf(

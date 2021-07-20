@@ -180,6 +180,7 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
         val charUnits = arrayListOf<Int>()
         val characters = arrayListOf<Char>()
         // Add character morse timings to string builder
+        var index = 0
         for (char in charMessage) {
             if (char == ' ') {
                 timeUnits.replace(timeUnits.length - 1, timeUnits.length, "")
@@ -190,11 +191,13 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
                 if (char == ' ') {
                     charUnits.add(charToTotalUnits[char]!!)
                 } else {
-                    charUnits.add(charToTotalUnits[char]!! + 3)
+                    charUnits[index - 1] = charUnits[index - 1] + 3
+                    charUnits.add(charToTotalUnits[char]!!)
                 }
             } else {
                 charUnits.add(charToTotalUnits[char]!!)
             }
+            index++
         }
         // Remove last character because we have added 3 units for space after every character
         timeUnits.replace(timeUnits.length - 1, timeUnits.length, "")
