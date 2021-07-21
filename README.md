@@ -1,5 +1,6 @@
 # MorseLight
 *MorseLight - An Android app to learn and decode morse code messages using the flashlight.*
+Play store link: https://play.google.com/store/apps/details?id=com.ranjan.malav.morselight_flashlightwithmorsecode
 
 MorseLight converts your message into morse code and then transmits it via flashlight. It also has the option to decode incoming flashlight messages.
 
