@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
 
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var controller: NavController
-    private lateinit var cameraProvider: ProcessCameraProvider
+    private var cameraProvider: ProcessCameraProvider? = null
     private var pm: PowerManager? = null
     private var wakeLock: PowerManager.WakeLock? = null
     private var preview: Preview? = null
@@ -247,13 +247,13 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
 
             try {
                 // Unbind use cases before rebinding
-                cameraProvider.unbindAll()
+                cameraProvider?.unbindAll()
 
                 // Bind use cases to camera
                 imageAnalyzer = ImageAnalysis.Builder()
                     .build()
                     .also { it.setAnalyzer(cameraExecutor, luminosityAnalyzer) }
-                cam = cameraProvider.bindToLifecycle(
+                cam = cameraProvider?.bindToLifecycle(
                     this, cameraSelector, imageAnalyzer
                 )
                 if (immediatelySwitchTorch && cam!!.cameraInfo.hasFlashUnit()) {
@@ -346,11 +346,11 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
     ) {
         try {
             val aspectRatio = aspectRatio(cameraPreview.width, cameraPreview.height)
-            cameraProvider.unbindAll()
+            cameraProvider?.unbindAll()
             preview = Preview.Builder().setTargetAspectRatio(aspectRatio).build()
             preview?.setSurfaceProvider(cameraPreview.surfaceProvider)
             this.imageAnalysisListener = imageAnalysisListener
-            cam = cameraProvider.bindToLifecycle(
+            cam = cameraProvider?.bindToLifecycle(
                 this, cameraSelector, imageAnalyzer, preview
             )
         } catch (ex: ArithmeticException) {
@@ -363,8 +363,8 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
     }
 
     override fun resetCameraBinds() {
-        cameraProvider.unbindAll()
-        cam = cameraProvider.bindToLifecycle(
+        cameraProvider?.unbindAll()
+        cam = cameraProvider?.bindToLifecycle(
             this, cameraSelector, imageAnalyzer
         )
     }
