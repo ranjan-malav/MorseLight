@@ -74,4 +74,25 @@
     <string name="auto_decode_info">Auto decode info</string>
     <string name="app_info">App info</string>
     <string name="about_app">About the App</string>
+    <string name="auto_info_perceptibility">Perceptibility basically means how easily it can be identified that incoming flash is on. Low values means there is very less contrast between flash on and off states, so luminosity doesn\'t increase much. High means luminosity difference between the on and off state will be high.</string>
+    <string name="auto_info_rect_size">Only a small portion that fits between red rectangle of camera preview is used to analyse whether the flash is on or off. If you increase the size of rectangle, surroundings of the flashlight have more effect on the calculations.</string>
+    <string name="auto_info_timings"><![CDATA[Incoming timings notes for how long flash was on or off depending on how long the Press & Hold button was hold or released.]]></string>
+    <string name="auto_info_reset">Reset button clears noted timings. In case you want to start again.</string>
+    <string name="auto_info_decoded">This shows decoded message based on the noted timings. Use decode button to decode messages.</string>
+    <string name="info_signal">Signal can be useful when you want to notify someone that you\'ll be starting the transmission soon. It is a short message transmitted at very high speed.</string>
+    <string name="auto_info_start">When you start, it takes 3 second to analyse the average low luminosity, after 3 seconds you can start receiving the message. It may give wrong results if you start receiving messages before the average low luminosity is calculated.</string>
+    <string name="info_sos">SOS button sends SOS morse code message.</string>
+    <string name="info_about_app">I started this app as a fun project to learn Android development while doing something interesting. I hope it can be useful for someone who wants to learn encoding and decoding morse code. This is free to use app without ads.\nThis is an open source project and code is available on Github. The same code is also stored in The GitHub Arctic Code Vault for hundreds of years :D</string>
+    <string name="manual_info_press_hold">Press and hold this button when you see incoming flashlight as on and release when it\'s off.</string>
+    <string name="manual_info_decode">Use decode button to decode incoming morse encoded messages.</string>
+    <string name="manual_info_decoded">This shows decoded message based on the noted timings. Use decode button to decode messages.</string>
+    <string name="manual_info_reset">Reset button clears noted timings. In case you want to start again.</string>
+    <string name="manual_info_timings"><![CDATA[Incoming timings notes for how long flash was on or off depending on how long the Press & Hold button was hold or released.]]></string>
+    <string name="manual_info_image"><![CDATA[Image shows current status of the flash. It reacts to PRESS & HOLD button.]]></string>
+    <string name="send_info_start">Use start button to start transmitting your message. Same button can be used to stop the transmission.</string>
+    <string name="send_info_input">Enter message that you want to transmit via flashlight.</string>
+    <string name="send_info_morse_code">Morse code of the currently entered message. It appears when you start transmitting the message.</string>
+    <string name="send_info_current_char">Currently transmitting info shows which character is in transmission with it\'s morse code.</string>
+    <string name="send_info_image">Image shows current status of the flash. Also, you can tap and hold to manually transmit any morse code.</string>
+    <string name="send_info_transmission">Use transmission speed to control how fast flashlight is blinked.</string>
 </resources>

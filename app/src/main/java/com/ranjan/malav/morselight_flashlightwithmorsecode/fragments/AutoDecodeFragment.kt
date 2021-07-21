@@ -66,6 +66,8 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
         perceptibility = sharedPref.getInt(PERCEPTIBILITY, 30)
 
         size_slider.value = percentageRectSize / 100f
+        callback?.updateRectAreaPerc(percentageRectSize)
+
         perceptibility_slider.value = perceptibility.toFloat()
         setRectConstraints(percentageRectSize / 100f)
 

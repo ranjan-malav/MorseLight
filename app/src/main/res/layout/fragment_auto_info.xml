@@ -28,7 +28,7 @@
         app:layout_constraintStart_toEndOf="@id/close_button"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/close_button">
@@ -39,7 +39,7 @@
             android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/transmission_title"
+                android:id="@+id/perceptibility_title"
                 style="@style/TextHeading1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -47,15 +47,15 @@
                 android:text="@string/perceptibility" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/transmission_info"
+                android:id="@+id/perceptibility_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="Perceptibility basically means how easily it can be identified that incoming flash is on. Low values means there is very less contrast between flash on and off states, so luminosity doesn't increase much. High means luminosity difference between the on and off state will be high." />
+                android:text="@string/auto_info_perceptibility" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/current_char_title"
+                android:id="@+id/rect_size_title"
                 style="@style/TextHeading1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -63,12 +63,12 @@
                 android:text="@string/analyzed_rect_size" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/current_char_info"
+                android:id="@+id/rect_size_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="Only a small portion that fits between red rectangle of camera preview is used to analyse whether the flash is on or off. If you increase the size of rectangle, surroundings of the flashlight have more effect on the calculations." />
+                android:text="@string/auto_info_rect_size" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/timings_title"
@@ -84,7 +84,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="Incoming timings notes for how long flash was on or off depending on how long the Press &amp; Hold button was hold or released." />
+                android:text="@string/auto_info_timings" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/reset_title"
@@ -100,7 +100,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="Reset button clears noted timings. In case you want to start again." />
+                android:text="@string/auto_info_reset" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/decoded_title"
@@ -116,7 +116,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="This shows decoded message based on the noted timings. Use decode button to decode messages." />
+                android:text="@string/auto_info_decoded" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/signal_title"
@@ -132,7 +132,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="Signal can be useful when you want to notify someone that you'll be starting the transmission soon. It is a short message transmitted at very high speed." />
+                android:text="@string/info_signal" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/start_title"
@@ -148,7 +148,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="When you start, it takes 3 second to analyse the average low luminosity, after 3 seconds you can start receiving the message. It may give wrong results if you start receiving messages before the average low luminosity is calculated." />
+                android:text="@string/auto_info_start" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/sos_title"
@@ -164,7 +164,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="SOS button sends SOS morse code message." />
+                android:text="@string/info_sos" />
 
             <View
                 android:layout_width="match_parent"
@@ -172,6 +172,6 @@
 
         </LinearLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

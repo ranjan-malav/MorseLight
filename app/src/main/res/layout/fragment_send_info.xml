@@ -28,7 +28,7 @@
         app:layout_constraintStart_toEndOf="@id/close_button"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="Use transmission speed to control how fast flashlight is blinked." />
+                android:text="@string/send_info_transmission" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/flash_status_view"
@@ -72,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="Image shows current status of the flash. Also, you can tap and hold to manually transmit any morse code." />
+                android:text="@string/send_info_image" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/current_char_title"
@@ -88,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="Currently transmitting info shows which character is in transmission with it's morse code." />
+                android:text="@string/send_info_current_char" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/morse_code_title"
@@ -104,7 +104,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="Morse code of the currently entered message. It appears when you start transmitting the message." />
+                android:text="@string/send_info_morse_code" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/message_input_title"
@@ -120,7 +120,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="Enter message that you want to transmit via flashlight." />
+                android:text="@string/send_info_input" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/signal_title"
@@ -136,7 +136,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="Signal can be useful when you want to notify someone that you'll be starting the transmission soon. It is a short message transmitted at very high speed." />
+                android:text="@string/info_signal" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/start_title"
@@ -152,7 +152,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="Use start button to start transmitting your message. Same button can be used to stop the transmission." />
+                android:text="@string/send_info_start" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/sos_title"
@@ -168,7 +168,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_xxs"
-                android:text="SOS button sends SOS morse code message." />
+                android:text="@string/info_sos" />
 
             <View
                 android:layout_width="match_parent"
@@ -176,6 +176,6 @@
 
         </LinearLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
