@@ -10,3 +10,5 @@ MorseLight app provides these functionalities:
   4. Manually decode incoming flashlight messages.
   5. Automatically decode incoming flashlight messages using the camera.
   6. Learn manual decoding by simulating incoming flash for custom messages.
+
+Source code is public. Contact me at ranjan2192@gmail.com if you want to contribute to the project.
