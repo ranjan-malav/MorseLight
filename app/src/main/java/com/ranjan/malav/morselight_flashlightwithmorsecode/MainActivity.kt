@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -21,6 +20,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.ranjan.malav.morselight_flashlightwithmorsecode.fragments.FragmentCallbacks
 import com.ranjan.malav.morselight_flashlightwithmorsecode.fragments.ImageAnalysisListener
 import com.ranjan.malav.morselight_flashlightwithmorsecode.fragments.InfoDialog
@@ -48,14 +48,13 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
         removeHandlers()
     }
     private var luminosityAnalyzer = LuminosityAnalyzer({ luminosity ->
-        Log.d(TAG, "luma: $luminosity")
+        //Log.d(TAG, "luma: $luminosity")
         imageAnalysisListener?.listenLuminosity(luminosity)
     }, 50)
     private val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var cam: Camera? = null
     private var isFlashOn = false
     private var ignoreClicks = false
-    private var log = false
     private val viewModel: MainViewModel by viewModels()
     private var currentFragment = "Send"
 
@@ -169,7 +168,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
     // We don't wanna perform those operations here because it messes up the timings then.
     private fun switchFlashOn(cam: Camera) {
         if (cam.cameraInfo.hasFlashUnit()) {
-            Log.d(TAG, "Switch flash on")
+            //Log.d(TAG, "Switch flash on")
             cam.cameraControl.enableTorch(true)
             isFlashOn = true
             viewModel.updateFlashStatus(true)
@@ -178,7 +177,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
 
     private fun switchFlashOff(cam: Camera) {
         if (cam.cameraInfo.hasFlashUnit()) {
-            Log.d(TAG, "Switch flash off")
+            //Log.d(TAG, "Switch flash off")
             cam.cameraControl.enableTorch(false)
             isFlashOn = false
             viewModel.updateFlashStatus(false)
@@ -261,7 +260,8 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
                     switchFlashOn(cam!!)
                 }
             } catch (exc: Exception) {
-                Log.e(TAG, "Use case binding failed", exc)
+                FirebaseCrashlytics.getInstance().recordException(exc)
+                //Log.e(TAG, "Use case binding failed", exc)
             }
 
         }, ContextCompat.getMainExecutor(this))
@@ -279,7 +279,8 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
                 null
             )
         } catch (npe: NullPointerException) {
-            Log.d(TAG, "Error: ${npe.localizedMessage}")
+            FirebaseCrashlytics.getInstance().recordException(npe)
+            //Log.d(TAG, "Error: ${npe.localizedMessage}")
         }
     }
 
@@ -308,7 +309,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
         val transmissionSpeed: Float = 3f / speed
         for (i in onOffDelays.indices) {
             if (!isFlashOn) {
-                Log.d(TAG, "Delay on: ${onOffDelays[i]}")
+                //Log.d(TAG, "Delay on: ${onOffDelays[i]}")
                 isFlashOn = true
                 handler.postDelayed(
                     onRunnable,
@@ -316,7 +317,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
                 )
             } else {
                 isFlashOn = false
-                Log.d(TAG, "Delay off: ${onOffDelays[i]}")
+                //Log.d(TAG, "Delay off: ${onOffDelays[i]}")
                 handler2.postDelayed(
                     offRunnable,
                     onOffDelays[i]

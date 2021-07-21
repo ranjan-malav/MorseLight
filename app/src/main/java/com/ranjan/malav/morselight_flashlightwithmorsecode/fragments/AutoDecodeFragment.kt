@@ -5,11 +5,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.method.ScrollingMovementMethod
-import android.util.Log
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.ranjan.malav.morselight_flashlightwithmorsecode.MainViewModel
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.*
@@ -223,7 +223,8 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
         try {
             handler.removeCallbacksAndMessages(null)
         } catch (npe: NullPointerException) {
-            Log.d(TAG, "Error: ${npe.localizedMessage}")
+            FirebaseCrashlytics.getInstance().recordException(npe)
+            //Log.d(TAG, "Error: ${npe.localizedMessage}")
         }
     }
 

@@ -1,6 +1,5 @@
 package com.ranjan.malav.morselight_flashlightwithmorsecode.utils
 
-import android.util.Log
 import kotlinx.android.synthetic.main.fragment_manual_decode.*
 
 
@@ -27,7 +26,7 @@ object DecoderUtils {
         percentageDiffs.forEach {
             percDiffs.append(it).append(" * ")
         }
-        Log.d("ManualDecode", "On percentage Diffs: $percDiffs")
+        //Log.d("ManualDecode", "On percentage Diffs: $percDiffs")
 
         val smallerUnits = arrayListOf<Long>()
         val biggerUnits = arrayListOf<Long>()
@@ -48,7 +47,7 @@ object DecoderUtils {
                 } else {
                     (timing - movingAverage).toFloat() / movingAverage * 100
                 }
-                Log.d("ManualDecode", "Diff from moving Avg: $diffFromMovingAvg")
+                //Log.d("ManualDecode", "Diff from moving Avg: $diffFromMovingAvg")
                 when {
                     switchToBiggerUnits -> {
                         biggerUnits.add(timing)
@@ -92,7 +91,7 @@ object DecoderUtils {
         percentageDiffs.forEach {
             percDiffs.append(it).append(" * ")
         }
-        Log.d("ManualDecode", "Off percentage Diffs: $percDiffs")
+        //Log.d("ManualDecode", "Off percentage Diffs: $percDiffs")
 
         val smallerUnits = arrayListOf<Long>()
         val mediumUnits = arrayListOf<Long>()
@@ -109,7 +108,7 @@ object DecoderUtils {
                 } else {
                     (timing - movingAverage).toFloat() / movingAverage * 100
                 }
-                Log.d("ManualDecode", "Diff from moving Avg: $diffFromMovingAvg")
+                //Log.d("ManualDecode", "Diff from moving Avg: $diffFromMovingAvg")
                 if (switchToBiggerUnits) {
                     biggerUnits.add(timing)
                 } else if (switchToMediumUnits && diffFromMovingAvg > 50) {

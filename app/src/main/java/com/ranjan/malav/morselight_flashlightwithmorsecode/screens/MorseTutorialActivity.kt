@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.method.ScrollingMovementMethod
-import android.util.Log
 import android.util.TypedValue
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -14,6 +13,7 @@ import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecoderUtils
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecoderUtils.getMorseForMessage
@@ -195,7 +195,7 @@ class MorseTutorialActivity : AppCompatActivity() {
 
             for (i in onOffDelays.indices) {
                 if (!isFlashOn) {
-                    Log.d(TAG, "Delay on: ${onOffDelays[i]}")
+                    //Log.d(TAG, "Delay on: ${onOffDelays[i]}")
                     isFlashOn = true
                     handler.postDelayed(
                         onRunnable,
@@ -203,7 +203,7 @@ class MorseTutorialActivity : AppCompatActivity() {
                     )
                 } else {
                     isFlashOn = false
-                    Log.d(TAG, "Delay off: ${onOffDelays[i]}")
+                    //Log.d(TAG, "Delay off: ${onOffDelays[i]}")
                     handler2.postDelayed(
                         offRunnable,
                         onOffDelays[i]
@@ -218,7 +218,8 @@ class MorseTutorialActivity : AppCompatActivity() {
         try {
             handler.removeCallbacksAndMessages(null)
         } catch (npe: NullPointerException) {
-            Log.d(TAG, "Error: ${npe.localizedMessage}")
+            FirebaseCrashlytics.getInstance().recordException(npe)
+            //Log.d(TAG, "Error: ${npe.localizedMessage}")
         }
     }
 
