@@ -6,29 +6,19 @@
 **Goal:** Bring a 2021-era app (AGP 4.2 / Kotlin 1.5 / targetSdk 30 / XML + Fragments) up to a
 currently Play-Store-compliant build, and rewrite the UI in Jetpack Compose.
 
-> ### ⚠️ OPEN BLOCKER — release signing key
-> **The release keystore could not be found, and it blocks shipping (Phase 6) — not development.**
-> Searched and ruled out on 2026-09-20: the whole home directory, `~/.android` (debug key only),
-> Android Studio's remembered signing configs (2023.3 → 2026.1.4), `~/.gradle/gradle.properties`,
-> and all 50 commits of git history. The `.jks` file itself is missing, so the forgotten password is
-> the *secondary* problem.
+> ### ✅ RESOLVED — release signing key
+> **Play App Signing is enabled** — Play Console shows *"Protect app signing key · Releases signed by
+> Play"* (confirmed 2026-09-20). Google holds the app signing key, so the keystore lost from the 2021
+> machine was only the **upload key**, and its forgotten password is now irrelevant.
 >
-> **The deciding question:** is Play App Signing enabled?
-> Play Console → Test and release → Setup → App integrity → App signing.
+> Recovery is a routine **upload key reset** (steps in Phase 6). Existing users are unaffected: Google
+> keeps re-signing every release with the same app signing key, so the on-device signature never changes
+> and updates install over existing installs as normal.
 >
-> - **Enabled →** recoverable. The lost key was only the *upload* key. Generate a new keystore, export
->   its cert (`keytool -export -rfc`), and request an upload key reset in Play Console. Google keeps
->   re-signing with the app signing key it already holds, so existing users update seamlessly.
-> - **Not enabled →** not recoverable. MorseLight predates the Aug 2021 mandate, so legacy self-signing
->   is plausible. Google never held a copy and cannot restore it; opting in now would require uploading
->   that same key. Fallback is republishing under a new `applicationId`, losing installs/ratings/reviews
->   and the listing URL. (Store *listing* text can still be edited without the key, so the old listing
->   can point users to the new one before being unpublished.)
->
-> **Still to check (off this machine):** the 2021 dev machine or its Time Machine backup, password
-> manager, Google Drive / iCloud / email-to-self, old external drives.
-> If the `.jks` turns up but the password doesn't, that is the recoverable case — a JKS password is
-> brute-forceable against your own keystore, and store/key passwords are often identical.
+> Searched and ruled out on 2026-09-20 before confirming this: whole home directory, `~/.android`
+> (debug key only), Android Studio's remembered signing configs (2023.3 → 2026.1.4),
+> `~/.gradle/gradle.properties`, and all 50 commits of git history. The old keystore is gone for good —
+> it just no longer matters.
 
 ---
 
@@ -148,8 +138,9 @@ Each phase should end on a **green build + working app**, and get its own commit
       Verified no already-tracked file became ignored.
 - [x] Confirmed clean: `.idea/` and `local.properties` are untracked. `app/google-services.json`
       *is* tracked — normal for Firebase, left as-is.
-- [ ] ⚠️ **Release keystore NOT located — see the blocker callout at the top of this file.**
-      Blocks Phase 6 only; Phases 1–5 proceed regardless.
+- [x] Release keystore investigated: not on this machine or in git history, but **Play App Signing is
+      enabled**, so it was only the upload key. Replaced via upload key reset in Phase 6 — no longer a
+      blocker for any phase.
 
 ### Phase 1 — Make it build again (no UI changes)
 Goal: same app, same XML UI, modern toolchain. Biggest-risk phase, because of AGP 9 (§2.1).
@@ -230,7 +221,14 @@ Port one screen at a time, deleting the Fragment + XML as each lands.
 - [ ] **Edge-to-edge**: targetSdk 35+ forces it — audit every screen for content under the status/nav bars; apply `WindowInsets` padding
 - [ ] **Predictive back**: `android:enableOnBackInvokedCallback="true"` + verify nav behaviour
 - [ ] **16 KB page size** compliance (required since Nov 2025) — verify no bundled `.so` breaks it (`zipalign -c -P 16 -v`); CameraX/Firebase should already be compliant
-- [ ] ⚠️ **Resolve the signing-key blocker first** (see callout at top). Then re-add the signing config, reading the keystore path/passwords from `keystore.properties` or env — never committed (`.gitignore` already blocks them).
+- [ ] **Upload key reset** — the 2021 upload key is lost, but Play App Signing is on, so this is routine.
+      Can be started any time; it does not block Phases 1–5.
+  - [ ] `keytool -genkeypair -v -keystore morselight-upload.jks -keyalg RSA -keysize 4096 -validity 10000 -alias morselight-upload`
+  - [ ] `keytool -export -rfc -keystore morselight-upload.jks -alias morselight-upload -file upload_certificate.pem`
+  - [ ] Play Console → Test and release → Setup → App integrity → App signing → **Request upload key reset**, attach the PEM. Allow ~1–2 business days.
+  - [ ] Store the keystore **and** its password in a password manager plus an off-machine backup — this is precisely what failed in 2021
+- [ ] Wire `signingConfigs` to read path/passwords from a gitignored `keystore.properties` (or env vars) — never committed; `.gitignore` already blocks `*.jks`, `*.keystore`, `keystore.properties`
+- [ ] Note: SHA-1-keyed services bind to the *app signing* key, which is unchanged, so Firebase needs no reconfiguration
 - [ ] `minifyEnabled true` + `shrinkResources true`; write ProGuard keep rules (Firebase, CameraX, any reflective Compose usage) and **test the release build end-to-end** — the current `proguard-rules.pro` is untouched boilerplate
 - [ ] Build an **App Bundle** (`bundleRelease`) and test via internal app sharing
 - [ ] Remove the portrait lock (D5); verify tablet/foldable layout
@@ -280,3 +278,4 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-20 | — | D1/D2/D3 decided: AGP 9.4.1, minSdk 26, Koin dropped. AGP 9 requirements verified (Gradle ≥ 9.6.0, JDK ≥ 17, Build Tools ≥ 36.0.0, max API 37) — local toolchain already satisfies all of them. §2.1 added. |
 | 2026-09-20 | 0 | **Phase 0 complete.** Branch `migration/modernize-compose` created, `v3.0.0-legacy` tagged at `4359d23`, `.gitignore` modernized. |
 | 2026-09-20 | 0 | ⚠️ Release keystore not found anywhere on this machine or in git history. Shipping blocker raised; awaiting Play App Signing status from Play Console. |
+| 2026-09-20 | 0 | ✅ Signing blocker resolved: Play App Signing confirmed enabled ("Releases signed by Play"). Lost key was the upload key only; replaced via upload key reset in Phase 6. No phase is blocked. |
