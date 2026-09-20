@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.BadgeTone
+import com.ranjan.malav.morselight_flashlightwithmorsecode.BuildConfig
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.CardSurface
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.StatusBadge
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
@@ -125,7 +126,7 @@ fun MoreScreen(
 
         SunkenCard(Modifier.fillMaxWidth().padding(bottom = 24.dp)) {
             Text(
-                "MorseLight 3.0. Timing follows ITU-R M.1677, one unit at 12 wpm.",
+                "MorseLight ${BuildConfig.VERSION_NAME}. Timing follows ITU-R M.1677, one unit at 12 wpm.",
                 style = MaterialTheme.typography.bodyMedium, color = c.infoOnSoft,
             )
         }
