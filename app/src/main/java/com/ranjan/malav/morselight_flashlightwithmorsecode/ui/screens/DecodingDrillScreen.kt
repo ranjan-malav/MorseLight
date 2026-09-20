@@ -36,11 +36,27 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.StatusB
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SunkenCard
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.TorchDisc
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseRadius
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseLightTheme
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseTheme
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun DecodingDrillScreen(vm: DecodingDrillViewModel, modifier: Modifier = Modifier) {
     val ui by vm.ui.collectAsStateWithLifecycle()
+    DecodingDrillContent(ui, vm::play, vm::next, vm::toggleReveal, vm::copyDown, vm::copyUp, vm::resetCopy, modifier)
+}
+
+@Composable
+fun DecodingDrillContent(
+    ui: DecodingDrillUi,
+    onPlay: () -> Unit,
+    onNext: () -> Unit,
+    onToggleReveal: () -> Unit,
+    onCopyDown: () -> Unit,
+    onCopyUp: () -> Unit,
+    onReset: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val c = MorseTheme.colors
 
     Column(modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -59,9 +75,9 @@ fun DecodingDrillScreen(vm: DecodingDrillViewModel, modifier: Modifier = Modifie
                     style = MaterialTheme.typography.headlineMedium, color = c.textHeading,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SoftPill(if (ui.playing) "Stop" else "Play", vm::play, tone = PillTone.Accent)
-                    SoftPill("Next", vm::next, tone = PillTone.Neutral)
-                    SoftPill(if (ui.reveal) "Hide" else "Reveal", vm::toggleReveal, tone = PillTone.Neutral)
+                    SoftPill(if (ui.playing) "Stop" else "Play", onPlay, tone = PillTone.Accent)
+                    SoftPill("Next", onNext, tone = PillTone.Neutral)
+                    SoftPill(if (ui.reveal) "Hide" else "Reveal", onToggleReveal, tone = PillTone.Neutral)
                 }
             }
         }
@@ -86,11 +102,17 @@ fun DecodingDrillScreen(vm: DecodingDrillViewModel, modifier: Modifier = Modifie
             Box(
                 Modifier.weight(1f).height(64.dp).clip(RoundedCornerShape(MorseRadius.control))
                     .background(c.accent)
-                    .pointerInput(Unit) { detectTapGestures(onPress = { vm.copyDown(); tryAwaitRelease(); vm.copyUp() }) }
+                    .pointerInput(Unit) { detectTapGestures(onPress = { onCopyDown(); tryAwaitRelease(); onCopyUp() }) }
                     .semantics { role = Role.Button; contentDescription = "Hold to copy the incoming message" },
                 contentAlignment = Alignment.Center,
             ) { Text("Hold to copy", style = MaterialTheme.typography.labelLarge, color = c.textOnAccent) }
-            SoftPill("Reset", vm::resetCopy, tone = PillTone.Neutral)
+            SoftPill("Reset", onReset, tone = PillTone.Neutral)
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DecodingDrillPreview() {
+    MorseLightTheme { DecodingDrillContent(DecodingDrillUi(reveal = true), {}, {}, {}, {}, {}, {}) }
 }

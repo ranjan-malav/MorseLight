@@ -36,11 +36,35 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.TorchDi
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.LabeledSlider
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.JetBrainsMono
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseRadius
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseLightTheme
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseTheme
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ReceiveScreen(vm: ReceiveViewModel, torch: TorchController, modifier: Modifier = Modifier) {
     val ui by vm.ui.collectAsStateWithLifecycle()
+    ReceiveContent(
+        ui = ui,
+        onSetMode = vm::setMode, onReset = vm::reset,
+        onSensitivity = vm::setSensitivity, onDetectionArea = vm::setDetectionArea,
+        onKeyDown = vm::keyDown, onKeyUp = vm::keyUp,
+        cameraContent = { CameraPreview(torch, Modifier.fillMaxWidth().height(160.dp)) },
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun ReceiveContent(
+    ui: ReceiveUiState,
+    onSetMode: (RxMode) -> Unit,
+    onReset: () -> Unit,
+    onSensitivity: (Int) -> Unit,
+    onDetectionArea: (Int) -> Unit,
+    onKeyDown: () -> Unit,
+    onKeyUp: () -> Unit,
+    cameraContent: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val c = MorseTheme.colors
 
     Column(
@@ -49,11 +73,11 @@ fun ReceiveScreen(vm: ReceiveViewModel, torch: TorchController, modifier: Modifi
     ) {
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
             SegmentedButton(
-                selected = ui.mode == RxMode.Manual, onClick = { vm.setMode(RxMode.Manual) },
+                selected = ui.mode == RxMode.Manual, onClick = { onSetMode(RxMode.Manual) },
                 shape = SegmentedButtonDefaults.itemShape(0, 2),
             ) { Text("Manual key") }
             SegmentedButton(
-                selected = ui.mode == RxMode.Camera, onClick = { vm.setMode(RxMode.Camera) },
+                selected = ui.mode == RxMode.Camera, onClick = { onSetMode(RxMode.Camera) },
                 shape = SegmentedButtonDefaults.itemShape(1, 2),
             ) { Text("Camera") }
         }
@@ -63,7 +87,7 @@ fun ReceiveScreen(vm: ReceiveViewModel, torch: TorchController, modifier: Modifi
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Eyebrow("Decoded", Modifier.weight(1f))
-                    TextButton(onClick = vm::reset) { Text("Reset") }
+                    TextButton(onClick = onReset) { Text("Reset") }
                 }
                 Text(
                     ui.decoded.ifBlank { "Nothing copied yet" },
@@ -99,9 +123,9 @@ fun ReceiveScreen(vm: ReceiveViewModel, torch: TorchController, modifier: Modifi
             SunkenCard(Modifier.fillMaxWidth()) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     LabeledSlider("Sensitivity", "${ui.sensitivity}%", ui.sensitivity.toFloat(),
-                        { vm.setSensitivity(it.toInt()) }, 0f..100f, 0)
+                        { onSensitivity(it.toInt()) }, 0f..100f, 0)
                     LabeledSlider("Detection area", "${ui.detectionArea}", ui.detectionArea.toFloat(),
-                        { vm.setDetectionArea(it.toInt()) }, 30f..90f, 0)
+                        { onDetectionArea(it.toInt()) }, 30f..90f, 0)
                 }
             }
         } else {
@@ -114,11 +138,23 @@ fun ReceiveScreen(vm: ReceiveViewModel, torch: TorchController, modifier: Modifi
                     contentDescription = "Key: hold while the sender's light is on",
                     modifier = Modifier.padding(bottom = 16.dp).pointerInput(Unit) {
                         detectTapGestures(onPress = {
-                            vm.keyDown(); tryAwaitRelease(); vm.keyUp()
+                            onKeyDown(); tryAwaitRelease(); onKeyUp()
                         })
                     },
                 )
             }
         }
+    }
+}
+
+@Preview(name = "Receive manual", showBackground = true)
+@Composable
+private fun ReceiveManualPreview() {
+    MorseLightTheme {
+        ReceiveContent(
+            ui = ReceiveUiState(mode = RxMode.Manual, decoded = "SOS", buffer = "... --- ..."),
+            onSetMode = {}, onReset = {}, onSensitivity = {}, onDetectionArea = {},
+            onKeyDown = {}, onKeyUp = {}, cameraContent = {},
+        )
     }
 }

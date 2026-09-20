@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ranjan.malav.morselight_flashlightwithmorsecode.data.Settings
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.BadgeTone
 import com.ranjan.malav.morselight_flashlightwithmorsecode.BuildConfig
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.CardSurface
@@ -36,7 +37,9 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.StatusB
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SunkenCard
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseRadius
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseLightTheme
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseTheme
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun MoreScreen(
@@ -50,6 +53,29 @@ fun MoreScreen(
     modifier: Modifier = Modifier,
 ) {
     val s by vm.state.collectAsStateWithLifecycle()
+    MoreContent(
+        s = s,
+        onKeyTone = vm::setKeyTone, onLoop = vm::setLoop, onKeepAwake = vm::setKeepAwake,
+        onOpenDecodingDrill = onOpenDecodingDrill, onOpenSendingDrill = onOpenSendingDrill,
+        onOpenReferenceChart = onOpenReferenceChart, onRate = onRate, onSource = onSource,
+        onDonate = onDonate, modifier = modifier,
+    )
+}
+
+@Composable
+fun MoreContent(
+    s: Settings,
+    onKeyTone: (Boolean) -> Unit,
+    onLoop: (Boolean) -> Unit,
+    onKeepAwake: (Boolean) -> Unit,
+    onOpenDecodingDrill: () -> Unit,
+    onOpenSendingDrill: () -> Unit,
+    onOpenReferenceChart: () -> Unit,
+    onRate: () -> Unit,
+    onSource: () -> Unit,
+    onDonate: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val c = MorseTheme.colors
 
     Column(
@@ -103,11 +129,11 @@ fun MoreScreen(
             Eyebrow("Preferences")
             CardSurface(Modifier.fillMaxWidth(), padding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
                 Column {
-                    SwitchRow("Key tone", "Sidetone while the light is on", s.keyTone, vm::setKeyTone)
+                    SwitchRow("Key tone", "Sidetone while the light is on", s.keyTone, onKeyTone)
                     HorizontalDivider(color = c.borderSubtle)
-                    SwitchRow("Loop transmission", "Repeat the message until stopped", s.loop, vm::setLoop)
+                    SwitchRow("Loop transmission", "Repeat the message until stopped", s.loop, onLoop)
                     HorizontalDivider(color = c.borderSubtle)
-                    SwitchRow("Keep screen awake", "While sending or receiving", s.keepAwake, vm::setKeepAwake)
+                    SwitchRow("Keep screen awake", "While sending or receiving", s.keepAwake, onKeepAwake)
                 }
             }
         }
@@ -164,5 +190,13 @@ private fun SwitchRow(title: String, subtitle: String, checked: Boolean, onChang
             checked = checked, onCheckedChange = onChange,
             colors = SwitchDefaults.colors(checkedTrackColor = c.accent),
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MorePreview() {
+    MorseLightTheme {
+        MoreContent(Settings(), {}, {}, {}, {}, {}, {}, {}, {}, {})
     }
 }

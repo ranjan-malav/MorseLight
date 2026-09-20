@@ -34,11 +34,26 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.StatusB
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SunkenCard
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.JetBrainsMono
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseRadius
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseLightTheme
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseTheme
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun SendingDrillScreen(vm: SendingDrillViewModel, modifier: Modifier = Modifier) {
     val ui by vm.ui.collectAsStateWithLifecycle()
+    SendingDrillContent(ui, vm::clear, vm::toggleHint, vm::skip, vm::keyDown, vm::keyUp, modifier)
+}
+
+@Composable
+fun SendingDrillContent(
+    ui: SendingDrillUi,
+    onClear: () -> Unit,
+    onToggleHint: () -> Unit,
+    onSkip: () -> Unit,
+    onKeyDown: () -> Unit,
+    onKeyUp: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val c = MorseTheme.colors
 
     Column(modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -65,9 +80,9 @@ fun SendingDrillScreen(vm: SendingDrillViewModel, modifier: Modifier = Modifier)
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SoftPill("Clear", vm::clear, tone = PillTone.Neutral)
-            SoftPill(if (ui.showHint) "Hide" else "Hint", vm::toggleHint, tone = PillTone.Neutral)
-            SoftPill("Skip", vm::skip, tone = PillTone.Neutral)
+            SoftPill("Clear", onClear, tone = PillTone.Neutral)
+            SoftPill(if (ui.showHint) "Hide" else "Hint", onToggleHint, tone = PillTone.Neutral)
+            SoftPill("Skip", onSkip, tone = PillTone.Neutral)
         }
 
         Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.BottomCenter) {
@@ -75,10 +90,16 @@ fun SendingDrillScreen(vm: SendingDrillViewModel, modifier: Modifier = Modifier)
                 Modifier.fillMaxWidth().height(64.dp).padding(bottom = 16.dp)
                     .clip(RoundedCornerShape(MorseRadius.control))
                     .background(if (ui.keyOn) c.accentPress else c.accent)
-                    .pointerInput(Unit) { detectTapGestures(onPress = { vm.keyDown(); tryAwaitRelease(); vm.keyUp() }) }
+                    .pointerInput(Unit) { detectTapGestures(onPress = { onKeyDown(); tryAwaitRelease(); onKeyUp() }) }
                     .semantics { role = Role.Button; contentDescription = "Hold to key the character" },
                 contentAlignment = Alignment.Center,
             ) { Text("Hold to key", style = MaterialTheme.typography.labelLarge, color = c.textOnAccent, textAlign = TextAlign.Center) }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SendingDrillPreview() {
+    MorseLightTheme { SendingDrillContent(SendingDrillUi(showHint = true), {}, {}, {}, {}, {}) }
 }
