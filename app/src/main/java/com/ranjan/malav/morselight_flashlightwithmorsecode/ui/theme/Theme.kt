@@ -5,48 +5,56 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.graphics.Color
 
-// Fixed brand scheme (no dynamic color) so the teal identity is consistent across devices.
-private val LightColors = lightColorScheme(
-    primary = Teal800,
-    onPrimary = AppWhite,
-    primaryContainer = Teal800Light,
-    onPrimaryContainer = AppBlack,
-    secondary = TealA700,
-    onSecondary = AppWhite,
-    tertiary = TealA700Light,
-    background = AppWhite,
-    onBackground = AppBlack,
-    surface = AppWhite,
-    onSurface = AppBlack,
-    error = ErrorLight,
-    onError = AppWhite,
-)
-
-private val DarkColors = darkColorScheme(
-    primary = Teal800Light,
-    onPrimary = AppBlack,
-    primaryContainer = Teal800Dark,
-    onPrimaryContainer = AppWhite,
-    secondary = TealA700Light,
-    onSecondary = AppBlack,
-    tertiary = TealA700,
-    background = AppDark,
-    onBackground = AppWhite,
-    surface = AppDarkSurface,
-    onSurface = AppWhite,
-    error = ErrorDark,
-    onError = AppBlack,
-)
+/**
+ * Personal UI design system (design_handoff_morselight). Single signal-blue accent, no dynamic
+ * colour (brand identity), light + dark. Stock Material components read the M3 ColorScheme below;
+ * everything bespoke reads the richer role set via [MorseTheme.colors].
+ */
+private fun schemeFrom(c: MorseColors) = if (c.isDark) {
+    darkColorScheme(
+        primary = c.accent, onPrimary = c.textOnAccent,
+        secondary = c.accent, onSecondary = c.textOnAccent,
+        background = c.bgApp, onBackground = c.textBody,
+        surface = c.surfaceCard, onSurface = c.textBody,
+        surfaceVariant = c.surfaceSunken, onSurfaceVariant = c.textMuted,
+        error = c.danger, onError = Color.Black,
+        outline = c.borderStrong, outlineVariant = c.borderSubtle,
+    )
+} else {
+    lightColorScheme(
+        primary = c.accent, onPrimary = c.textOnAccent,
+        secondary = c.accent, onSecondary = c.textOnAccent,
+        background = c.bgApp, onBackground = c.textBody,
+        surface = c.surfaceCard, onSurface = c.textBody,
+        surfaceVariant = c.surfaceSunken, onSurfaceVariant = c.textMuted,
+        error = c.danger, onError = Color.White,
+        outline = c.borderStrong, outlineVariant = c.borderSubtle,
+    )
+}
 
 @Composable
 fun MorseLightTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-    MaterialTheme(
-        colorScheme = if (darkTheme) DarkColors else LightColors,
-        typography = AppTypography,
-        content = content,
-    )
+    val colors = if (darkTheme) DarkMorseColors else LightMorseColors
+    CompositionLocalProvider(LocalMorseColors provides colors) {
+        MaterialTheme(
+            colorScheme = schemeFrom(colors),
+            typography = AppTypography,
+            shapes = AppShapes,
+            content = content,
+        )
+    }
+}
+
+/** Access point for the extended design-system roles: `MorseTheme.colors.surfaceSunken`, etc. */
+object MorseTheme {
+    val colors: MorseColors
+        @Composable @ReadOnlyComposable
+        get() = LocalMorseColors.current
 }

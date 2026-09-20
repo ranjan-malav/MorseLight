@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="support.js"></script>
+<script src="./support.js"></script>
 </head>
 <body>
 <x-dc>
@@ -27,10 +27,10 @@
 <div style="display:grid;gap:10px;max-width:760px">
 <span style="font:var(--type-caption);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-subtle)">MorseLight &middot; redesign</span>
 <h1 style="margin:0;font:var(--type-title-1);letter-spacing:var(--tracking-title);color:var(--text-heading)">Send, receive and learn — rebuilt on Personal UI</h1>
-<p style="margin:0;font:var(--type-body);color:var(--text-muted);max-width:66ch;text-wrap:pretty">Both frames are live and independent. Hold the torch or the key to transmit by hand, type a message and press send to watch the morse light up symbol by symbol, or open Learn for the drills and the chart. Sound is on — the sidetone follows the light.</p>
+<p style="margin:0;font:var(--type-body);color:var(--text-muted);max-width:66ch;text-wrap:pretty">Both frames are live and independent. Hold the torch or the key to transmit by hand, type a message and press send to watch the morse light up symbol by symbol, or open More for the drills, the chart and settings. Sound is on — the sidetone follows the light.</p>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
 <x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Badge" tone="accent" hint-size="118px,24px">Working prototype</x-import>
-<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Badge" tone="neutral" hint-size="96px,24px">7 screens</x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Badge" tone="neutral" hint-size="96px,24px">6 screens</x-import>
 <x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Badge" tone="neutral" hint-size="140px,24px">Light and dark</x-import>
 </div>
 </div>
@@ -53,7 +53,7 @@
 <span><strong>Tappable things look tappable.</strong> Pill buttons, filled accent for the one primary action, outlined secondaries. The read-only morse and decoded output are sunken cards, never bordered boxes that look like fields.</span>
 <span><strong>Live transmit feedback.</strong> The torch fills with accent, glows, and the morse string highlights the symbol currently going out.</span>
 <span><strong>Signal and SOS demoted, not removed.</strong> Both were solid colour blocks competing with Start. They are now soft-tinted buttons flanking the one filled primary — Signal fires the attention prosign before a message, SOS the distress group.</span>
-<span><strong>Nothing scrolls.</strong> Every screen fits the phone, with the hold target sitting low where the thumb is.</span>
+<span><strong>The task screens don't scroll.</strong> Send, Receive and both drills fit the phone exactly, with the hold target low where the thumb is. More and the reference chart are lists, so they scroll.</span>
 <span><strong>Camera tuning moved out of the viewfinder.</strong> Sliders no longer overlay the preview; they sit in a Tuning card beneath it.</span>
 </div>
 </div>

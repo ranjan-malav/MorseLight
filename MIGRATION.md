@@ -1,6 +1,6 @@
 # MorseLight — Modernization & Compose Migration Plan
 
-**Status:** Phases 0–2 done; Phase 3 foundation done (theme to be re-based on the new design system). **Scope expanded 2026-09-20:** a full redesign (`design_handoff_morselight/`) now drives the UI, and the transmit/decode logic is being reworked to the handoff's cleaner engine (user request). See §7 Redesign. Real-device test pending.
+**Status:** Phases 0–2 done; **Phase 3 design-system foundation done** (Personal UI tokens + fonts in place, build green). **Scope expanded 2026-09-20:** a full redesign (`design_handoff_morselight/`) now drives the UI, and the transmit/decode logic is being reworked to the handoff's cleaner engine (user request). See §7 Redesign. Real-device test pending.
 **Started:** 2026-09-20
 **Owner:** Ranjan Malav
 **Goal:** Bring a 2021-era app (AGP 4.2 / Kotlin 1.5 / targetSdk 30 / XML + Fragments) up to a
@@ -139,20 +139,22 @@ icons render as grey blocks — open `MorseLight.dc.html` for the real thing).
 > list below reflects the current handoff; treat Settings as a section of Learn once the update lands.
 
 ### 7.1 Design system (replaces the teal M3 theme built in Phase 3)
-- **Accent:** signal-blue `--accent` `#1E5EFF` (light) / `#5A85FF` (dark). Single accent; drives
-  primary action, active tab, focus. **This is a brand change** from teal — update Play listing.
+- [x] **Accent:** signal-blue `--accent` `#1E5EFF` (light) / `#5A85FF` (dark) — in `Color.kt` (raw
+  palette) + `MorseColors.kt` (semantic roles, light+dark). **Brand change** from teal → update Play listing.
 - **Surfaces:** `--bg-app`, `--surface-card`, `--surface-sunken`, `--surface-raised` (light→dark in
   `tokens/colors.css` + `dark.css`). Read-only output uses **sunken** cards, never bordered fields.
 - **Status colors:** success `#0B8A5C`, warning `#B26A00`, danger `#C8304C`, info (system) violet.
-- **Type:** **Plus Jakarta Sans** (400/500/600/700/800) UI + display; **JetBrains Mono** (morse
-  strings, codes). Ramp 11·12·13·15·17·20·22·28·34·44, body 17/1.45. → bundle both into `res/font`
-  (Google Fonts; replaces Nunito Sans).
-- **Radii:** control 999 · field 16 · tile 20 · card 24 · sheet 28. Heavily rounded.
+- [x] **Type:** **Plus Jakarta Sans** + **JetBrains Mono** bundled as variable TTFs in `res/font`
+  (`FontVariation` wght axis, API 26+); iOS ramp in `Type.kt`. Nunito kept until the old XML UI
+  goes (Phase 5). ⏳ *Runtime font render validated at the first Compose screen (Phase 4); Roboto is
+  the agreed fallback if the variable fonts misbehave.*
+- [x] **Radii:** `Shape.kt` (`MorseRadius` + M3 `Shapes`). Motion tokens: `Motion.kt`.
 - **Elevation / the halo+shadow effects the user called out** (`tokens/elevation.css`):
   soft cool-tinted `--shadow-1..4`; **`--shadow-accent`** blue glow under the filled primary; the
   **torch/key disc glow** `0 0 46px -6px var(--accent)` when lit; `--inset-field` inner shadow on
   inputs. Implement via Compose `Modifier.shadow`/`drawBehind` + a radial glow layer (M3 elevation
-  alone won't give the colored halo).
+  alone won't give the colored halo). — [x] token values in `MorseColors.accentGlow`; a first
+  `Modifier.accentGlow()` in `Glow.kt` (radial wash). Full multi-layer soft shadows land with the components.
 - **Motion:** `--dur-fast 140 / base 220 / slow 320`, `--ease-standard cubic-bezier(.2,0,0,1)`;
   light on/off 50–70ms linear so keying feels instant; all collapse under reduced-motion.
 - **Icons:** Lucide in the handoff → use **Material Symbols** equivalents at matching sizes.
@@ -191,13 +193,15 @@ logic. This supersedes the Phase-2 `MorseEncoder`/`MorseDecoder` that were kept 
   wpm, and `KeyClassifier` gap/duration classification.
 
 ### 7.4 Screens (per current handoff; Settings folding into Learn)
-Main tabs **Send · Receive · Learn**; sub-screens use a back button (no tab bar).
+Main tabs **Send · Receive · More**; sub-screens use a back button (no tab bar). *(Mockup update
+2026-09-20: Learn + Settings merged into one **More** tab — no separate Settings screen, no header
+gear. Screenshots: `screens/04-more-*`.)*
 | Screen | Status vs today | Notes |
 |---|---|---|
 | **Send** | redesign of existing | one torch disc (glow), message input, three-state morse card + progress, wpm slider, Signal/Send/SOS pills |
 | **Receive — Manual key** | redesign | segmented Manual|Camera; decoded card + raw buffer; key disc (press-hold) |
 | **Receive — Camera** | redesign + logic rework | viewfinder w/ detection box; **tuning card moved out of viewfinder** (Sensitivity, Detection area); decoded card |
-| **Learn hub** | redesign; **absorbs Settings** | progress card, drill/chart links, timing card, + Settings section (Preferences switches, Support links, About) |
+| **More** (was Learn+Settings) | redesign; merged tab | progress card + amber donation banner, drill/chart links, Preferences switches (Key tone / Loop / Keep awake), Support links (Rate, Source), About card. Scrolls. |
 | **Reference chart** | **net-new** | searchable A–Z/0–9 grid, tap plays; only scrolling screen |
 | **Decoding drill** | **net-new** | play masked target, copy by hand, match check |
 | **Sending drill** | **net-new** | prompt a character, key it, correct/advance |
@@ -392,3 +396,4 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-20 | 1–3 | **Emulator smoke test passed** (API 33). Send encode + live char readout + transmit state machine correct; nav to Receive/Learn works; DataStore defaults read; no crashes. Real-device test deferred to user. |
 | 2026-09-20 | plan | **Redesign folded into roadmap (§7).** `design_handoff_morselight/` adopted: Personal UI design system (signal-blue, Plus Jakarta Sans + JetBrains Mono, elevation/glow, radii), three-state morse coloring, and a reworked transmit/decode engine (WPM/ITU-R M.1677, gap-based keying, luminance camera decode) that replaces the old hand-written logic per user request. D7 added; D6 superseded. Phase 3 theme to be re-based; Phase 4 retargeted to the new screens. Settings merging into Learn (mockups being revised). |
 | 2026-09-20 | 2b | **Logic rework core built + tested.** New `MorseCode` (standard-form encode/decode), `MorseTimeline` (unit-based ITU event list + `unitMillis(wpm)`), `KeyClassifier` (gap/duration keying) — 18 new unit tests, all green; app still assembles. These replace the old hand-written transmit/decode logic (user request); the coroutine TransmitEngine ticker + camera luminance decode land in Phase 4 with the torch controller. Old MorseEncoder/Decoder retained until the old UI is deleted. |
+| 2026-09-20 | 3 | **Design-system foundation done.** Replaced the teal M3 theme with Personal UI tokens: `Color.kt` (raw palette), `MorseColors.kt` (semantic roles light+dark via `LocalMorseColors`/`MorseTheme`), `Type.kt` (Plus Jakarta Sans + JetBrains Mono variable fonts + iOS ramp), `Shape.kt`, `Motion.kt`, `Glow.kt` (accent halo), and a preview exercising three-state morse colouring. Fonts bundled + packaged in the APK; build green. Also folded in the mockup update: Learn+Settings → one **More** tab. |

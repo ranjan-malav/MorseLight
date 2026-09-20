@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="support.js"></script>
+<script src="./support.js"></script>
 </head>
 <body>
 <x-dc>
@@ -32,7 +32,7 @@
 </span>
 </div>
 
-<div style="flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:0 10px 10px 16px">
+<div style="flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:0 16px 10px 16px">
 <sc-if value="{{ showBack }}">
 <x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.IconButton" icon="chevron-left" label="Back" onClick="{{ goBack }}" hint-size="40px,40px"></x-import>
 </sc-if>
@@ -40,9 +40,7 @@
 <span style="font:var(--type-caption);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-subtle)">MorseLight</span>
 <span style="font:var(--type-title-1);letter-spacing:var(--tracking-title);color:var(--text-heading);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ title }}</span>
 </div>
-<sc-if value="{{ showSettingsBtn }}" hint-placeholder-val="{{ true }}">
-<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.IconButton" icon="settings" label="Settings" onClick="{{ goSettings }}" hint-size="40px,40px"></x-import>
-</sc-if>
+
 </div>
 
 <div style="flex:1;min-height:0;overflow:hidden;padding:0 16px 14px;display:flex;flex-direction:column">
@@ -56,7 +54,7 @@
 <div style="display:grid;gap:6px">
 <div style="display:flex;align-items:baseline;justify-content:space-between">
 <span style="font:var(--type-caption);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-subtle)">Morse</span>
-<span style="font:var(--type-caption);color:var(--text-subtle);font-variant-numeric:tabular-nums">{{ txPctLabel }}</span>
+<span style="font:var(--type-caption);color:var(--text-subtle);font-variant-numeric:tabular-nums">{{ txCount }}</span>
 </div>
 <div style="font:var(--type-mono);font-size:22px;font-weight:var(--weight-bold);line-height:1.35;word-break:break-word;height:60px;overflow:hidden;letter-spacing:.06em">
 <sc-for list="{{ txSymbols }}" as="s" hint-placeholder-count="12">
@@ -163,6 +161,17 @@
 
 <sc-if value="{{ isLearn }}">
 <div style="flex:1;min-height:0;overflow:auto;display:grid;gap:16px;align-content:start">
+<div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--radius-card);background:var(--warning-soft);cursor:pointer" onClick="{{ noop }}">
+<div style="flex:0 0 auto;width:40px;height:40px;border-radius:999px;display:grid;place-items:center;background:var(--surface-card);color:var(--warning)">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Icon" name="coffee" size="{{ 20 }}" hint-size="20px,20px"></x-import>
+</div>
+<div style="display:grid;gap:2px;flex:1;min-width:0">
+<span style="font:var(--type-subhead);font-weight:var(--weight-semibold);color:var(--warning-on-soft)">Buy me a coffee</span>
+<span style="font:var(--type-footnote);color:var(--warning-on-soft)">MorseLight is free and ad-free</span>
+</div>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Icon" name="chevron-right" size="{{ 18 }}" color="var(--warning-on-soft)" hint-size="18px,18px"></x-import>
+</div>
+
 <x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" tint="accent" padding="lg" hint-size="100%,140px">
 <div style="display:flex;align-items:center;gap:16px">
 <div style="background:var(--surface-card);border-radius:999px;padding:3px">
@@ -178,6 +187,7 @@
 </div>
 </x-import>
 
+<span style="font:var(--type-caption);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-subtle);margin-bottom:-6px">Learn</span>
 <x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" padding="none" hint-size="100%,210px">
 <x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" title="Decoding drill" subtitle="Copy a played message by ear and eye" chevron="{{ true }}" onClick="{{ goDrill }}" hint-size="100%,68px"></x-import>
 <x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" title="Sending drill" subtitle="Tap out one letter at a time" chevron="{{ true }}" onClick="{{ goSdrill }}" hint-size="100%,68px"></x-import>
@@ -193,6 +203,26 @@
 <span style="height:12px;border-radius:999px;width:{{ b.w }};background:{{ b.c }}"></span>
 </sc-for>
 </div>
+</div>
+</x-import>
+
+<span style="font:var(--type-caption);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-subtle);margin-bottom:-6px">Preferences</span>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" padding="none" hint-size="100%,210px">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" title="Key tone" subtitle="Play a sidetone while the light is on" trailing="{{ toneSwitch }}" hint-size="100%,68px"></x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" title="Loop transmission" subtitle="Repeat the message until stopped" trailing="{{ loopSwitch }}" hint-size="100%,68px"></x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" title="Keep screen awake" subtitle="While sending or receiving" trailing="{{ awakeSwitch }}" divider="{{ false }}" hint-size="100%,68px"></x-import>
+</x-import>
+
+<span style="font:var(--type-caption);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-subtle);margin-bottom:-6px">Support</span>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" padding="none" hint-size="100%,136px">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" leading="{{ iconStar }}" title="Rate this app" subtitle="Leave a review on the Play Store" chevron="{{ true }}" onClick="{{ noop }}" hint-size="100%,68px"></x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" leading="{{ iconCode }}" title="Source code" subtitle="MorseLight is open source, browse the repository" chevron="{{ true }}" onClick="{{ noop }}" divider="{{ false }}" hint-size="100%,68px"></x-import>
+</x-import>
+
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" tint="sunken" padding="md" hint-size="100%,110px">
+<div style="display:grid;gap:6px">
+<span style="font:var(--type-label);color:var(--text-body)">About</span>
+<span style="font:var(--type-footnote);color:var(--text-muted)">MorseLight 3.0. Timing follows ITU-R M.1677, one unit at {{ wpmLabel }}.</span>
 </div>
 </x-import>
 </div>
@@ -279,29 +309,6 @@
 <div style="display:flex;align-items:center;gap:12px;align-self:end">
 <div style="position:relative;flex:1;height:64px;border-radius:999px;display:grid;place-items:center;background:var(--accent);color:var(--text-on-accent);cursor:pointer;user-select:none;touch-action:none;box-shadow:var(--shadow-accent);font:var(--weight-semibold) var(--text-subhead)/1 var(--font-core);letter-spacing:var(--tracking-caps);text-transform:uppercase;opacity:{{ sdPressOpacity }}" onPointerDown="{{ sdDown }}" onPointerUp="{{ sdUp }}" onPointerLeave="{{ sdUp }}">Hold to key</div>
 </div>
-</div>
-</sc-if>
-
-<sc-if value="{{ isSettings }}">
-<div style="flex:1;min-height:0;overflow:auto;display:grid;gap:16px;align-content:start">
-<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" padding="none" hint-size="100%,210px">
-<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" title="Key tone" subtitle="Play a sidetone while the light is on" trailing="{{ toneSwitch }}" hint-size="100%,68px"></x-import>
-<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" title="Loop transmission" subtitle="Repeat the message until stopped" trailing="{{ loopSwitch }}" hint-size="100%,68px"></x-import>
-<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" title="Keep screen awake" subtitle="While sending or receiving" trailing="{{ awakeSwitch }}" divider="{{ false }}" hint-size="100%,68px"></x-import>
-</x-import>
-
-<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" padding="none" hint-size="100%,204px">
-<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" leading="{{ iconStar }}" title="Rate this app" subtitle="Leave a review on the Play Store" chevron="{{ true }}" onClick="{{ noop }}" hint-size="100%,68px"></x-import>
-<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" leading="{{ iconCoffee }}" title="Buy me a coffee" subtitle="Support development" chevron="{{ true }}" onClick="{{ noop }}" hint-size="100%,68px"></x-import>
-<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" leading="{{ iconCode }}" title="Source code" subtitle="MorseLight is open source, browse the repository" chevron="{{ true }}" onClick="{{ noop }}" divider="{{ false }}" hint-size="100%,68px"></x-import>
-</x-import>
-
-<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" tint="info" padding="md" hint-size="100%,110px">
-<div style="display:grid;gap:6px">
-<span style="font:var(--type-label);color:var(--info-on-soft)">About</span>
-<span style="font:var(--type-footnote);color:var(--info-on-soft)">MorseLight 3.0. Timing follows ITU-R M.1677, one unit at {{ wpmLabel }}.</span>
-</div>
-</x-import>
 </div>
 </sc-if>
 
@@ -504,7 +511,7 @@ class Component extends DCLogic {
   renderVals() {
     const s = this.state;
     const morse = encode(s.msg);
-    const TITLES = { send: 'Send', receive: 'Receive', learn: 'Learn', chart: 'Reference chart', drill: 'Decoding drill', sdrill: 'Sending drill', settings: 'Settings' };
+    const TITLES = { send: 'Send', receive: 'Receive', learn: 'More', chart: 'Reference chart', drill: 'Decoding drill', sdrill: 'Sending drill' };
     const main = s.screen === 'send' || s.screen === 'receive' || s.screen === 'learn';
     const txActive = s.txOn || s.keyOn;
     const decoded = decode(s.buffer);
@@ -534,18 +541,16 @@ class Component extends DCLogic {
     const Switch = window.PersonalUIDesignSystem_06a1d8.Switch;
     const mkSwitch = (key) => React.createElement(Switch, { checked: s[key], onChange: () => this.setState({ [key]: !s[key] }) });
 
-    const tabDef = [['send', 'Send', 'flashlight'], ['receive', 'Receive', 'radio'], ['learn', 'Learn', 'graduation-cap']];
+    const tabDef = [['send', 'Send', 'flashlight'], ['receive', 'Receive', 'radio'], ['learn', 'More', 'ellipsis']];
 
     return {
       theme: this.props.theme || 'light',
       title: TITLES[s.screen],
       showBack: !main,
       showTabs: main,
-      goBack: () => this.go(s.screen === 'settings' ? (main ? 'send' : s.back) : 'learn'),
-      goSettings: () => this.go('settings', s.screen),
-      showSettingsBtn: s.screen !== 'settings',
+      goBack: () => this.go('learn'),
       isSend: s.screen === 'send', isReceive: s.screen === 'receive', isLearn: s.screen === 'learn',
-      isChart: s.screen === 'chart', isDrill: s.screen === 'drill', isSdrill: s.screen === 'sdrill', isSettings: s.screen === 'settings',
+      isChart: s.screen === 'chart', isDrill: s.screen === 'drill', isSdrill: s.screen === 'sdrill',
       tabs: tabDef.map(([k, label, icon]) => ({
         label, icon, c: s.screen === k ? 'var(--accent)' : 'var(--text-subtle)', go: () => this.go(k),
       })),

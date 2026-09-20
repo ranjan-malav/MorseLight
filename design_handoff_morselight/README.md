@@ -6,8 +6,9 @@ flashlight, decodes incoming Morse (manual key or camera), and teaches Morse cod
 the redesign of that app on the **Personal UI design system** (Material elevation logic + iOS
 control geometry, single signal-blue accent, light and dark).
 
-Seven screens: Send, Receive (manual key), Receive (camera), Learn hub, Decoding drill,
-Sending drill, Reference chart, Settings.
+Six screens across three tabs — **Send**, **Receive** (manual key / camera) and **More**
+(learning, preferences, support) — plus three sub-screens pushed from More: decoding drill,
+sending drill and the reference chart.
 
 ## About the Design Files
 The files in this bundle are **design references created in HTML** — working prototypes showing
@@ -23,8 +24,9 @@ prototype. Recreate the UI faithfully using the target platform's equivalents of
 listed below.
 
 ## Platform notes
-- Designed at **390 × 844** (phone). **No screen scrolls** except the reference chart — every
-  screen must fit the viewport, with press-and-hold targets in the lower third.
+- Designed at **390 × 844** (phone). **The task screens must not scroll** — Send, Receive (both
+  modes) and both drills fit the viewport exactly, with press-and-hold targets in the lower third.
+  Only the two list screens scroll: **More** and the **reference chart**.
 - Flashlight is **simulated** in the prototype (the disc fills with accent + glow). In the app
   this drives `CameraManager.setTorchMode` / equivalent.
 - Camera decoding is **mocked** with a "Demo" button that plays a known signal and animates a
@@ -84,14 +86,33 @@ Grid `auto 1fr auto`:
    Sensitivity slider (0–100%), Detection area slider (30–140px, drives the box size).
 4. **Decoded card** — same as manual.
 
-### 4. Learn hub — `screen: 'learn'`
-- **Progress card** — accent tint (no border, no shadow, per the system's tinted-card rule):
-  `ProgressRing` 82px on a white pill, "12 of 36 learned" title, "Lesson 4 covers K, R and S.",
-  success Badge "6 day streak".
-- **Grouped list card** (padding none): "Decoding drill", "Sending drill", "Reference chart" — each
-  with subtitle and chevron.
-- **Timing card** (sunken): "A dash is three dots long. Letters are three dots apart, words are
-  seven." plus a 9-bar dot/dash rhythm graphic (9px per unit, accent bars, `--track` gaps).
+### 4. More — \`screen: 'learn'\`
+The hub tab: learning, preferences and support in one scrolling list. Sections are separated by
+12px caps eyebrow labels (\`--text-subtle\`) sitting directly above each card.
+
+1. **Coffee banner** (top, full width) — \`--warning-soft\` fill, radius 24, no border or shadow,
+   padding 14/16, tappable. A 40px white circle holding a 20px \`coffee\` icon in \`--warning\`,
+   then "Buy me a coffee" (17/600) over "MorseLight is free and ad-free" (13), then an 18px
+   \`chevron-right\`. All ink is \`--warning-on-soft\` at full opacity.
+2. **Progress card** — accent tint (no border, no shadow, per the system's tinted-card rule):
+   \`ProgressRing\` 82px on a white pill, "12 of 36 learned" title, "Lesson 4 covers K, R and S.",
+   success Badge "6 day streak".
+3. **LEARN** — grouped list card: "Decoding drill" / "Copy a played message by ear and eye",
+   "Sending drill" / "Tap out one letter at a time", "Reference chart" / "All 36 characters".
+   Each has a chevron and pushes a sub-screen.
+4. **Timing card** (sunken) — "A dash is three dots long. Letters are three dots apart, words are
+   seven." plus a 9-bar dot/dash rhythm graphic (9px per unit, accent bars, \`--track\` gaps).
+5. **PREFERENCES** — three Switch rows: "Key tone" (sidetone while the light is on),
+   "Loop transmission" (repeat the message until stopped), "Keep screen awake" (while sending or
+   receiving).
+6. **SUPPORT** — two chevron rows with a 20px leading Lucide icon in \`--text-muted\`:
+   \`star\` "Rate this app" / "Leave a review on the Play Store" → Play Store review intent;
+   \`code\` "Source code" / "MorseLight is open source, browse the repository" → repository link.
+   Donation lives in the banner, not here.
+7. **About card** (sunken) — "MorseLight 3.0. Timing follows ITU-R M.1677, one unit at 12 wpm."
+
+Only two washes on this screen: the amber banner and the accent progress card. There is **no
+separate Settings screen and no header gear** — this tab replaced both.
 
 ### 5. Decoding drill — `screen: 'drill'`
 Grid `auto 1fr auto auto`. Target card (message masked as bullets until Reveal; badge
@@ -108,22 +129,7 @@ hint line (dots until "Hint" is tapped), and a state Badge (Waiting / Correct / 
 ### 7. Reference chart — `screen: 'chart'`
 Search Input (icon `search`) filtering by character or code, then a 2-column grid of tiles
 (radius 20, card surface, hairline): character 17/700 left, code in mono 15px `--accent`.
-Order is A–Z then 0–9. Tapping a tile plays that character. **This is the only scrolling screen.**
-
-### 8. Settings — `screen: 'settings'`
-Two grouped list cards, then an About card.
-
-**Preferences** — three Switch rows: "Key tone" (sidetone while the light is on),
-"Loop transmission" (repeat the message until stopped), "Keep screen awake" (while sending or
-receiving).
-
-**Support** — three chevron rows, each with a 20px leading Lucide icon in `--text-muted`:
-- `star` — "Rate this app" / "Leave a review on the Play Store" → Play Store review intent
-- `coffee` — "Buy me a coffee" / "Support development" → external donation link
-- `code` — "Source code" / "MorseLight is open source, browse the repository" → external repository link
-
-Then an info-tinted About card: "MorseLight 3.0. Timing
-follows ITU-R M.1677, one unit at 12 wpm." The header gear hides on this screen.
+Order is A–Z then 0–9. Tapping a tile plays that character. This screen scrolls.
 
 ---
 
@@ -135,7 +141,7 @@ follows ITU-R M.1677, one unit at 12 wpm." The header gear hides on this screen.
   `graduation-cap` at 23px, label 11px/600. Active = `--accent`, inactive = `--text-subtle`.
   Background `color-mix(in oklab, var(--surface-card) 82%, transparent)` + `--blur-sheet`
   (`saturate(180%) blur(20px)`), 1px top hairline, 22px bottom inset for the home indicator.
-  Sub-screens (chart, drills, settings) replace the tab bar with a back button.
+  Sub-screens (chart, both drills) replace the tab bar with a back button and return to More.
 
 ## Interactions & Behavior
 
@@ -170,7 +176,7 @@ linear — so keying feels instant. All durations collapse to 0 under `prefers-r
 
 ## State
 ```
-screen           'send'|'receive'|'learn'|'chart'|'drill'|'sdrill'|'settings'
+screen           'send'|'receive'|'learn'|'chart'|'drill'|'sdrill'   ('learn' = the More tab)
 back             screen to return to from a sub-screen
 rxMode           'manual'|'camera'
 wpm              5..25 (default 12)
@@ -186,7 +192,7 @@ sens/box         camera sensitivity, detection box px
 drill/reveal     decoding drill index + reveal toggle
 sdIdx/sdBuf/sdResult/sdHint   sending drill
 query            chart search
-tone/loop/awake  settings switches
+tone/loop/awake  preference switches
 ```
 
 ## Design tokens (light → dark)
@@ -230,8 +236,10 @@ sizes — 16 inline, 20 controls, 23–24 nav.
 4. **Signal and SOS demoted but not hidden** — soft-tinted buttons flanking the primary. Signal
    fires the attention prosign `-.-.-` before a message; SOS fires the distress group.
 5. **Camera tuning moved out of the viewfinder** — sliders no longer overlay the preview.
-6. **Nothing scrolls** (except the 36-row chart), and hold targets sit low in thumb reach.
-7. **Learn promoted to a tab** with a progress card, two drills and a searchable chart.
+6. **The task screens never scroll**, and hold targets sit low in thumb reach. Only More and the
+   36-row chart scroll.
+7. **Learn promoted to a tab** with a progress card, two drills and a searchable chart — then
+   merged with Settings into one **More** tab, so the app has three tabs and no buried gear.
 
 ## Files
 - `MorseLight.dc.html` — the canvas: two live frames (light + dark) side by side, plus the
