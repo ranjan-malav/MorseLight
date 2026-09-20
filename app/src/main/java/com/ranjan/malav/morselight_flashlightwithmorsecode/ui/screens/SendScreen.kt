@@ -20,8 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.capitalize
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,10 +36,36 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Labeled
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseRadius
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.tooling.preview.Preview
+import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.TransmitState
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseLightTheme
 
 @Composable
 fun SendScreen(vm: SendViewModel, modifier: Modifier = Modifier) {
     val ui by vm.ui.collectAsStateWithLifecycle()
+    SendContent(
+        ui = ui,
+        onMessageChange = vm::onMessageChange,
+        onWpmChange = vm::onWpmChange,
+        onManualTorch = vm::setManualTorch,
+        onSignal = vm::sendSignal,
+        onToggleSend = vm::toggleSend,
+        onSos = vm::sendSos,
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun SendContent(
+    ui: SendUiState,
+    onMessageChange: (String) -> Unit,
+    onWpmChange: (Int) -> Unit,
+    onManualTorch: (Boolean) -> Unit,
+    onSignal: () -> Unit,
+    onToggleSend: () -> Unit,
+    onSos: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val c = MorseTheme.colors
 
     Column(
@@ -50,7 +74,7 @@ fun SendScreen(vm: SendViewModel, modifier: Modifier = Modifier) {
     ) {
         OutlinedTextField(
             value = ui.message,
-            onValueChange = vm::onMessageChange,
+            onValueChange = onMessageChange,
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text("Type your message") },
             shape = RoundedCornerShape(MorseRadius.field),
@@ -87,9 +111,9 @@ fun SendScreen(vm: SendViewModel, modifier: Modifier = Modifier) {
                     modifier = Modifier.pointerInput(ui.transmitting) {
                         if (!ui.transmitting) detectTapGestures(
                             onPress = {
-                                vm.setManualTorch(true)
+                                onManualTorch(true)
                                 tryAwaitRelease()
-                                vm.setManualTorch(false)
+                                onManualTorch(false)
                             },
                         )
                     },
@@ -106,7 +130,7 @@ fun SendScreen(vm: SendViewModel, modifier: Modifier = Modifier) {
 
         LabeledSlider(
             title = "Transmission speed", valueLabel = "${ui.wpm} wpm",
-            value = ui.wpm.toFloat(), onValueChange = { vm.onWpmChange(it.toInt()) },
+            value = ui.wpm.toFloat(), onValueChange = { onWpmChange(it.toInt()) },
             valueRange = 5f..25f, steps = 25 - 5 - 1,
         )
 
@@ -115,15 +139,31 @@ fun SendScreen(vm: SendViewModel, modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            SoftPill("Signal", onClick = vm::sendSignal, tone = PillTone.Accent, enabled = !ui.transmitting)
+            SoftPill("Signal", onClick = onSignal, tone = PillTone.Accent, enabled = !ui.transmitting)
             FilledPill(
                 if (ui.transmitting) "Stop" else "Send",
-                onClick = vm::toggleSend,
+                onClick = onToggleSend,
                 modifier = Modifier.weight(1f),
                 tone = if (ui.transmitting) PillTone.Danger else PillTone.Accent,
             )
-            SoftPill("SOS", onClick = vm::sendSos, tone = PillTone.Danger, enabled = !ui.transmitting)
+            SoftPill("SOS", onClick = onSos, tone = PillTone.Danger, enabled = !ui.transmitting)
         }
         Spacer(Modifier.height(0.dp))
+    }
+}
+
+@Preview(name = "Send idle", showBackground = true)
+@Preview(name = "Send transmitting", showBackground = true)
+@Composable
+private fun SendContentPreview() {
+    MorseLightTheme {
+        SendContent(
+            ui = SendUiState(
+                message = "HELLO", wpm = 12,
+                tx = TransmitState(running = true, torchOn = true, symbolIndex = 6, doneIndex = 4, percent = 0.3f),
+            ),
+            onMessageChange = {}, onWpmChange = {}, onManualTorch = {},
+            onSignal = {}, onToggleSend = {}, onSos = {},
+        )
     }
 }
