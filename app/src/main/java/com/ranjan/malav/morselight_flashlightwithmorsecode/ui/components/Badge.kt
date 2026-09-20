@@ -17,7 +17,7 @@ enum class BadgeTone { Neutral, Accent, Success, Warning, Danger }
 
 /** Small tinted state pill — "Idle", "Keying", "Transmitting", "Match", etc. */
 @Composable
-fun StatusBadge(text: String, tone: BadgeTone = BadgeTone.Neutral, modifier: Modifier = Modifier) {
+fun StatusBadge(text: String, modifier: Modifier = Modifier, tone: BadgeTone = BadgeTone.Neutral) {
     val c = MorseTheme.colors
     val (bg, fg) = when (tone) {
         BadgeTone.Neutral -> c.surfaceSunken to c.textMuted

@@ -31,7 +31,7 @@ private fun DesignSystemPreview() {
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Text("MORSELIGHT", style = EyebrowStyle, color = c.textSubtle)
-                Text("Send", style = MaterialTheme_displaySmall(), color = c.textHeading)
+                Text("Send", style = androidx.compose.material3.MaterialTheme.typography.displaySmall, color = c.textHeading)
 
                 // Sunken morse card with three-state per-symbol colouring: sent / current / pending.
                 Column(
@@ -49,10 +49,6 @@ private fun DesignSystemPreview() {
         }
     }
 }
-
-@Composable
-private fun MaterialTheme_displaySmall() =
-    androidx.compose.material3.MaterialTheme.typography.displaySmall
 
 private fun threeStateMorse(c: MorseColors, morse: String, currentIndex: Int) =
     buildAnnotatedString {
