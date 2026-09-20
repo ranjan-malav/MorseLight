@@ -1,16 +1,27 @@
-*.iml
+# Gradle / build
 .gradle
-/local.properties
-/.idea/
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
+
+# Kotlin 2.x build output
+.kotlin/
+
+# IDE
+*.iml
+/.idea/
+.DS_Store
+
+# Local config — never commit
 local.properties
+
+# Signing — never commit
+*.jks
+*.keystore
+keystore.properties
+
+# Build artifacts / diagnostics
+*.apk
+*.aab
+*.hprof
