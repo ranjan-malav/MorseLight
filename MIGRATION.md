@@ -123,6 +123,7 @@ Going straight to AGP 9 from 4.2.2 means handling these on top of the normal upg
 | **D4** | SharedPreferences → DataStore | **Yes.** `SettingsRepository` on DataStore with a one-time migration of the existing `speed`/`react_size`/`perceptibility` values. Flow API feeds Compose state. | ✅ Decided 2026-09-20 |
 | **D5** | Keep portrait lock | Recommended: **drop `screenOrientation="portrait"`.** API 36 ignores orientation restrictions on large screens anyway; better to lay out responsively than be letterboxed. | Open |
 | **D6** | Visual redesign scope | **Superseded by D7.** The earlier recommendation (keep teal, light reskin) is replaced by the `design_handoff_morselight/` redesign. | ⛔ Superseded 2026-09-20 |
+| **D8** | Net-new features (drills, reference chart) | **Build everything in one release** — Phase 4 includes the two drills + reference chart before shipping. | ✅ Decided 2026-09-20 |
 | **D7** | Adopt the Personal UI redesign handoff | **Yes.** Ground-up redesign on the *Personal UI* design system: single **signal-blue** accent `#1E5EFF` (replaces teal — a Play-Store brand change), **Plus Jakarta Sans** + **JetBrains Mono** (replaces Nunito Sans), Material-elevation + iOS control geometry, light+dark. Also adopt the handoff's **improved transmit/decode logic** (user request). See §7. | ✅ Decided 2026-09-20 |
 
 ---
@@ -168,22 +169,22 @@ The handoff's `MorseFrame.dc.html` logic class is correct and **replaces** the o
 logic. This supersedes the Phase-2 `MorseEncoder`/`MorseDecoder` that were kept faithful to the
 **old** behaviour. New `morse/` domain (all pure/unit-testable, coroutine-driven — no `Handler`s):
 
-- **`MorseCode`** — `encode(text)`: `word → per-char MAP → join(" ") → join(" / ")`, standard ITU
+- [x] **`MorseCode`** — done (6 tests). `encode(text)`: `word → per-char MAP → join(" ") → join(" / ")`, standard ITU
   string (`.... . .-.. .-.. --- / .-- ---`). `decode(morse)`: split on ` / ` then whitespace →
   reverse-map. Far simpler/robust than today's moving-average timing-cluster guess.
-- **`TransmitEngine`** — **ITU-R M.1677**, `unit = 1200 / wpm` ms. Build an event list
+- [x] **`MorseTimeline`** (pure event list + `unitMillis(wpm)`) — done (6 tests). The coroutine **`TransmitEngine`** ticker that drives the torch from it is a thin Phase-4 wrapper (needs the torch controller + lifecycle). — **ITU-R M.1677**, `unit = 1200 / wpm` ms. Build an event list
   `{tUnits, on, symbolIndex}` (dot 1u, dash 3u, +1u intra-gap; char gap 3u, word gap 7u), tick at
   16 ms comparing elapsed units, emit `{torchOn, symbolIndex, doneIndex, pct}`. **Replaces the old
   speed 1–10 / (3/speed)s model** with a real WPM model (5–25 wpm, default 12). Optional loop +
   620 Hz sidetone.
-- **`KeyClassifier`** (manual key) — on down: gap since last release ≥6u → word ` / `, ≥2u → char
+- [x] **`KeyClassifier`** (manual key) — done (7 tests).  on down: gap since last release ≥6u → word ` / `, ≥2u → char
   ` `; on up: <2u → dot, else dash; idle timers commit a char sep at 3.5u and a word sep at 8u.
   Feeds `decode`. **Replaces** the fragile timing-difference clustering.
 - **Camera decode** — per-frame **mean luminance inside the detection box**, thresholded by a
   **Sensitivity** slider; a crossing = a pulse fed to the same gap classifier. **Replaces** the
   moving-average natural-break `DecoderUtils` clustering (audit B9). `LuminosityAnalyzer` cleanup
   (B5) folds in here. Detection-box size is user-adjustable, **moved out of the viewfinder**.
-- **Settings migration:** old `speed` (1–10) → **wpm** (map, e.g. `wpm ≈ round(5 + (speed-1)*2)`),
+- **Settings migration (confirmed):** old `speed` (1–10) → **wpm**, mapped to nearest (e.g. `wpm ≈ round(5 + (speed-1)*2)`, spanning ~5–23 wpm),
   keep `perceptibility`→sensitivity and `react_size`→detection-box. Add `keyTone`, `loop`,
   `keepAwake`. Extend `SettingsRepository`.
 - New unit tests for `MorseCode` (encode/decode round-trip), `TransmitEngine` event list at several
@@ -390,3 +391,4 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-20 | 2 | **DataStore done (D4).** `SettingsRepository` on DataStore with one-time SharedPreferences migration; `SharedPreferenceUtils` removed; 3 fragments rewired (temporary runBlocking bridge). Build green. |
 | 2026-09-20 | 1–3 | **Emulator smoke test passed** (API 33). Send encode + live char readout + transmit state machine correct; nav to Receive/Learn works; DataStore defaults read; no crashes. Real-device test deferred to user. |
 | 2026-09-20 | plan | **Redesign folded into roadmap (§7).** `design_handoff_morselight/` adopted: Personal UI design system (signal-blue, Plus Jakarta Sans + JetBrains Mono, elevation/glow, radii), three-state morse coloring, and a reworked transmit/decode engine (WPM/ITU-R M.1677, gap-based keying, luminance camera decode) that replaces the old hand-written logic per user request. D7 added; D6 superseded. Phase 3 theme to be re-based; Phase 4 retargeted to the new screens. Settings merging into Learn (mockups being revised). |
+| 2026-09-20 | 2b | **Logic rework core built + tested.** New `MorseCode` (standard-form encode/decode), `MorseTimeline` (unit-based ITU event list + `unitMillis(wpm)`), `KeyClassifier` (gap/duration keying) — 18 new unit tests, all green; app still assembles. These replace the old hand-written transmit/decode logic (user request); the coroutine TransmitEngine ticker + camera luminance decode land in Phase 4 with the torch controller. Old MorseEncoder/Decoder retained until the old UI is deleted. |
