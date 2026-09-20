@@ -4,11 +4,12 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.core.net.toUri
 import android.widget.Toast
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 
 fun Context.rateApp() {
-    val uri = Uri.parse("market://details?id=" + applicationContext.packageName)
+    val uri = ("market://details?id=" + applicationContext.packageName).toUri()
     val goToMarket = Intent(Intent.ACTION_VIEW, uri)
     goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
     try {

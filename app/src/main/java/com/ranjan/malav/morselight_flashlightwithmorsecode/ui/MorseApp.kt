@@ -1,6 +1,6 @@
 package com.ranjan.malav.morselight_flashlightwithmorsecode.ui
 
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -157,8 +157,8 @@ fun MorseApp(container: AppContainer) {
                     onOpenSendingDrill = { nav.navigate(Dest.SendingDrill.route) },
                     onOpenReferenceChart = { nav.navigate(Dest.Chart.route) },
                     onRate = { ctx.rateApp() },
-                    onSource = { ctx.launchWeb(Uri.parse("https://github.com/ranjan-malav/MorseLight")) },
-                    onDonate = { ctx.launchWeb(Uri.parse("https://ko-fi.com/ranjan")) },
+                    onSource = { ctx.launchWeb("https://github.com/ranjan-malav/MorseLight".toUri()) },
+                    onDonate = { ctx.launchWeb("https://ko-fi.com/ranjan".toUri()) },
                 )
             }
             composable(Dest.Chart.route) { ReferenceChartScreen() }
