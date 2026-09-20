@@ -15,10 +15,15 @@ currently Play-Store-compliant build, and rewrite the UI in Jetpack Compose.
 > keeps re-signing every release with the same app signing key, so the on-device signature never changes
 > and updates install over existing installs as normal.
 >
-> Searched and ruled out on 2026-09-20 before confirming this: whole home directory, `~/.android`
-> (debug key only), Android Studio's remembered signing configs (2023.3 → 2026.1.4),
-> `~/.gradle/gradle.properties`, and all 50 commits of git history. The old keystore is gone for good —
-> it just no longer matters.
+> **Search record (2026-09-20).** A full sweep of the home directory found no MorseLight keystore. The
+> only non-debug, non-unrelated-project candidate was `~/Downloads/bhojan_android_key.jks` — named for a
+> different app, and it did not open with the remembered password (`malavR21`, `malavR21!`, or 10 case/
+> punctuation variants; verified byte-exact via `-storepass:file`, so not a shell-quoting artifact).
+> Also checked: `~/.gradle/gradle.properties` (no signing entries) and all 50 commits of git history
+> (no keystore blob, no `signingConfig`/`storePassword`/`keyAlias` ever committed).
+>
+> Conclusion: the 2021 upload key is unrecoverable, and that is fine — the upload key reset makes it
+> irrelevant. Do not spend more time hunting for it.
 
 ---
 
@@ -279,3 +284,4 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-20 | 0 | **Phase 0 complete.** Branch `migration/modernize-compose` created, `v3.0.0-legacy` tagged at `4359d23`, `.gitignore` modernized. |
 | 2026-09-20 | 0 | ⚠️ Release keystore not found anywhere on this machine or in git history. Shipping blocker raised; awaiting Play App Signing status from Play Console. |
 | 2026-09-20 | 0 | ✅ Signing blocker resolved: Play App Signing confirmed enabled ("Releases signed by Play"). Lost key was the upload key only; replaced via upload key reset in Phase 6. No phase is blocked. |
+| 2026-09-20 | 0 | Keystore hunt closed. Full home sweep found no MorseLight key; `~/Downloads/bhojan_android_key.jks` (different app) rejected every remembered password. Proceeding with the upload key reset. |
