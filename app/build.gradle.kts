@@ -32,9 +32,8 @@ android {
 
     buildFeatures {
         compose = true
-        // ViewBinding stays until the XML screens are removed in Phase 5.
-        viewBinding = true
-        // Temporary XML views still reference BuildConfig.APPLICATION_ID; off by default in AGP 9.
+        // ViewBinding removed with the old fragment UI (Phase 4). Old layouts are no longer
+        // inflated; their XML + custom-view attrs are deleted in the Phase 5 resource cleanup.
         buildConfig = true
     }
 

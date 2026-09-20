@@ -2,8 +2,9 @@ package com.ranjan.malav.morselight_flashlightwithmorsecode.utils
 
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.ranjan.malav.morselight_flashlightwithmorsecode.fragments.LumaListener
 import java.nio.ByteBuffer
+
+typealias LumaListener = (luma: Double) -> Unit
 
 
 class LuminosityAnalyzer(
