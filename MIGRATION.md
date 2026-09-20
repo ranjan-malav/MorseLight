@@ -1,6 +1,6 @@
 # MorseLight — Modernization & Compose Migration Plan
 
-**Status:** Phase 0 complete — Phase 1 not started
+**Status:** Phase 1 complete (build green) — on-device smoke test pending; Phase 2 not started
 **Started:** 2026-09-20
 **Owner:** Ranjan Malav
 **Goal:** Bring a 2021-era app (AGP 4.2 / Kotlin 1.5 / targetSdk 30 / XML + Fragments) up to a
@@ -179,7 +179,23 @@ Goal: same app, same XML UI, modern toolchain. Biggest-risk phase, because of AG
 **Code**
 - [ ] **Replace Kotlin synthetics with ViewBinding** in all 8 files that use them. Unavoidable even though these views die in Phase 5 — synthetics don't exist in modern Kotlin.
 - [ ] Fix deprecations: `onBackPressed()` → `OnBackPressedDispatcher`, `LiveData.observe(owner) {}` 2-arg lambda form, `requestPermissions`/`onRequestPermissionsResult` → `ActivityResultContracts`
-- [ ] **Verify:** `./gradlew assembleDebug` green; app installs and all 6 flows work on device
+- [x] **Verify:** `./gradlew :app:assembleDebug` green; `:app:testDebugUnitTest` green. APK: 14 MB, minSdk 26 / targetSdk 36 / compileSdk 37.
+- [ ] ⏳ **On-device smoke test pending** — no device/emulator was attached during the migration. Run all 6 flows (Send, Manual/Auto decode, Learn, Detail, Tutorial) before closing Phase 1.
+
+**Phase 1 outcome (2026-09-20):**
+- Toolchain jumped 4.2.2 → **AGP 9.4.1**, Gradle 6.7.1 → **9.7.1**, Kotlin 1.5.10 → **2.2.10 (AGP built-in)**. `kotlin-android`, `kotlin-kapt`, `kotlin-android-extensions` all removed.
+- Build converted to Kotlin DSL + version catalog (`gradle/libs.versions.toml`). Repos moved to `settings.gradle.kts` (jcenter gone).
+- Manifest: `package` → `namespace`, `android:exported="true"` on launcher activity, dead `SDK_INT >= M` branch removed (minSdk 26).
+- Koin fully removed (6 files); `SharedPreferenceUtils` now constructed directly.
+- **Synthetics → ViewBinding** across 9 files; `InfoDialog` uses `findViewById` (dynamic layout). Bugs B3 (nullable `icon`) fixed in passing.
+- Firebase `-ktx` imports → merged packages (BOM 34). CameraX alpha → 1.6.2. Test deps added (were never declared).
+
+**Deviations from the plan, and why:**
+- **compileSdk 36 → 37.** `androidx.core:core-ktx:1.19.0` (and current AndroidX) require compileSdk 37. AGP 9.4 supports up to API 37; installed `platforms;android-37.0`. **targetSdk stays 36** (Play's requirement) — compileSdk and targetSdk are independent.
+- **`nonTransitiveRClass=false`** (not the AGP 9 default `true`). The temporary XML/Views reference library attrs via the app R (`colorOnBackground`, `backgroundColor`), which non-transitive R breaks. Flip back to `true` in Phase 5 once Views are gone.
+- **`java.net.preferIPv4Stack=true`** added to `org.gradle.jvmargs` — the JVM's IPv6 route to the Gradle CDN / Maven timed out on this machine while IPv4 (curl) worked. Harmless to keep; revisit if it ever matters.
+- Deprecation warning left: `Preview.Builder.setTargetAspectRatio` — belongs to the Phase 4 CameraX rewrite.
+- **ActivityResult permissions migration deferred to Phase 3/4**, when `MainActivity` becomes a `ComponentActivity`. The deprecated `requestPermissions`/`onRequestPermissionsResult` still compile (warnings only), so this does not block a green build.
 
 ### Phase 2 — Extract the domain layer (UI-independent)
 Goal: pull all logic out of Activities/Fragments so Compose screens are thin.
@@ -285,3 +301,4 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-20 | 0 | ⚠️ Release keystore not found anywhere on this machine or in git history. Shipping blocker raised; awaiting Play App Signing status from Play Console. |
 | 2026-09-20 | 0 | ✅ Signing blocker resolved: Play App Signing confirmed enabled ("Releases signed by Play"). Lost key was the upload key only; replaced via upload key reset in Phase 6. No phase is blocked. |
 | 2026-09-20 | 0 | Keystore hunt closed. Full home sweep found no MorseLight key; `~/Downloads/bhojan_android_key.jks` (different app) rejected every remembered password. Proceeding with the upload key reset. |
+| 2026-09-20 | 1 | **Phase 1 build green.** AGP 9.4.1 / Gradle 9.7.1 / Kotlin 2.2.10 built-in; Koin removed; synthetics → ViewBinding (9 files); Firebase BOM 34. Deviations: compileSdk 37 (targetSdk still 36), nonTransitiveRClass=false, IPv4 forced for downloads. On-device smoke test still pending. |

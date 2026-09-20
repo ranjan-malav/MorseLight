@@ -10,7 +10,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
-import kotlinx.android.synthetic.main.fragment_send_info.view.*
 
 class InfoDialog : BottomSheetDialogFragment() {
 
@@ -52,7 +51,7 @@ class InfoDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.close_button.setOnClickListener {
+        view.findViewById<View>(R.id.close_button).setOnClickListener {
             dismiss()
         }
 

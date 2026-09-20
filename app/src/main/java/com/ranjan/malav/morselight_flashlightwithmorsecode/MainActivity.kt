@@ -26,14 +26,11 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.fragments.ImageAnalys
 import com.ranjan.malav.morselight_flashlightwithmorsecode.fragments.InfoDialog
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.LuminosityAnalyzer
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.showSettingsOpenDialog
-import kotlinx.android.synthetic.main.activity_main.*
-import org.koin.core.component.KoinApiExtension
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 
-@KoinApiExtension
 class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallbacks {
 
     private lateinit var cameraExecutor: ExecutorService
@@ -103,7 +100,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
         )
         navView.setupWithNavController(controller)
 
-        setSupportActionBar(toolbar)
+        setSupportActionBar(findViewById(R.id.toolbar))
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         // Start camera if we have the permission
@@ -188,10 +185,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main), FragmentCallback
         val item = menu.findItem(R.id.action_flash)
         if (ignoreClicks) {
             item.isEnabled = false
-            item.icon.alpha = 130
+            item.icon?.alpha = 130
         } else {
             item.isEnabled = true
-            item.icon.alpha = 255
+            item.icon?.alpha = 255
         }
         return super.onPrepareOptionsMenu(menu)
     }

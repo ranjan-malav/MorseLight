@@ -13,9 +13,9 @@ import android.view.View
 import android.widget.Toast
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
-import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.analytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 
 

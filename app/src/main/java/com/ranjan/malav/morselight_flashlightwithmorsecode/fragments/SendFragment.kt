@@ -11,22 +11,21 @@ import androidx.camera.core.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.analytics.analytics
+import com.google.firebase.Firebase
 import com.ranjan.malav.morselight_flashlightwithmorsecode.MainViewModel
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.*
-import kotlinx.android.synthetic.main.fragment_send.*
-import org.koin.core.component.KoinApiExtension
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import com.ranjan.malav.morselight_flashlightwithmorsecode.databinding.FragmentSendBinding
 import java.util.*
 
 
-@KoinApiExtension
-class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
+class SendFragment : Fragment(R.layout.fragment_send) {
 
-    private val sharedPref: SharedPreferenceUtils by inject()
+    private var _binding: FragmentSendBinding? = null
+    private val binding get() = _binding!!
+
+    private val sharedPref by lazy { SharedPreferenceUtils(requireContext()) }
     private var isFlashOn = false
     private var ignoreClicks = false
     private var transmissionSpeed: Int = 3
@@ -42,16 +41,18 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        transmissionSpeed = sharedPref.getInt(SPEED, 3)
-        speed_slider.value = transmissionSpeed.toFloat()
+        _binding = FragmentSendBinding.bind(view)
 
-        speed_slider.addOnChangeListener { _, value, _ ->
+        transmissionSpeed = sharedPref.getInt(SPEED, 3)
+        binding.speedSlider.value = transmissionSpeed.toFloat()
+
+        binding.speedSlider.addOnChangeListener { _, value, _ ->
             transmissionSpeed = value.toInt()
             sharedPref.setInt(SPEED, transmissionSpeed)
             ignoreClicks = false
         }
 
-        flash_status_view.setOnTouchListener { _, event ->
+        binding.flashStatusView.setOnTouchListener { _, event ->
             if (ignoreClicks) return@setOnTouchListener false
             if (event.action == MotionEvent.ACTION_DOWN) {
                 callback?.switchTorch(true)
@@ -62,7 +63,7 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
             return@setOnTouchListener true
         }
 
-        sos_button.setOnClickListener {
+        binding.sosButton.setOnClickListener {
             if (ignoreClicks) {
                 runCleanUp()
                 callback?.removeHandlers()
@@ -72,7 +73,7 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
             }
         }
 
-        signal_button.setOnClickListener {
+        binding.signalButton.setOnClickListener {
             if (ignoreClicks) return@setOnClickListener
             val charMessage = arrayListOf('E', 'E', 'E')
             playWithFlash(
@@ -81,12 +82,12 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
             )
         }
 
-        start_stop_button.setOnClickListener {
+        binding.startStopButton.setOnClickListener {
             if (ignoreClicks) {
                 runCleanUp()
                 callback?.removeHandlers()
             } else {
-                val charMessage = message_input.editText?.text.toString().trim()
+                val charMessage = binding.messageInput.editText?.text.toString().trim()
                 if (charMessage.isBlank()) {
                     Toast.makeText(
                         requireContext(), R.string.no_message_to_transmit, Toast.LENGTH_SHORT
@@ -107,11 +108,11 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
 
         viewModel.currentlyTransmittingChar.observe(viewLifecycleOwner, {
             if (it == ' ') {
-                current_char.text = ""
-                current_char_morse.text = ""
+                binding.currentChar.text = ""
+                binding.currentCharMorse.text = ""
             } else {
-                current_char.text = "$it = "
-                current_char_morse.text = charToMorse[it]
+                binding.currentChar.text = "$it = "
+                binding.currentCharMorse.text = charToMorse[it]
             }
         })
 
@@ -148,16 +149,16 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
         val theme = requireActivity().theme
         theme.resolveAttribute(R.attr.colorOnBackground, typedValue, true)
         @ColorInt val color = typedValue.data
-        flash_status_text.text = getString(R.string.off)
-        flash_status_view.setColorFilter(
+        binding.flashStatusText.text = getString(R.string.off)
+        binding.flashStatusView.setColorFilter(
             color,
             android.graphics.PorterDuff.Mode.SRC_IN
         )
     }
 
     private fun setTorchOnImageView() {
-        flash_status_text.text = getString(R.string.on)
-        flash_status_view.setColorFilter(
+        binding.flashStatusText.text = getString(R.string.on)
+        binding.flashStatusView.setColorFilter(
             ContextCompat.getColor(requireContext(), R.color.colorAccent),
             android.graphics.PorterDuff.Mode.SRC_IN
         )
@@ -165,11 +166,11 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
 
     private fun runCleanUp() {
         ignoreClicks = false
-        start_stop_button.text = getString(R.string.start)
-        sos_button.text = getString(R.string.sos)
-        signal_button.isEnabled = true
-        current_char.text = ""
-        current_char_morse.text = ""
+        binding.startStopButton.text = getString(R.string.start)
+        binding.sosButton.text = getString(R.string.sos)
+        binding.signalButton.isEnabled = true
+        binding.currentChar.text = ""
+        binding.currentCharMorse.text = ""
     }
 
     private fun playWithFlash(
@@ -178,9 +179,9 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
     ) {
         // Setup, remove click listeners
         ignoreClicks = true
-        start_stop_button.text = getString(R.string.stop)
-        sos_button.text = getString(R.string.stop)
-        signal_button.isEnabled = false
+        binding.startStopButton.text = getString(R.string.stop)
+        binding.sosButton.text = getString(R.string.stop)
+        binding.signalButton.isEnabled = false
 
         // Speed can be from 1 to 10, 3 means 1 unit = 3/3 sec, 10 means 1 unit = 3/10 sec
         // 1 means 1 unit = 3/1 sec. Default speed is 3 which means 1 sec = 1 unit.
@@ -215,8 +216,8 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
         var delay = 0L
         val onOffDelays = arrayListOf<Long>()
         if (!isOnlySignal) {
-            encoded_morse_code.text = morseCode.toString()
-            message_input.editText?.setText(message)
+            binding.encodedMorseCode.text = morseCode.toString()
+            binding.messageInput.editText?.setText(message)
         }
         for (i in timeUnits.indices) {
             onOffDelays.add((delay * 1000 * transmissionSpeed).toLong())
@@ -237,5 +238,10 @@ class SendFragment : Fragment(R.layout.fragment_send), KoinComponent {
             onOffDelays, charUnits, characters, speed,
             shouldUpdateCurrentChar, (delay * 1000 * transmissionSpeed).toLong()
         )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

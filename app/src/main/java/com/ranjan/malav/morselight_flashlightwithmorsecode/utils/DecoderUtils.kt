@@ -1,6 +1,5 @@
 package com.ranjan.malav.morselight_flashlightwithmorsecode.utils
 
-import kotlinx.android.synthetic.main.fragment_manual_decode.*
 
 
 object DecoderUtils {

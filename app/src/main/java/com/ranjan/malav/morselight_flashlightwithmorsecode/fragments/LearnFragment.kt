@@ -13,7 +13,7 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.contactMail
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.launchWeb
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.rateApp
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.shareApp
-import kotlinx.android.synthetic.main.fragment_learn.*
+import com.ranjan.malav.morselight_flashlightwithmorsecode.databinding.FragmentLearnBinding
 
 
 class LearnFragment : Fragment(R.layout.fragment_learn) {
@@ -23,27 +23,29 @@ class LearnFragment : Fragment(R.layout.fragment_learn) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        learn_about.setOnClickListener {
+        val binding = FragmentLearnBinding.bind(view)
+
+        binding.learnAbout.setOnClickListener {
             startActivity(Intent(requireContext(), MorseDetailActivity::class.java))
         }
 
-        learn_decode.setOnClickListener {
+        binding.learnDecode.setOnClickListener {
             startActivity(Intent(requireContext(), MorseTutorialActivity::class.java))
         }
 
-        learn_contact.setOnClickListener { requireContext().contactMail() }
+        binding.learnContact.setOnClickListener { requireContext().contactMail() }
 
-        learn_rate.setOnClickListener { requireContext().rateApp() }
+        binding.learnRate.setOnClickListener { requireContext().rateApp() }
 
-        learn_share.setOnClickListener { requireContext().shareApp() }
+        binding.learnShare.setOnClickListener { requireContext().shareApp() }
 
-        learn_source.setOnClickListener {
+        binding.learnSource.setOnClickListener {
             requireContext().launchWeb(
                 Uri.parse("https://github.com/ranjan-malav/MorseLight")
             )
         }
 
-        learn_donate.setOnClickListener {
+        binding.learnDonate.setOnClickListener {
             requireContext().launchWeb(
                 Uri.parse("https://ko-fi.com/ranjan")
             )

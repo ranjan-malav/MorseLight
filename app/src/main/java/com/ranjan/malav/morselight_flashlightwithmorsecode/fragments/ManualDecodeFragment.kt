@@ -16,17 +16,16 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.*
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecoderUtils.decryptMorse
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecoderUtils.findMorseFromTimings
-import kotlinx.android.synthetic.main.fragment_manual_decode.*
-import org.koin.core.component.KoinApiExtension
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import com.ranjan.malav.morselight_flashlightwithmorsecode.databinding.FragmentManualDecodeBinding
 import java.util.*
 
 
-@KoinApiExtension
-class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComponent {
+class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode) {
 
-    private val sharedPref: SharedPreferenceUtils by inject()
+    private var _binding: FragmentManualDecodeBinding? = null
+    private val binding get() = _binding!!
+
+    private val sharedPref by lazy { SharedPreferenceUtils(requireContext()) }
     private var isFlashOn = false
     private var ignoreClicks = false
     private var transmissionSpeed: Int = 3
@@ -44,14 +43,16 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        _binding = FragmentManualDecodeBinding.bind(view)
+
         transmissionSpeed = sharedPref.getInt(SPEED, 3)
 
-        tap_and_hold_button.setOnTouchListener { _, event ->
+        binding.tapAndHoldButton.setOnTouchListener { _, event ->
             if (ignoreClicks) {
                 runCleanUp()
                 callback?.removeHandlers()
             } else {
-                report_button.gone()
+                binding.reportButton.gone()
                 if (event.action == MotionEvent.ACTION_DOWN
                     || event.action == MotionEvent.ACTION_UP
                 ) {
@@ -65,15 +66,15 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
             return@setOnTouchListener true
         }
 
-        incoming_message.movementMethod = ScrollingMovementMethod()
+        binding.incomingMessage.movementMethod = ScrollingMovementMethod()
 
-        signal_button.setOnClickListener {
+        binding.signalButton.setOnClickListener {
             if (ignoreClicks) return@setOnClickListener
             val charMessage = arrayListOf('E', 'E', 'E')
             playWithFlash(charMessage, 20)
         }
 
-        sos_button.setOnClickListener {
+        binding.sosButton.setOnClickListener {
             if (ignoreClicks) {
                 runCleanUp()
                 callback?.removeHandlers()
@@ -83,15 +84,15 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
             }
         }
 
-        reset_button.setOnClickListener {
+        binding.resetButton.setOnClickListener {
             timings.clear()
             diffTimings.clear()
-            report_button.gone()
-            incoming_message.text = ""
-            decoded_message.text = ""
+            binding.reportButton.gone()
+            binding.incomingMessage.text = ""
+            binding.decodedMessage.text = ""
         }
 
-        decode_button.setOnClickListener {
+        binding.decodeButton.setOnClickListener {
             val timingsCopy = arrayListOf<Long>()
             timingsCopy.addAll(timings)
             val morseMessage = findMorseFromTimings(timings, diffTimings)
@@ -99,7 +100,7 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
                 val decryptedMessage = if (!morseMessage.contains("-")) {
                     // All the units are of same size, it could be . or -
                     val dashedMessage = morseMessage.replace(".", "-")
-                    incoming_message.text = getString(
+                    binding.incomingMessage.text = getString(
                         R.string.dot_message_or_dash_message, morseMessage, dashedMessage
                     )
                     getString(
@@ -107,13 +108,13 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
                         decryptMorse(morseMessage), decryptMorse(dashedMessage)
                     )
                 } else {
-                    incoming_message.text = morseMessage
+                    binding.incomingMessage.text = morseMessage
                     decryptMorse(morseMessage)
                 }
-                incoming_message.text = morseMessage
-                decoded_message.text = decryptedMessage
-                report_button.visible()
-                report_button.setOnClickListener {
+                binding.incomingMessage.text = morseMessage
+                binding.decodedMessage.text = decryptedMessage
+                binding.reportButton.visible()
+                binding.reportButton.setOnClickListener {
                     activity?.askIfDecryptedCorrectly(decryptedMessage, timingsCopy)
                 }
             }
@@ -156,9 +157,9 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
             }
         }
         if (timings.size == 1) {
-            decoded_message.text = ""
+            binding.decodedMessage.text = ""
         }
-        incoming_message.text = sb.toString().trim()
+        binding.incomingMessage.text = sb.toString().trim()
     }
 
     private fun setTorchOffImageView() {
@@ -166,16 +167,16 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
         val theme = requireActivity().theme
         theme.resolveAttribute(R.attr.colorOnBackground, typedValue, true)
         @ColorInt val color = typedValue.data
-        flash_status_text.text = getString(R.string.off)
-        flash_status_view.setColorFilter(
+        binding.flashStatusText.text = getString(R.string.off)
+        binding.flashStatusView.setColorFilter(
             color,
             android.graphics.PorterDuff.Mode.SRC_IN
         )
     }
 
     private fun setTorchOnImageView() {
-        flash_status_text.text = getString(R.string.on)
-        flash_status_view.setColorFilter(
+        binding.flashStatusText.text = getString(R.string.on)
+        binding.flashStatusView.setColorFilter(
             ContextCompat.getColor(requireContext(), R.color.colorAccent),
             android.graphics.PorterDuff.Mode.SRC_IN
         )
@@ -183,19 +184,19 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
 
     private fun runCleanUp() {
         ignoreClicks = false
-        report_button.gone()
-        sos_button.text = getString(R.string.sos)
-        tap_and_hold_button.text = getString(R.string.press_hold)
-        signal_button.isEnabled = true
+        binding.reportButton.gone()
+        binding.sosButton.text = getString(R.string.sos)
+        binding.tapAndHoldButton.text = getString(R.string.press_hold)
+        binding.signalButton.isEnabled = true
     }
 
     private fun playWithFlash(charMessage: ArrayList<Char>, speed: Int) {
         // Setup, remove click listeners
         ignoreClicks = true
-        report_button.gone()
-        sos_button.text = getString(R.string.stop)
-        tap_and_hold_button.text = getString(R.string.stop)
-        signal_button.isEnabled = false
+        binding.reportButton.gone()
+        binding.sosButton.text = getString(R.string.stop)
+        binding.tapAndHoldButton.text = getString(R.string.stop)
+        binding.signalButton.isEnabled = false
 
         // Speed can be from 1 to 10, 3 means 1 unit = 3/3 sec, 10 means 1 unit = 3/10 sec
         // 1 means 1 unit = 3/1 sec. Default speed is 3 which means 1 sec = 1 unit.
@@ -240,5 +241,10 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode), KoinComp
             onOffDelays, charUnits, characters, speed,
             false, (delay * 1000 * transmissionSpeed).toLong()
         )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

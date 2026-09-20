@@ -19,10 +19,12 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecoderUtils
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecoderUtils.getMorseForMessage
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.charToMorse
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.charToUnits
-import kotlinx.android.synthetic.main.activity_morse_tutorial.*
+import com.ranjan.malav.morselight_flashlightwithmorsecode.databinding.ActivityMorseTutorialBinding
 import java.util.*
 
 class MorseTutorialActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMorseTutorialBinding
 
     private var ignoreClicks = false
     private var isFlashOn = false
@@ -39,7 +41,7 @@ class MorseTutorialActivity : AppCompatActivity() {
     }
     private val cleanUpRunnable = Runnable {
         runCleanUp()
-        start_timer.text = getString(R.string.finished)
+        binding.startTimer.text = getString(R.string.finished)
     }
     private var messages = arrayOf(
         "NICE", "GOOD JOB", "OK", "SOS", "HELLO",
@@ -53,26 +55,27 @@ class MorseTutorialActivity : AppCompatActivity() {
     }
 
     private val timer3Sec = Runnable {
-        start_timer.text = "3"
+        binding.startTimer.text = "3"
     }
     private val timer2Sec = Runnable {
-        start_timer.text = "2"
+        binding.startTimer.text = "2"
     }
     private val timer1Sec = Runnable {
-        start_timer.text = "1"
+        binding.startTimer.text = "1"
     }
     private val timer0Sec = Runnable {
-        start_timer.text = ""
+        binding.startTimer.text = ""
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_morse_tutorial)
-        setSupportActionBar(toolbar)
+        binding = ActivityMorseTutorialBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        tap_and_hold_button.setOnTouchListener { _, event ->
+        binding.tapAndHoldButton.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN
                 || event.action == MotionEvent.ACTION_UP
             ) {
@@ -85,33 +88,33 @@ class MorseTutorialActivity : AppCompatActivity() {
             return@setOnTouchListener true
         }
 
-        morse_message.setText(currentMessage)
-        morse_encoded_message.text = ".... . .-.. .-.. ---"
-        incoming_message.movementMethod = ScrollingMovementMethod()
+        binding.morseMessage.setText(currentMessage)
+        binding.morseEncodedMessage.text = ".... . .-.. .-.. ---"
+        binding.incomingMessage.movementMethod = ScrollingMovementMethod()
 
-        morse_message.doOnTextChanged { text, _, _, _ ->
+        binding.morseMessage.doOnTextChanged { text, _, _, _ ->
             val charArray = arrayListOf<Char>()
             text.toString().trim().toCharArray().forEach {
                 charArray.add(it)
             }
             val morseCode = getMorseForMessage(charArray)
-            morse_encoded_message.text = morseCode
+            binding.morseEncodedMessage.text = morseCode
         }
 
-        next_button.setOnClickListener {
+        binding.nextButton.setOnClickListener {
             currentMessageIndex++
             if (currentMessageIndex > messages.size - 1) {
                 currentMessageIndex = 0
             }
             currentMessage = messages[currentMessageIndex]
-            morse_message.setText(currentMessage)
+            binding.morseMessage.setText(currentMessage)
         }
 
-        start_stop_button.setOnClickListener {
+        binding.startStopButton.setOnClickListener {
             if (ignoreClicks) {
                 runCleanUp()
             } else {
-                val charMessage = morse_message.text.toString().trim()
+                val charMessage = binding.morseMessage.text.toString().trim()
                 if (charMessage.isBlank()) {
                     Toast.makeText(
                         this, R.string.no_message_to_transmit, Toast.LENGTH_SHORT
@@ -126,23 +129,23 @@ class MorseTutorialActivity : AppCompatActivity() {
             }
         }
 
-        decode_button.setOnClickListener {
+        binding.decodeButton.setOnClickListener {
             val morseMessage = DecoderUtils.findMorseFromTimings(timings, diffTimings)
             if (morseMessage.isNotBlank()) {
                 if (!morseMessage.contains("-")) {
                     // All the units are of same size, it could be . or -
                     val dashedMessage = morseMessage.replace(".", "-")
-                    incoming_message.text = getString(
+                    binding.incomingMessage.text = getString(
                         R.string.dot_message_or_dash_message, morseMessage, dashedMessage
                     )
-                    decoded_message.text = getString(
+                    binding.decodedMessage.text = getString(
                         R.string.dot_message_or_dash_message,
                         DecoderUtils.decryptMorse(morseMessage),
                         DecoderUtils.decryptMorse(dashedMessage)
                     )
                 } else {
-                    incoming_message.text = morseMessage
-                    decoded_message.text = DecoderUtils.decryptMorse(morseMessage)
+                    binding.incomingMessage.text = morseMessage
+                    binding.decodedMessage.text = DecoderUtils.decryptMorse(morseMessage)
                 }
             }
         }
@@ -150,7 +153,7 @@ class MorseTutorialActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            super.onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -158,10 +161,10 @@ class MorseTutorialActivity : AppCompatActivity() {
     private fun playWithFlash(charMessage: ArrayList<Char>) {
         // Setup, remove click listeners
         ignoreClicks = true
-        incoming_message.text = ""
-        decoded_message.text = ""
-        start_stop_button.text = getString(R.string.stop)
-        next_button.isEnabled = false
+        binding.incomingMessage.text = ""
+        binding.decodedMessage.text = ""
+        binding.startStopButton.text = getString(R.string.stop)
+        binding.nextButton.isEnabled = false
         handler.postDelayed(timer3Sec, 0)
         handler.postDelayed(timer2Sec, 1000)
         handler.postDelayed(timer1Sec, 2000)
@@ -186,7 +189,7 @@ class MorseTutorialActivity : AppCompatActivity() {
 
             var delay = 0L
             val onOffDelays = arrayListOf<Long>()
-            morse_encoded_message.text = morseCode.toString()
+            binding.morseEncodedMessage.text = morseCode.toString()
             for (i in timeUnits.indices) {
                 onOffDelays.add((delay * 1000 * transmissionSpeed).toLong())
                 val unit = timeUnits[i].toString().toInt()
@@ -227,16 +230,16 @@ class MorseTutorialActivity : AppCompatActivity() {
         val typedValue = TypedValue()
         theme.resolveAttribute(R.attr.colorOnBackground, typedValue, true)
         @ColorInt val color = typedValue.data
-        flash_status_text.text = getString(R.string.off)
-        flash_status_view.setColorFilter(
+        binding.flashStatusText.text = getString(R.string.off)
+        binding.flashStatusView.setColorFilter(
             color,
             android.graphics.PorterDuff.Mode.SRC_IN
         )
     }
 
     private fun setTorchOnImageView() {
-        flash_status_text.text = getString(R.string.on)
-        flash_status_view.setColorFilter(
+        binding.flashStatusText.text = getString(R.string.on)
+        binding.flashStatusView.setColorFilter(
             ContextCompat.getColor(this, R.color.colorAccent),
             android.graphics.PorterDuff.Mode.SRC_IN
         )
@@ -256,17 +259,17 @@ class MorseTutorialActivity : AppCompatActivity() {
             }
         }
         if (timings.size == 1) {
-            decoded_message.text = ""
+            binding.decodedMessage.text = ""
         }
-        incoming_message.text = sb.toString().trim()
+        binding.incomingMessage.text = sb.toString().trim()
     }
 
     private fun runCleanUp() {
         ignoreClicks = false
         isFlashOn = false
         setTorchOffImageView()
-        next_button.isEnabled = true
-        start_stop_button.text = getString(R.string.start)
+        binding.nextButton.isEnabled = true
+        binding.startStopButton.text = getString(R.string.start)
         removeHandlerCallbacks()
     }
 }

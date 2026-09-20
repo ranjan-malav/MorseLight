@@ -13,28 +13,18 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.ranjan.malav.morselight_flashlightwithmorsecode.MainViewModel
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.*
-import kotlinx.android.synthetic.main.fragment_auto_decode.*
-import kotlinx.android.synthetic.main.fragment_auto_decode.decoded_message
-import kotlinx.android.synthetic.main.fragment_auto_decode.flash_status_view
-import kotlinx.android.synthetic.main.fragment_auto_decode.incoming_message
-import kotlinx.android.synthetic.main.fragment_auto_decode.report_button
-import kotlinx.android.synthetic.main.fragment_auto_decode.reset_button
-import kotlinx.android.synthetic.main.fragment_auto_decode.signal_button
-import kotlinx.android.synthetic.main.fragment_auto_decode.sos_button
-import kotlinx.android.synthetic.main.fragment_manual_decode.*
-import org.koin.core.component.KoinApiExtension
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import com.ranjan.malav.morselight_flashlightwithmorsecode.databinding.FragmentAutoDecodeBinding
 import java.util.*
 
 
 typealias LumaListener = (luma: Double) -> Unit
 
-@KoinApiExtension
-class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponent,
-    ImageAnalysisListener {
+class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), ImageAnalysisListener {
 
-    private val sharedPref: SharedPreferenceUtils by inject()
+    private var _binding: FragmentAutoDecodeBinding? = null
+    private val binding get() = _binding!!
+
+    private val sharedPref by lazy { SharedPreferenceUtils(requireContext()) }
     private var isFlashOn = false
     private var ignoreClicks = false
     private var transmissionSpeed: Int = 3
@@ -61,17 +51,19 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        _binding = FragmentAutoDecodeBinding.bind(view)
+
         transmissionSpeed = sharedPref.getInt(SPEED, 3)
         percentageRectSize = sharedPref.getInt(REACT_SIZE, 50)
         perceptibility = sharedPref.getInt(PERCEPTIBILITY, 30)
 
-        size_slider.value = percentageRectSize / 100f
+        binding.sizeSlider.value = percentageRectSize / 100f
         callback?.updateRectAreaPerc(percentageRectSize)
 
-        perceptibility_slider.value = perceptibility.toFloat()
+        binding.perceptibilitySlider.value = perceptibility.toFloat()
         setRectConstraints(percentageRectSize / 100f)
 
-        start_stop_button.setOnClickListener {
+        binding.startStopButton.setOnClickListener {
             if (ignoreClicks) {
                 runCleanUp()
                 callback?.removeHandlers()
@@ -80,12 +72,12 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                     // Start capturing high luminosity to on flash timings and lows to off flash timings
                     callback?.acquireWakeLock()
                     startCapturing = true
-                    report_button.gone()
-                    incoming_message.text = ""
-                    decoded_message.text = ""
-                    start_stop_button.text = getString(R.string.stop)
-                    sos_button.isEnabled = false
-                    signal_button.isEnabled = false
+                    binding.reportButton.gone()
+                    binding.incomingMessage.text = ""
+                    binding.decodedMessage.text = ""
+                    binding.startStopButton.text = getString(R.string.stop)
+                    binding.sosButton.isEnabled = false
+                    binding.signalButton.isEnabled = false
                     handler.postDelayed(timer3Sec, 0)
                     handler.postDelayed(timer2Sec, 1000)
                     handler.postDelayed(timer1Sec, 2000)
@@ -94,12 +86,12 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                     callback?.releaseWakeLock()
                     startCapturing = false
                     stopCapturingLowLuminosity = false
-                    sos_button.isEnabled = true
-                    signal_button.isEnabled = true
-                    start_stop_button.text = getString(R.string.start)
-                    start_timer.text = ""
+                    binding.sosButton.isEnabled = true
+                    binding.signalButton.isEnabled = true
+                    binding.startStopButton.text = getString(R.string.start)
+                    binding.startTimer.text = ""
                     isFlashOn = false
-                    flash_status_view.gone()
+                    binding.flashStatusView.gone()
                     avgLowLuminosity = 0.0
                     avgHighLuminosity = 0.0
                     avgCounter = 0
@@ -109,29 +101,29 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
             }
         }
 
-        perceptibility_title.isSelected = true
-        rect_size_title.isSelected = true
-        incoming_message.movementMethod = ScrollingMovementMethod()
+        binding.perceptibilityTitle.isSelected = true
+        binding.rectSizeTitle.isSelected = true
+        binding.incomingMessage.movementMethod = ScrollingMovementMethod()
 
-        perceptibility_slider.addOnChangeListener { _, value, _ ->
+        binding.perceptibilitySlider.addOnChangeListener { _, value, _ ->
             perceptibility = value.toInt()
             sharedPref.setInt(PERCEPTIBILITY, perceptibility)
         }
 
-        size_slider.addOnChangeListener { _, value, _ ->
+        binding.sizeSlider.addOnChangeListener { _, value, _ ->
             percentageRectSize = (value * 100).toInt()
             sharedPref.setInt(REACT_SIZE, percentageRectSize)
             setRectConstraints(value)
             callback?.updateRectAreaPerc(percentageRectSize)
         }
 
-        signal_button.setOnClickListener {
+        binding.signalButton.setOnClickListener {
             if (ignoreClicks) return@setOnClickListener
             val charMessage = arrayListOf('E', 'E', 'E')
             playWithFlash(charMessage, 20)
         }
 
-        sos_button.setOnClickListener {
+        binding.sosButton.setOnClickListener {
             if (ignoreClicks) {
                 runCleanUp()
                 callback?.removeHandlers()
@@ -141,7 +133,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
             }
         }
 
-        reset_button.setOnClickListener {
+        binding.resetButton.setOnClickListener {
             runCleanUp()
         }
 
@@ -162,7 +154,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
 
     override fun onResume() {
         super.onResume()
-        callback?.bindPreview(camera_preview, this@AutoDecodeFragment)
+        callback?.bindPreview(binding.cameraPreview, this@AutoDecodeFragment)
     }
 
     override fun onPause() {
@@ -180,7 +172,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
             val decryptedMessage = if (!morseMessage.contains("-")) {
                 // All the units are of same size, it could be . or -
                 val dashedMessage = morseMessage.replace(".", "-")
-                incoming_message.text = getString(
+                binding.incomingMessage.text = getString(
                     R.string.dot_message_or_dash_message, morseMessage, dashedMessage
                 )
                 getString(
@@ -189,12 +181,12 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                     DecoderUtils.decryptMorse(dashedMessage)
                 )
             } else {
-                incoming_message.text = morseMessage
+                binding.incomingMessage.text = morseMessage
                 DecoderUtils.decryptMorse(morseMessage)
             }
-            decoded_message.text = decryptedMessage
-            report_button.visible()
-            report_button.setOnClickListener {
+            binding.decodedMessage.text = decryptedMessage
+            binding.reportButton.visible()
+            binding.reportButton.setOnClickListener {
                 activity?.askIfDecryptedCorrectly(decryptedMessage, timingsCopy)
             }
         }
@@ -214,9 +206,9 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
             }
         }
         if (timings.size == 1) {
-            decoded_message.text = ""
+            binding.decodedMessage.text = ""
         }
-        incoming_message.text = sb.toString().trim()
+        binding.incomingMessage.text = sb.toString().trim()
     }
 
     private fun removeHandlerCallbacks() {
@@ -230,32 +222,32 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
 
     private fun runCleanUp() {
         ignoreClicks = false
-        sos_button.text = getString(R.string.sos)
-        start_stop_button.text = getString(R.string.start)
-        sos_button.isEnabled = true
-        signal_button.isEnabled = true
-        report_button.gone()
+        binding.sosButton.text = getString(R.string.sos)
+        binding.startStopButton.text = getString(R.string.start)
+        binding.sosButton.isEnabled = true
+        binding.signalButton.isEnabled = true
+        binding.reportButton.gone()
         timings.clear()
         diffTimings.clear()
-        incoming_message.text = ""
-        decoded_message.text = ""
+        binding.incomingMessage.text = ""
+        binding.decodedMessage.text = ""
         avgLowLuminosity = 0.0
         avgHighLuminosity = 0.0
         avgCounter = 0
         startCapturing = false
         stopCapturingLowLuminosity = false
-        start_timer.text = ""
+        binding.startTimer.text = ""
         isFlashOn = false
-        flash_status_view.gone()
+        binding.flashStatusView.gone()
     }
 
     private fun playWithFlash(charMessage: ArrayList<Char>, speed: Int) {
         // Setup, remove click listeners
         ignoreClicks = true
-        report_button.gone()
-        sos_button.text = getString(R.string.stop)
-        start_stop_button.text = getString(R.string.stop)
-        signal_button.isEnabled = false
+        binding.reportButton.gone()
+        binding.sosButton.text = getString(R.string.stop)
+        binding.startStopButton.text = getString(R.string.stop)
+        binding.signalButton.isEnabled = false
 
         // Speed can be from 1 to 10, 3 means 1 unit = 3/3 sec, 10 means 1 unit = 3/10 sec
         // 1 means 1 unit = 3/1 sec. Default speed is 3 which means 1 sec = 1 unit.
@@ -303,16 +295,16 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
     }
 
     private val timer3Sec = Runnable {
-        start_timer.text = getString(R.string.learning_low_luminosity, "3")
+        binding.startTimer.text = getString(R.string.learning_low_luminosity, "3")
     }
     private val timer2Sec = Runnable {
-        start_timer.text = getString(R.string.learning_low_luminosity, "2")
+        binding.startTimer.text = getString(R.string.learning_low_luminosity, "2")
     }
     private val timer1Sec = Runnable {
-        start_timer.text = getString(R.string.learning_low_luminosity, "1")
+        binding.startTimer.text = getString(R.string.learning_low_luminosity, "1")
     }
     private val timer0Sec = Runnable {
-        start_timer.text = ""
+        binding.startTimer.text = ""
         stopCapturingLowLuminosity = true
     }
 
@@ -320,7 +312,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
         if (startCapturing) {
             activity?.let {
                 it.runOnUiThread {
-                    avg_luminosity.text = getString(
+                    binding.avgLuminosity.text = getString(
                         R.string.average_current_luminosity,
                         String.format("%.1f", avgLowLuminosity),
                         String.format("%.1f", luminosity)
@@ -343,7 +335,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                     }
                     activity?.let {
                         it.runOnUiThread {
-                            flash_status_view.visible()
+                            binding.flashStatusView.visible()
                             updateTimingViews()
                         }
                     }
@@ -366,7 +358,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
                     }
                     activity?.let {
                         it.runOnUiThread {
-                            flash_status_view.gone()
+                            binding.flashStatusView.gone()
                             updateTimingViews()
                         }
                     }
@@ -375,7 +367,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
         } else {
             activity?.let {
                 it.runOnUiThread {
-                    avg_luminosity.text =
+                    binding.avgLuminosity.text =
                         getString(R.string.average_luminosity, String.format("%.1f", luminosity))
                 }
             }
@@ -393,17 +385,22 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), KoinComponen
     }
 
     private fun setGuidePercentage(leftTopPerc: Float, rightBottomPerc: Float) {
-        val leftParams = guide_left.layoutParams as ConstraintLayout.LayoutParams
+        val leftParams = binding.guideLeft.layoutParams as ConstraintLayout.LayoutParams
         leftParams.guidePercent = leftTopPerc
-        guide_left.layoutParams = leftParams
-        val topParams = guide_top.layoutParams as ConstraintLayout.LayoutParams
+        binding.guideLeft.layoutParams = leftParams
+        val topParams = binding.guideTop.layoutParams as ConstraintLayout.LayoutParams
         topParams.guidePercent = leftTopPerc
-        guide_top.layoutParams = topParams
-        val rightParams = guide_right.layoutParams as ConstraintLayout.LayoutParams
+        binding.guideTop.layoutParams = topParams
+        val rightParams = binding.guideRight.layoutParams as ConstraintLayout.LayoutParams
         rightParams.guidePercent = rightBottomPerc
-        guide_right.layoutParams = rightParams
-        val bottomParams = guide_bottom.layoutParams as ConstraintLayout.LayoutParams
+        binding.guideRight.layoutParams = rightParams
+        val bottomParams = binding.guideBottom.layoutParams as ConstraintLayout.LayoutParams
         bottomParams.guidePercent = rightBottomPerc
-        guide_bottom.layoutParams = bottomParams
+        binding.guideBottom.layoutParams = bottomParams
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
