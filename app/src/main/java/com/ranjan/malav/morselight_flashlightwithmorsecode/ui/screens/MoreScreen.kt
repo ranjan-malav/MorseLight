@@ -1,9 +1,12 @@
 package com.ranjan.malav.morselight_flashlightwithmorsecode.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,6 +14,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -20,12 +25,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.BadgeTone
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.CardSurface
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.StatusBadge
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SunkenCard
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseRadius
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseTheme
 
 @Composable
@@ -36,6 +45,7 @@ fun MoreScreen(
     onOpenReferenceChart: () -> Unit,
     onRate: () -> Unit,
     onSource: () -> Unit,
+    onDonate: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val s by vm.state.collectAsStateWithLifecycle()
@@ -46,6 +56,36 @@ fun MoreScreen(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
+        // Progress card (accent tint, no border per the tinted-card rule)
+        Box(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(MorseRadius.card)).background(c.accentSoft)
+                .padding(16.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Box(contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(progress = { 12f / 36f }, modifier = Modifier.size(64.dp),
+                        color = c.accent, trackColor = c.surfaceCard)
+                    Text("12", style = MaterialTheme.typography.titleMedium, color = c.accentOnSoft)
+                }
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text("12 of 36 learned", style = MaterialTheme.typography.titleMedium, color = c.textHeading)
+                    Text("Lesson 4 covers K, R and S.", style = MaterialTheme.typography.bodyMedium, color = c.textMuted)
+                    StatusBadge("6 day streak", tone = BadgeTone.Success)
+                }
+            }
+        }
+
+        // Donation banner (amber wash)
+        Box(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(MorseRadius.card)).background(c.warningSoft)
+                .clickable(onClick = onDonate).padding(16.dp),
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text("Buy me a coffee", style = MaterialTheme.typography.titleMedium, color = c.warningOnSoft)
+                Text("Support development", style = MaterialTheme.typography.bodyMedium, color = c.textMuted)
+            }
+        }
+
         // Learn / practice
         CardSurface(Modifier.fillMaxWidth(), padding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
             Column {

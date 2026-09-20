@@ -28,6 +28,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ranjan.malav.morselight_flashlightwithmorsecode.torch.TorchController
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.CameraPreview
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SunkenCard
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.TorchDisc
@@ -37,7 +39,7 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseRadius
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseTheme
 
 @Composable
-fun ReceiveScreen(vm: ReceiveViewModel, modifier: Modifier = Modifier) {
+fun ReceiveScreen(vm: ReceiveViewModel, torch: TorchController, modifier: Modifier = Modifier) {
     val ui by vm.ui.collectAsStateWithLifecycle()
     val c = MorseTheme.colors
 

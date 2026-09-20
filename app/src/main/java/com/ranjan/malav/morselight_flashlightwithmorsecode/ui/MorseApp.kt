@@ -1,7 +1,9 @@
 package com.ranjan.malav.morselight_flashlightwithmorsecode.ui
 
 import android.net.Uri
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,7 +12,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.FlashlightOn
 import androidx.compose.material.icons.outlined.Radio
 import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -36,7 +39,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.ranjan.malav.morselight_flashlightwithmorsecode.app.AppContainer
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
-import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.screens.DrillPlaceholderScreen
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.screens.DecodingDrillScreen
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.screens.DecodingDrillViewModel
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.screens.SendingDrillScreen
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.screens.SendingDrillViewModel
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.screens.MoreScreen
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.screens.MoreViewModel
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.screens.ReceiveScreen
@@ -83,7 +89,7 @@ fun MorseApp(container: AppContainer) {
     Scaffold(
         containerColor = c.bgApp,
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = {
                     Column {
                         Eyebrow("MorseLight")
@@ -95,11 +101,16 @@ fun MorseApp(container: AppContainer) {
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back", tint = c.textBody)
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = c.bgApp),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = c.bgApp),
             )
         },
         bottomBar = {
-            if (isTab) NavigationBar(containerColor = c.surfaceCard) {
+            if (isTab) NavigationBar(
+                containerColor = c.surfaceCard,
+                modifier = Modifier.fillMaxWidth().border(
+                    androidx.compose.foundation.BorderStroke(1.dp, c.borderSubtle),
+                ),
+            ) {
                 tabs.forEach { tab ->
                     val selected = current.route == tab.dest.route
                     NavigationBarItem(
@@ -134,7 +145,7 @@ fun MorseApp(container: AppContainer) {
                 val vm: ReceiveViewModel = viewModel(factory = viewModelFactory {
                     initializer { ReceiveViewModel(container.torch, container.settings) }
                 })
-                ReceiveScreen(vm)
+                ReceiveScreen(vm, container.torch)
             }
             composable(Dest.More.route) {
                 val vm: MoreViewModel = viewModel(factory = viewModelFactory {
@@ -147,11 +158,18 @@ fun MorseApp(container: AppContainer) {
                     onOpenReferenceChart = { nav.navigate(Dest.Chart.route) },
                     onRate = { ctx.rateApp() },
                     onSource = { ctx.launchWeb(Uri.parse("https://github.com/ranjan-malav/MorseLight")) },
+                    onDonate = { ctx.launchWeb(Uri.parse("https://ko-fi.com/ranjan")) },
                 )
             }
             composable(Dest.Chart.route) { ReferenceChartScreen() }
-            composable(Dest.DecodingDrill.route) { DrillPlaceholderScreen("Decoding drill") }
-            composable(Dest.SendingDrill.route) { DrillPlaceholderScreen("Sending drill") }
+            composable(Dest.DecodingDrill.route) {
+                val vm: DecodingDrillViewModel = viewModel()
+                DecodingDrillScreen(vm)
+            }
+            composable(Dest.SendingDrill.route) {
+                val vm: SendingDrillViewModel = viewModel()
+                SendingDrillScreen(vm)
+            }
         }
     }
 }

@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.Preview
+import androidx.camera.view.PreviewView
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -36,20 +38,39 @@ class TorchController(private val context: Context) {
         considerableArea = 50,
     )
 
-    /** Bind the back camera to [owner]; the torch and luminance stream become available. */
-    fun bind(owner: LifecycleOwner, onReady: () -> Unit = {}) {
+    private var lifecycleOwner: LifecycleOwner? = null
+
+    /** Bind the back camera (torch + luminance only). */
+    fun bind(owner: LifecycleOwner, onReady: () -> Unit = {}) =
+        withProvider(owner) { p, analysis ->
+            camera = p.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, analysis)
+            onReady()
+        }
+
+    /** Bind the back camera with a live preview surface (Receive-camera screen). */
+    fun bindPreview(owner: LifecycleOwner, previewView: PreviewView) =
+        withProvider(owner) { p, analysis ->
+            val preview = Preview.Builder().build().also { it.surfaceProvider = previewView.surfaceProvider }
+            camera = p.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis)
+        }
+
+    private fun withProvider(owner: LifecycleOwner, bind: (ProcessCameraProvider, ImageAnalysis) -> Unit) {
+        lifecycleOwner = owner
         val future = ProcessCameraProvider.getInstance(context)
         future.addListener({
             val p = future.get()
             provider = p
             p.unbindAll()
-            val analysis = ImageAnalysis.Builder().build().also {
+            val analysis = analyzer ?: ImageAnalysis.Builder().build().also {
                 it.setAnalyzer(executor, lumaAnalyzer)
-            }
-            analyzer = analysis
-            camera = p.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, analysis)
-            onReady()
+            }.also { analyzer = it }
+            bind(p, analysis)
         }, ContextCompat.getMainExecutor(context))
+    }
+
+    /** Restore the torch-only binding (called when the camera preview leaves composition). */
+    fun restoreTorchOnly() {
+        lifecycleOwner?.let { bind(it) }
     }
 
     fun hasFlash(): Boolean = camera?.cameraInfo?.hasFlashUnit() == true
