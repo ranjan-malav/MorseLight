@@ -1,0 +1,54 @@
+:root{
+/* ---- base palette ---- */
+--blue-50:#EDF2FF;--blue-100:#DCE6FF;--blue-200:#B9CCFF;--blue-300:#8FAEFF;--blue-400:#5A85FF;--blue-500:#1E5EFF;--blue-600:#1749D6;--blue-700:#1239A8;--blue-800:#0D2A7A;
+--slate-0:#FFFFFF;--slate-25:#FAFBFC;--slate-50:#F6F7F9;--slate-100:#F1F3F7;--slate-150:#E9ECF2;--slate-200:#E3E7EE;--slate-300:#CBD2DE;--slate-400:#A3ACBD;--slate-500:#8A93A3;--slate-600:#646D7D;--slate-700:#454D5C;--slate-800:#272D39;--slate-850:#1D222B;--slate-900:#161A21;--slate-950:#0E1116;
+--mint-100:#E1F5EE;--mint-200:#BFE9DA;--mint-500:#0B8A5C;--mint-600:#08714B;
+--amber-100:#FFF2DC;--amber-200:#FFE0AE;--amber-500:#B57300;--amber-600:#945D00;
+--rose-100:#FFE8EC;--rose-200:#FFCBD4;--rose-500:#D93B3B;--rose-600:#B72C2C;
+--violet-100:#EEEAFF;--violet-200:#D8CFFF;--violet-500:#6B4CF6;--violet-600:#5636DC;
+
+/* ---- semantic: surface ---- */
+--bg-app:var(--slate-50);
+--surface-card:var(--slate-0);
+--surface-sunken:var(--slate-100);
+--surface-raised:var(--slate-0);
+--surface-inverse:var(--slate-900);
+--surface-overlay:rgba(14,17,22,.44);
+--surface-hover:rgba(30,94,255,.06);
+--surface-press:rgba(30,94,255,.12);
+--surface-selected:var(--blue-50);
+
+/* ---- semantic: text ---- */
+--text-heading:var(--slate-900);
+--text-body:var(--slate-800);
+--text-muted:var(--slate-600);
+--text-subtle:var(--slate-500);
+--text-on-accent:#FFFFFF;
+--text-on-inverse:var(--slate-50);
+--text-link:var(--blue-600);
+--text-link-hover:var(--blue-700);
+
+/* ---- semantic: line ---- */
+--border-subtle:var(--slate-150);
+--border-default:var(--slate-200);
+--border-strong:var(--slate-300);
+--border-accent:var(--blue-500);
+--focus-ring:rgba(30,94,255,.38);
+
+/* ---- semantic: accent + status ---- */
+--accent:var(--blue-500);
+--accent-hover:var(--blue-600);
+--accent-press:var(--blue-700);
+--accent-soft:var(--blue-50);
+--accent-soft-border:var(--blue-100);
+--accent-on-soft:var(--blue-700);
+
+--success:var(--mint-500);--success-soft:var(--mint-100);--success-on-soft:var(--mint-600);
+--warning:var(--amber-500);--warning-soft:var(--amber-100);--warning-on-soft:var(--amber-600);
+--danger:var(--rose-500);--danger-soft:var(--rose-100);--danger-on-soft:var(--rose-600);
+--info:var(--violet-500);--info-soft:var(--violet-100);--info-on-soft:var(--violet-600);
+
+/* ---- data viz (dashboards, habit rings) ---- */
+--chart-1:var(--blue-500);--chart-2:var(--mint-500);--chart-3:var(--violet-500);--chart-4:var(--amber-500);--chart-5:var(--rose-500);
+--track:var(--slate-150);
+}

@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/personal-ui-design-system-06a1d8ae-1184-47cd-b30f-8715c576206b/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/personal-ui-design-system-06a1d8ae-1184-47cd-b30f-8715c576206b/tokens/colors.css">
+<link rel="stylesheet" href="_ds/personal-ui-design-system-06a1d8ae-1184-47cd-b30f-8715c576206b/tokens/typography.css">
+<link rel="stylesheet" href="_ds/personal-ui-design-system-06a1d8ae-1184-47cd-b30f-8715c576206b/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/personal-ui-design-system-06a1d8ae-1184-47cd-b30f-8715c576206b/tokens/radius.css">
+<link rel="stylesheet" href="_ds/personal-ui-design-system-06a1d8ae-1184-47cd-b30f-8715c576206b/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/personal-ui-design-system-06a1d8ae-1184-47cd-b30f-8715c576206b/tokens/motion.css">
+<link rel="stylesheet" href="_ds/personal-ui-design-system-06a1d8ae-1184-47cd-b30f-8715c576206b/tokens/base.css">
+<link rel="stylesheet" href="_ds/personal-ui-design-system-06a1d8ae-1184-47cd-b30f-8715c576206b/tokens/dark.css">
+<link rel="stylesheet" href="_ds/personal-ui-design-system-06a1d8ae-1184-47cd-b30f-8715c576206b/styles.css">
+<script src="_ds/personal-ui-design-system-06a1d8ae-1184-47cd-b30f-8715c576206b/_ds_bundle.js"></script>
+<style>body{margin:0}a{color:var(--text-link)}a:hover{color:var(--text-link-hover)}</style>
+</helmet>
+<div data-theme="{{ theme }}" style="width:390px;height:844px;position:relative;background:var(--bg-app);border-radius:44px;overflow:hidden;border:1px solid var(--border-default);box-shadow:var(--shadow-4);display:flex;flex-direction:column;color:var(--text-body);font:var(--type-body)">
+
+<div style="height:46px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font:var(--weight-semibold) 14px/1 var(--font-core);color:var(--text-heading)">
+<span>9:41</span>
+<span style="display:flex;gap:6px;align-items:center">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Icon" name="signal" size="{{ 15 }}" hint-size="15px,15px"></x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Icon" name="wifi" size="{{ 15 }}" hint-size="15px,15px"></x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Icon" name="battery-full" size="{{ 17 }}" hint-size="17px,17px"></x-import>
+</span>
+</div>
+
+<div style="flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:0 10px 10px 16px">
+<sc-if value="{{ showBack }}">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.IconButton" icon="chevron-left" label="Back" onClick="{{ goBack }}" hint-size="40px,40px"></x-import>
+</sc-if>
+<div style="display:grid;gap:1px;flex:1;min-width:0">
+<span style="font:var(--type-caption);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-subtle)">MorseLight</span>
+<span style="font:var(--type-title-1);letter-spacing:var(--tracking-title);color:var(--text-heading);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ title }}</span>
+</div>
+<sc-if value="{{ showSettingsBtn }}" hint-placeholder-val="{{ true }}">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.IconButton" icon="settings" label="Settings" onClick="{{ goSettings }}" hint-size="40px,40px"></x-import>
+</sc-if>
+</div>
+
+<div style="flex:1;min-height:0;overflow:hidden;padding:0 16px 14px;display:flex;flex-direction:column">
+
+<sc-if value="{{ isSend }}" hint-placeholder-val="{{ true }}">
+<div style="flex:1;min-height:0;display:grid;grid-template-rows:auto auto 1fr auto auto;gap:12px">
+
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Input" multiline="{{ true }}" rows="{{ 2 }}" value="{{ msg }}" onChange="{{ setMsg }}" placeholder="Type your message" hint-size="100%,62px"></x-import>
+
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" tint="sunken" padding="sm" hint-size="100%,84px">
+<div style="display:grid;gap:6px">
+<div style="display:flex;align-items:baseline;justify-content:space-between">
+<span style="font:var(--type-caption);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-subtle)">Morse</span>
+<span style="font:var(--type-caption);color:var(--text-subtle);font-variant-numeric:tabular-nums">{{ txPctLabel }}</span>
+</div>
+<div style="font:var(--type-mono);font-size:22px;font-weight:var(--weight-bold);line-height:1.35;word-break:break-word;height:60px;overflow:hidden;letter-spacing:.06em">
+<sc-for list="{{ txSymbols }}" as="s" hint-placeholder-count="12">
+<span style="color:{{ s.c }};font-weight:{{ s.w }};transition:color 90ms linear">{{ s.t }}</span>
+</sc-for>
+</div>
+<div style="height:4px;border-radius:999px;overflow:hidden;background:{{ txTrack }}">
+<div style="height:100%;border-radius:999px;background:var(--accent);width:{{ txProgress }}"></div>
+</div>
+</div>
+</x-import>
+
+<div style="min-height:0;display:grid;place-items:center;align-content:center;gap:10px">
+<div style="position:relative;width:168px;height:168px;border-radius:999px;display:grid;place-items:center;background:var(--surface-sunken);border:1px solid var(--border-subtle);cursor:pointer;user-select:none;touch-action:none;box-shadow:{{ txGlow }}" onPointerDown="{{ txDown }}" onPointerUp="{{ txUp }}" onPointerLeave="{{ txUp }}">
+<div style="position:absolute;inset:7px;border-radius:999px;background:var(--accent);opacity:{{ txOpacity }};transition:opacity 60ms linear"></div>
+<div style="position:relative;display:grid;gap:8px;justify-items:center;color:{{ txInk }}">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Icon" name="flashlight" size="{{ 40 }}" hint-size="40px,40px"></x-import>
+<span style="font:var(--weight-semibold) var(--text-footnote)/1 var(--font-core);letter-spacing:var(--tracking-caps);text-transform:uppercase">{{ txDisc }}</span>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:8px">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Badge" tone="{{ txTone }}" dot="{{ true }}" hint-size="80px,24px">{{ txBadge }}</x-import>
+<span style="font:var(--type-footnote);color:var(--text-muted)">Hold to key by hand</span>
+</div>
+</div>
+
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Slider" value="{{ wpm }}" min="{{ 5 }}" max="{{ 25 }}" step="{{ 1 }}" onChange="{{ setWpm }}" label="Transmission speed" valueLabel="{{ wpmLabel }}" hint-size="100%,56px"></x-import>
+
+<div style="display:flex;gap:8px;align-items:center">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Button" size="lg" variant="soft" tone="accent" onClick="{{ sendSignal }}" hint-size="86px,52px">Signal</x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Button" size="lg" block="{{ true }}" icon="{{ txIcon }}" tone="{{ txBtnTone }}" onClick="{{ toggleTx }}" style="flex:1" hint-size="100%,52px">{{ txBtn }}</x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Button" size="lg" variant="soft" tone="danger" onClick="{{ sendSos }}" hint-size="72px,52px">SOS</x-import>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isReceive }}">
+<div style="flex:1;min-height:0;display:grid;grid-template-rows:auto 1fr;gap:12px">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.SegmentedControl" items="{{ rxModes }}" value="{{ rxMode }}" onChange="{{ setRxMode }}" block="{{ true }}" hint-size="100%,38px"></x-import>
+
+<sc-if value="{{ isCamera }}">
+<div style="min-height:0;display:grid;gap:8px;align-content:start;overflow:hidden">
+<div style="position:relative;height:172px;border-radius:var(--radius-card);overflow:hidden;background:#05070B;border:1px solid var(--border-default);display:grid;place-items:center">
+<div style="position:absolute;inset:0;background:var(--accent);opacity:{{ srcOpacity }};transition:opacity 60ms linear"></div>
+<div style="position:relative;width:{{ boxPx }};height:{{ boxPx }};border:2px solid var(--accent);border-radius:12px;box-shadow:0 0 0 999px rgba(0,0,0,.28)"></div>
+<div style="position:absolute;left:12px;top:12px;display:flex;gap:6px">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Badge" tone="{{ camTone }}" dot="{{ true }}" size="sm" hint-size="74px,20px">{{ camState }}</x-import>
+</div>
+<div style="position:absolute;right:12px;bottom:12px;padding:4px 9px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font:var(--type-mono);font-size:12px">lum {{ lum }}</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:nowrap">
+<span style="font:var(--type-footnote);color:var(--text-muted);min-width:0">Point the camera at the sender's light.</span>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Button" size="sm" variant="soft" icon="play" onClick="{{ simulate }}" hint-size="120px,32px">Demo</x-import>
+</div>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" tint="sunken" padding="sm" hint-size="100%,150px">
+<div style="display:grid;gap:14px">
+<div style="display:flex;align-items:center;justify-content:space-between">
+<span style="font:var(--type-label);color:var(--text-body)">Tuning</span>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Badge" tone="neutral" size="sm" hint-size="64px,20px">{{ tuneHint }}</x-import>
+</div>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Slider" value="{{ sens }}" min="{{ 0 }}" max="{{ 100 }}" onChange="{{ setSens }}" label="Sensitivity" valueLabel="{{ sensLabel }}" hint-size="100%,56px"></x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Slider" value="{{ box }}" min="{{ 30 }}" max="{{ 140 }}" onChange="{{ setBox }}" label="Detection area" valueLabel="{{ boxLabel }}" hint-size="100%,56px"></x-import>
+</div>
+</x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" padding="md" hint-size="100%,150px">
+<div style="display:grid;gap:10px">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+<span style="font:var(--type-caption);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-subtle)">Decoded</span>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Button" size="sm" variant="ghost" icon="rotate-ccw" onClick="{{ resetRx }}" hint-size="86px,32px">Reset</x-import>
+</div>
+<span style="font:var(--type-title-2);color:{{ decodedInk }};letter-spacing:.02em;min-height:29px;word-break:break-word">{{ decodedText }}</span>
+<div style="height:1px;background:var(--border-subtle)"></div>
+<div style="font:var(--type-mono);font-size:15px;color:var(--text-muted);word-break:break-word;min-height:22px;letter-spacing:.04em">{{ bufferText }}</div>
+</div>
+</x-import>
+</div>
+</sc-if>
+
+<sc-if value="{{ isManual }}">
+<div style="min-height:0;display:grid;grid-template-rows:auto 1fr auto;gap:12px;justify-items:stretch">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" padding="md" hint-size="100%,150px">
+<div style="display:grid;gap:10px">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+<span style="font:var(--type-caption);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-subtle)">Decoded</span>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Button" size="sm" variant="ghost" icon="rotate-ccw" onClick="{{ resetRx }}" hint-size="86px,32px">Reset</x-import>
+</div>
+<span style="font:var(--type-title-2);color:{{ decodedInk }};letter-spacing:.02em;min-height:29px;word-break:break-word">{{ decodedText }}</span>
+<div style="height:1px;background:var(--border-subtle)"></div>
+<div style="font:var(--type-mono);font-size:15px;color:var(--text-muted);word-break:break-word;min-height:22px;letter-spacing:.04em">{{ bufferText }}</div>
+</div>
+</x-import>
+<span style="font:var(--type-footnote);color:var(--text-muted);text-align:center;align-self:center">Hold while the sender's light is on. Short is a dot, long is a dash.</span>
+<div style="justify-self:center;position:relative;width:168px;height:168px;border-radius:999px;display:grid;place-items:center;background:var(--surface-sunken);border:1px solid var(--border-subtle);cursor:pointer;user-select:none;touch-action:none;box-shadow:{{ keyGlow }}" onPointerDown="{{ keyDown }}" onPointerUp="{{ keyUp }}" onPointerLeave="{{ keyUp }}">
+<div style="position:absolute;inset:6px;border-radius:999px;background:var(--accent);opacity:{{ keyOpacity }};transition:opacity 50ms linear"></div>
+<div style="position:relative;display:grid;gap:6px;justify-items:center;color:{{ keyInk }}">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Icon" name="circle-dot" size="{{ 34 }}" hint-size="34px,34px"></x-import>
+<span style="font:var(--weight-semibold) var(--text-footnote)/1 var(--font-core);letter-spacing:var(--tracking-caps);text-transform:uppercase">Hold</span>
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isLearn }}">
+<div style="flex:1;min-height:0;overflow:auto;display:grid;gap:16px;align-content:start">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" tint="accent" padding="lg" hint-size="100%,140px">
+<div style="display:flex;align-items:center;gap:16px">
+<div style="background:var(--surface-card);border-radius:999px;padding:3px">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ProgressRing" value="{{ learnPct }}" size="{{ 82 }}" label="{{ learnPctLabel }}" hint-size="82px,82px"></x-import>
+</div>
+<div style="display:grid;gap:5px">
+<span style="font:var(--type-title-3);color:var(--accent-on-soft)">{{ learnedLabel }}</span>
+<span style="font:var(--type-footnote);color:var(--accent-on-soft)">Lesson 4 covers K, R and S.</span>
+<div style="display:flex;gap:6px;margin-top:2px">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Badge" tone="success" size="sm" hint-size="84px,20px">6 day streak</x-import>
+</div>
+</div>
+</div>
+</x-import>
+
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" padding="none" hint-size="100%,210px">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" title="Decoding drill" subtitle="Copy a played message by ear and eye" chevron="{{ true }}" onClick="{{ goDrill }}" hint-size="100%,68px"></x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" title="Sending drill" subtitle="Tap out one letter at a time" chevron="{{ true }}" onClick="{{ goSdrill }}" hint-size="100%,68px"></x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" title="Reference chart" subtitle="All 36 characters" chevron="{{ true }}" onClick="{{ goChart }}" divider="{{ false }}" hint-size="100%,68px"></x-import>
+</x-import>
+
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" tint="sunken" padding="md" hint-size="100%,120px">
+<div style="display:grid;gap:8px">
+<span style="font:var(--type-caption);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-subtle)">Timing</span>
+<span style="font:var(--type-footnote);color:var(--text-body)">A dash is three dots long. Letters are three dots apart, words are seven.</span>
+<div style="display:flex;align-items:center;gap:4px;height:22px;margin-top:2px">
+<sc-for list="{{ timingBars }}" as="b" hint-placeholder-count="9">
+<span style="height:12px;border-radius:999px;width:{{ b.w }};background:{{ b.c }}"></span>
+</sc-for>
+</div>
+</div>
+</x-import>
+</div>
+</sc-if>
+
+<sc-if value="{{ isChart }}">
+<div style="flex:1;min-height:0;overflow:auto;display:grid;gap:14px;align-content:start">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Input" icon="search" value="{{ query }}" onChange="{{ setQuery }}" placeholder="Find a character" hint-size="100%,44px"></x-import>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<sc-for list="{{ chart }}" as="c" hint-placeholder-count="12">
+<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-tile);background:var(--surface-card);border:1px solid var(--border-subtle);cursor:pointer" onClick="{{ c.play }}">
+<span style="width:24px;font:var(--weight-bold) var(--text-subhead)/1 var(--font-core);color:var(--text-heading)">{{ c.ch }}</span>
+<span style="font:var(--type-mono);font-size:15px;color:var(--accent);letter-spacing:.06em">{{ c.code }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isDrill }}">
+<div style="flex:1;min-height:0;display:grid;grid-template-rows:auto 1fr auto auto;gap:12px">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" padding="md" hint-size="100%,124px">
+<div style="display:grid;gap:10px">
+<div style="display:flex;align-items:center;justify-content:space-between">
+<span style="font:var(--type-caption);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-subtle)">Target message</span>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Badge" tone="{{ drillTone }}" size="sm" hint-size="70px,20px">{{ drillState }}</x-import>
+</div>
+<span style="font:var(--type-title-2);color:{{ drillInk }};letter-spacing:.03em">{{ drillShown }}</span>
+<div style="display:flex;gap:8px">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Button" size="sm" icon="{{ drillIcon }}" onClick="{{ playDrill }}" hint-size="104px,32px">{{ drillBtn }}</x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Button" size="sm" variant="secondary" onClick="{{ nextDrill }}" hint-size="86px,32px">Next</x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Button" size="sm" variant="ghost" onClick="{{ toggleReveal }}" hint-size="80px,32px">{{ revealBtn }}</x-import>
+</div>
+</div>
+</x-import>
+
+<div style="min-height:0;display:grid;gap:8px;justify-items:center;align-content:center">
+<div style="position:relative;width:126px;height:126px;border-radius:999px;display:grid;place-items:center;background:var(--surface-sunken);border:1px solid var(--border-subtle);box-shadow:{{ srcGlow }}">
+<div style="position:absolute;inset:6px;border-radius:999px;background:var(--accent);opacity:{{ srcOpacity }};transition:opacity 60ms linear"></div>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Icon" name="flashlight" size="{{ 34 }}" hint-size="34px,34px"></x-import>
+</div>
+<span style="font:var(--type-footnote);color:var(--text-muted)">Mocked sender</span>
+</div>
+
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" tint="sunken" padding="md" hint-size="100%,110px">
+<div style="display:grid;gap:8px">
+<span style="font:var(--type-caption);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-subtle)">Your copy</span>
+<span style="font:var(--type-title-3);color:{{ decodedInk }};min-height:26px;word-break:break-word">{{ decodedText }}</span>
+<div style="font:var(--type-mono);font-size:14px;color:var(--text-muted);min-height:20px;word-break:break-word;letter-spacing:.04em">{{ bufferText }}</div>
+</div>
+</x-import>
+
+<div style="display:flex;align-items:center;gap:12px">
+<div style="position:relative;flex:1;height:64px;border-radius:999px;display:grid;place-items:center;background:var(--accent);color:var(--text-on-accent);cursor:pointer;user-select:none;touch-action:none;box-shadow:var(--shadow-accent);font:var(--weight-semibold) var(--text-subhead)/1 var(--font-core);letter-spacing:var(--tracking-caps);text-transform:uppercase;opacity:{{ keyPressOpacity }}" onPointerDown="{{ keyDown }}" onPointerUp="{{ keyUp }}" onPointerLeave="{{ keyUp }}">Hold to copy</div>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.IconButton" icon="rotate-ccw" label="Reset copy" variant="outline" size="lg" onClick="{{ resetRx }}" hint-size="48px,48px"></x-import>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isSdrill }}">
+<div style="flex:1;min-height:0;display:grid;grid-template-rows:auto auto auto 1fr auto;gap:12px">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" padding="lg" hint-size="100%,200px">
+<div style="display:grid;gap:12px;justify-items:center">
+<span style="font:var(--type-caption);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-subtle)">Send this character</span>
+<span style="font:var(--type-display);color:var(--text-heading);line-height:1">{{ sdLetter }}</span>
+<span style="font:var(--type-mono);font-size:20px;color:{{ sdHintInk }};letter-spacing:.1em;min-height:26px">{{ sdHint }}</span>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Badge" tone="{{ sdTone }}" dot="{{ true }}" hint-size="96px,24px">{{ sdState }}</x-import>
+</div>
+</x-import>
+
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" tint="sunken" padding="md" hint-size="100%,84px">
+<div style="display:grid;gap:8px">
+<span style="font:var(--type-caption);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-subtle)">You keyed</span>
+<span style="font:var(--type-mono);font-size:20px;color:var(--text-heading);letter-spacing:.1em;min-height:26px">{{ sdBuf }}</span>
+</div>
+</x-import>
+
+<div style="display:flex;gap:8px">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Button" size="sm" variant="secondary" onClick="{{ sdReset }}" hint-size="86px,32px">Clear</x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Button" size="sm" variant="ghost" onClick="{{ sdShowHint }}" hint-size="82px,32px">Hint</x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Button" size="sm" variant="secondary" onClick="{{ sdNext }}" hint-size="86px,32px">Skip</x-import>
+</div>
+
+<div style="display:flex;align-items:center;gap:12px;align-self:end">
+<div style="position:relative;flex:1;height:64px;border-radius:999px;display:grid;place-items:center;background:var(--accent);color:var(--text-on-accent);cursor:pointer;user-select:none;touch-action:none;box-shadow:var(--shadow-accent);font:var(--weight-semibold) var(--text-subhead)/1 var(--font-core);letter-spacing:var(--tracking-caps);text-transform:uppercase;opacity:{{ sdPressOpacity }}" onPointerDown="{{ sdDown }}" onPointerUp="{{ sdUp }}" onPointerLeave="{{ sdUp }}">Hold to key</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isSettings }}">
+<div style="flex:1;min-height:0;overflow:auto;display:grid;gap:16px;align-content:start">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" padding="none" hint-size="100%,210px">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" title="Key tone" subtitle="Play a sidetone while the light is on" trailing="{{ toneSwitch }}" hint-size="100%,68px"></x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" title="Loop transmission" subtitle="Repeat the message until stopped" trailing="{{ loopSwitch }}" hint-size="100%,68px"></x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" title="Keep screen awake" subtitle="While sending or receiving" trailing="{{ awakeSwitch }}" divider="{{ false }}" hint-size="100%,68px"></x-import>
+</x-import>
+
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" padding="none" hint-size="100%,204px">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" leading="{{ iconStar }}" title="Rate this app" subtitle="Leave a review on the Play Store" chevron="{{ true }}" onClick="{{ noop }}" hint-size="100%,68px"></x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" leading="{{ iconCoffee }}" title="Buy me a coffee" subtitle="Support development" chevron="{{ true }}" onClick="{{ noop }}" hint-size="100%,68px"></x-import>
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.ListRow" leading="{{ iconCode }}" title="Source code" subtitle="MorseLight is open source, browse the repository" chevron="{{ true }}" onClick="{{ noop }}" divider="{{ false }}" hint-size="100%,68px"></x-import>
+</x-import>
+
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Card" tint="info" padding="md" hint-size="100%,110px">
+<div style="display:grid;gap:6px">
+<span style="font:var(--type-label);color:var(--info-on-soft)">About</span>
+<span style="font:var(--type-footnote);color:var(--info-on-soft)">MorseLight 3.0. Timing follows ITU-R M.1677, one unit at {{ wpmLabel }}.</span>
+</div>
+</x-import>
+</div>
+</sc-if>
+
+</div>
+
+<sc-if value="{{ showTabs }}" hint-placeholder-val="{{ true }}">
+<nav style="flex:0 0 auto;display:flex;align-items:center;justify-content:space-around;padding:8px 12px 22px;background:color-mix(in oklab, var(--surface-card) 82%, transparent);backdrop-filter:var(--blur-sheet);-webkit-backdrop-filter:var(--blur-sheet);border-top:1px solid var(--border-subtle)">
+<sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+<span style="display:grid;gap:4px;justify-items:center;width:78px;min-height:44px;padding-top:4px;cursor:pointer;color:{{ t.c }};font:var(--weight-semibold) var(--text-caption-2)/1 var(--font-core)" onClick="{{ t.go }}">
+<x-import component-from-global-scope="PersonalUIDesignSystem_06a1d8.Icon" name="{{ t.icon }}" size="{{ 23 }}" hint-size="23px,23px"></x-import>
+{{ t.label }}
+</span>
+</sc-for>
+</nav>
+</sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light'|'dark'&quot;}}">
+const MAP = {A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..',J:'.---',K:'-.-',L:'.-..',M:'--',N:'-.',O:'---',P:'.--.',Q:'--.-',R:'.-.',S:'...',T:'-',U:'..-',V:'...-',W:'.--',X:'-..-',Y:'-.--',Z:'--..','0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.'};
+const ORDER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+const REV = {};
+ORDER.forEach(k => { REV[MAP[k]] = k; });
+const DRILLS = ['LETS GO', 'ON MY WAY', 'ALL CLEAR', 'NEED WATER', 'MEET AT NINE'];
+const ATTENTION = '-.-.-';
+const SAVED = [
+  { t: 'SOS', code: '... --- ...', note: 'Distress call, sent as one unbroken group' },
+  { t: 'Signal', code: ATTENTION, note: 'Attention prosign, sent before a message' },
+];
+
+function encode(text) {
+  return String(text || '').toUpperCase().trim().split(/\s+/).filter(Boolean)
+    .map(w => w.split('').map(c => MAP[c] || '').filter(Boolean).join(' '))
+    .filter(Boolean).join(' / ');
+}
+function decode(morse) {
+  return String(morse || '').trim().split(/\s*\/\s*/).map(w =>
+    w.split(/\s+/).filter(Boolean).map(t => REV[t] || '\u00b7').join('')
+  ).join(' ').trim();
+}
+function events(morse) {
+  const out = []; let t = 0;
+  for (let i = 0; i < morse.length; i++) {
+    const ch = morse[i];
+    if (ch === '.' || ch === '-') {
+      out.push({ t, on: 1, i, sym: ch }); t += (ch === '.' ? 1 : 3);
+      out.push({ t, on: 0, i, sym: ch }); t += 1;
+    } else if (ch === ' ') { t += 2; } else if (ch === '/') { t += 2; }
+  }
+  return { list: out, total: t };
+}
+
+class Component extends DCLogic {
+  state = {
+    screen: 'send', back: 'learn', rxMode: 'manual',
+    wpm: 12, msg: 'HELLO', preset: '',
+    txOn: false, txIdx: -1, txDone: -1, txPct: 0, txRun: false, txMorse: '',
+    buffer: '', keyOn: false,
+    srcOn: false, lum: 6, camRun: false,
+    drill: 0, reveal: false,
+    sdIdx: 0, sdBuf: '', sdOn: false, sdHint: false, sdResult: '',
+    query: '', tone: true, loop: false, awake: true,
+  };
+
+  unit() { return 1200 / this.state.wpm; }
+
+  componentWillUnmount() { this.stopAll(); }
+
+  /* ---- audio sidetone ---- */
+  beep(on) {
+    if (!this.state.tone) { if (this.gain) this.gain.gain.value = 0; return; }
+    try {
+      if (!this.ac) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        this.ac = new AC();
+        this.osc = this.ac.createOscillator();
+        this.gain = this.ac.createGain();
+        this.gain.gain.value = 0;
+        this.osc.type = 'sine'; this.osc.frequency.value = 620;
+        this.osc.connect(this.gain).connect(this.ac.destination);
+        this.osc.start();
+      }
+      if (this.ac.state === 'suspended') this.ac.resume();
+      this.gain.gain.setTargetAtTime(on ? 0.05 : 0, this.ac.currentTime, 0.008);
+    } catch (e) { /* audio unavailable */ }
+  }
+
+  /* ---- timeline playback ---- */
+  play(morse, kind) {
+    this.stopAll();
+    const ev = events(morse);
+    if (!ev.list.length) return;
+    const u = this.unit(), t0 = performance.now();
+    const onKey = kind === 'tx' ? 'txOn' : 'srcOn';
+    let last = -1;
+    this.setState(kind === 'tx' ? { txRun: true, txIdx: -1, txDone: -1, txPct: 0 } : { camRun: true });
+    this.timer = setInterval(() => {
+      const el = (performance.now() - t0) / u;
+      if (el >= ev.total) {
+        this.beep(false);
+        clearInterval(this.timer); this.timer = null;
+        const done = {}; done[onKey] = false;
+        if (kind === 'tx') { done.txRun = false; done.txIdx = -1; done.txDone = -1; done.txPct = 0; }
+        else { done.camRun = false; done.lum = 6; }
+        this.setState(done);
+        if (kind === 'tx' && this.state.loop) setTimeout(() => this.play(morse, 'tx'), 800);
+        return;
+      }
+      let idx = -1;
+      for (let i = 0; i < ev.list.length; i++) { if (ev.list[i].t <= el) idx = i; else break; }
+      if (kind === 'tx') this.setState({ txPct: Math.max(0, Math.min(1, el / ev.total)) });
+      if (idx === last) return;
+      last = idx;
+      const e = ev.list[idx];
+      this.beep(!!e.on);
+      const next = {}; next[onKey] = !!e.on;
+      if (kind === 'tx') { next.txIdx = e.i; next.txDone = e.on ? e.i - 1 : e.i; }
+      else {
+        next.lum = e.on ? 168 + Math.round(Math.random() * 20) : 5 + Math.round(Math.random() * 6);
+        if (e.on && this.state.rxMode === 'camera' && this.state.screen === 'receive') {
+          next.buffer = this.appendFromSource(e);
+        }
+      }
+      this.setState(next);
+    }, 16);
+  }
+
+  appendFromSource(e) {
+    const b = this.state.buffer;
+    const prev = this.srcPrev;
+    this.srcPrev = e;
+    let sep = '';
+    if (prev) {
+      const gap = e.t - (prev.t + (prev.sym === '.' ? 1 : 3));
+      if (gap >= 6) sep = ' / '; else if (gap >= 2) sep = ' ';
+    }
+    return b + sep + e.sym;
+  }
+
+  stopAll() {
+    if (this.timer) { clearInterval(this.timer); this.timer = null; }
+    this.beep(false);
+    this.srcPrev = null;
+  }
+
+  /* ---- manual keying ---- */
+  keyDown = () => {
+    if (this.idle) { clearTimeout(this.idle); this.idle = null; }
+    if (this.idleW) { clearTimeout(this.idleW); this.idleW = null; }
+    const now = performance.now(), u = this.unit();
+    let b = this.state.buffer;
+    if (this.lastUp) {
+      const gap = (now - this.lastUp) / u;
+      if (gap >= 6) b += ' / '; else if (gap >= 2) b += ' ';
+    }
+    this.down = now;
+    this.beep(true);
+    this.setState({ keyOn: true, buffer: b });
+  };
+
+  keyUp = () => {
+    if (!this.down) return;
+    const now = performance.now(), u = this.unit();
+    const dur = (now - this.down) / u;
+    this.down = null; this.lastUp = now;
+    this.beep(false);
+    this.setState({ keyOn: false, buffer: this.state.buffer + (dur < 2 ? '.' : '-') });
+    this.idle = setTimeout(() => {
+      if (!/[ /]$/.test(this.state.buffer)) this.setState({ buffer: this.state.buffer + ' ' });
+      this.lastUp = null;
+    }, u * 3.5);
+    this.idleW = setTimeout(() => {
+      if (/[^/] $/.test(this.state.buffer)) this.setState({ buffer: this.state.buffer + '/ ' });
+    }, u * 8);
+  };
+
+  /* ---- sending drill ---- */
+  sdDown = () => { this.sdStart = performance.now(); this.beep(true); this.setState({ sdOn: true }); };
+  sdUp = () => {
+    if (!this.sdStart) return;
+    const dur = (performance.now() - this.sdStart) / this.unit();
+    this.sdStart = null; this.beep(false);
+    const buf = this.state.sdBuf + (dur < 2 ? '.' : '-');
+    const target = MAP[this.sdTarget()];
+    let result = '';
+    if (buf === target) result = 'right';
+    else if (!target.startsWith(buf)) result = 'wrong';
+    this.setState({ sdOn: false, sdBuf: buf, sdResult: result });
+    if (result === 'right') setTimeout(() => this.sdNext(), 900);
+  };
+  sdTarget() { return ORDER[this.state.sdIdx % ORDER.length]; }
+  sdNext = () => this.setState({ sdIdx: this.state.sdIdx + 1, sdBuf: '', sdResult: '', sdHint: false });
+  sdReset = () => this.setState({ sdBuf: '', sdResult: '' });
+  sdShowHint = () => this.setState({ sdHint: !this.state.sdHint });
+
+  go(screen, back) { this.stopAll(); this.setState({ screen, back: back || this.state.back, txOn: false, txRun: false, srcOn: false, camRun: false }); }
+
+  renderVals() {
+    const s = this.state;
+    const morse = encode(s.msg);
+    const TITLES = { send: 'Send', receive: 'Receive', learn: 'Learn', chart: 'Reference chart', drill: 'Decoding drill', sdrill: 'Sending drill', settings: 'Settings' };
+    const main = s.screen === 'send' || s.screen === 'receive' || s.screen === 'learn';
+    const txActive = s.txOn || s.keyOn;
+    const decoded = decode(s.buffer);
+
+    const run = s.txRun;
+    const symbols = (run && s.txMorse ? s.txMorse : morse).split('').map((ch, i) => {
+      let c = 'var(--text-body)';
+      if (run) {
+        if (i === s.txIdx && s.txOn) c = 'var(--accent)';
+        else if (i <= s.txDone) c = 'var(--success)';
+        else c = 'var(--text-subtle)';
+      }
+      return {
+        t: ch === ' ' ? '\u00a0' : ch,
+        c,
+        w: 'var(--weight-bold)',
+      };
+    });
+
+    const q = s.query.trim().toUpperCase();
+    const chart = ORDER.filter(k => !q || k.includes(q) || MAP[k].includes(q)).map(k => ({
+      ch: k, code: MAP[k], play: () => this.play(MAP[k], 'src'),
+    }));
+
+    const target = DRILLS[s.drill % DRILLS.length];
+    const sdT = this.sdTarget();
+    const Switch = window.PersonalUIDesignSystem_06a1d8.Switch;
+    const mkSwitch = (key) => React.createElement(Switch, { checked: s[key], onChange: () => this.setState({ [key]: !s[key] }) });
+
+    const tabDef = [['send', 'Send', 'flashlight'], ['receive', 'Receive', 'radio'], ['learn', 'Learn', 'graduation-cap']];
+
+    return {
+      theme: this.props.theme || 'light',
+      title: TITLES[s.screen],
+      showBack: !main,
+      showTabs: main,
+      goBack: () => this.go(s.screen === 'settings' ? (main ? 'send' : s.back) : 'learn'),
+      goSettings: () => this.go('settings', s.screen),
+      showSettingsBtn: s.screen !== 'settings',
+      isSend: s.screen === 'send', isReceive: s.screen === 'receive', isLearn: s.screen === 'learn',
+      isChart: s.screen === 'chart', isDrill: s.screen === 'drill', isSdrill: s.screen === 'sdrill', isSettings: s.screen === 'settings',
+      tabs: tabDef.map(([k, label, icon]) => ({
+        label, icon, c: s.screen === k ? 'var(--accent)' : 'var(--text-subtle)', go: () => this.go(k),
+      })),
+
+      /* send */
+      msg: s.msg,
+      setMsg: (e) => this.setState({ msg: e.target.value }),
+      txSymbols: symbols,
+      txCount: s.txRun ? Math.round(s.txPct * 100) + '% sent' : (s.txRun && s.txMorse ? s.txMorse : morse).replace(/[^.\-]/g, '').length + ' symbols',
+      txProgress: s.txRun ? Math.round(s.txPct * 100) + '%' : '0%',
+      txTrack: s.txRun ? 'var(--track)' : 'transparent',
+      sendSignal: () => { this.setState({ txMorse: ATTENTION }); this.play(ATTENTION, 'tx'); },
+      sendSos: () => { const m = encode('SOS').replace(/ /g, ''); this.setState({ txMorse: m }); this.play(m, 'tx'); },
+      txOpacity: txActive ? 1 : 0,
+      txInk: txActive ? 'var(--text-on-accent)' : 'var(--text-muted)',
+      txGlow: txActive ? '0 0 46px -6px var(--accent)' : 'none',
+      txDisc: txActive ? 'On' : 'Off',
+      txBadge: s.txRun ? 'Transmitting' : s.keyOn ? 'Keying' : 'Idle',
+      txTone: s.txRun ? 'accent' : s.keyOn ? 'success' : 'neutral',
+      txBtn: s.txRun ? 'Stop' : 'Send',
+      txIcon: s.txRun ? 'square' : 'play',
+      txBtnTone: s.txRun ? 'danger' : 'accent',
+      toggleTx: () => { if (s.txRun) { this.stopAll(); this.setState({ txRun: false, txOn: false, txIdx: -1, txPct: 0 }); } else { this.setState({ txMorse: morse }); this.play(morse, 'tx'); } },
+      clearMsg: () => this.setState({ msg: '' }),
+      txDown: () => { this.beep(true); this.setState({ keyOn: true }); },
+      txUp: () => { this.beep(false); this.setState({ keyOn: false }); },
+      wpm: s.wpm,
+      setWpm: (e) => this.setState({ wpm: Number(e.target.value) }),
+      wpmLabel: s.wpm + ' wpm',
+
+      /* receive */
+      rxMode: s.rxMode,
+      rxModes: [{ value: 'manual', label: 'Manual key' }, { value: 'camera', label: 'Camera' }],
+      setRxMode: (v) => { this.stopAll(); this.setState({ rxMode: v, srcOn: false, camRun: false }); },
+      isManual: s.rxMode === 'manual', isCamera: s.rxMode === 'camera',
+      keyDown: this.keyDown, keyUp: this.keyUp,
+      keyOpacity: s.keyOn ? 1 : 0,
+      keyInk: s.keyOn ? 'var(--text-on-accent)' : 'var(--text-muted)',
+      keyGlow: s.keyOn ? '0 0 40px -6px var(--accent)' : 'none',
+      keyPressOpacity: s.keyOn ? 0.86 : 1,
+      bufferText: s.buffer.trim() || '\u2014',
+      decodedText: decoded || 'Nothing copied yet',
+      decodedInk: decoded ? 'var(--text-heading)' : 'var(--text-subtle)',
+      resetRx: () => { this.lastUp = null; this.setState({ buffer: '' }); },
+      srcOpacity: s.srcOn ? 1 : 0,
+      srcGlow: s.srcOn ? '0 0 40px -6px var(--accent)' : 'none',
+      lum: s.lum,
+      camState: s.camRun ? 'Reading' : 'Waiting',
+      camTone: s.camRun ? 'success' : 'neutral',
+      simulate: () => { this.setState({ buffer: '' }); this.lastUp = null; this.play(encode('SOS'), 'src'); },
+      sens: s.sens === undefined ? 55 : s.sens,
+      setSens: (e) => this.setState({ sens: Number(e.target.value) }),
+      sensLabel: (s.sens === undefined ? 55 : s.sens) + '%',
+      box: s.box === undefined ? 96 : s.box,
+      setBox: (e) => this.setState({ box: Number(e.target.value) }),
+      boxLabel: (s.box === undefined ? 96 : s.box) + ' px',
+      boxPx: (s.box === undefined ? 96 : s.box) + 'px',
+      tuneHint: 'Auto ok',
+
+      /* learn */
+      learnPct: 33, learnPctLabel: '33%', learnedLabel: '12 of 36 learned',
+      goChart: () => this.go('chart', 'learn'),
+      goDrill: () => this.go('drill', 'learn'),
+      goSdrill: () => this.go('sdrill', 'learn'),
+      timingBars: [1, 3, 1, 1, 3, 3, 1, 1, 1].map((w, i) => ({
+        w: (w * 9) + 'px', c: i % 3 === 2 ? 'var(--track)' : 'var(--accent)',
+      })),
+
+      /* chart */
+      query: s.query,
+      setQuery: (e) => this.setState({ query: e.target.value }),
+      chart,
+
+      /* decoding drill */
+      drillShown: s.reveal ? target : target.replace(/[A-Z]/g, '\u2022'),
+      drillState: decoded === target ? 'Match' : s.camRun ? 'Playing' : 'Ready',
+      drillTone: decoded === target ? 'success' : s.camRun ? 'accent' : 'neutral',
+      drillInk: decoded === target ? 'var(--success)' : 'var(--text-heading)',
+      drillBtn: s.camRun ? 'Stop' : 'Play',
+      drillIcon: s.camRun ? 'square' : 'play',
+      playDrill: () => { if (s.camRun) { this.stopAll(); this.setState({ camRun: false, srcOn: false }); } else { this.setState({ buffer: '' }); this.lastUp = null; this.play(encode(target), 'src'); } },
+      nextDrill: () => { this.stopAll(); this.lastUp = null; this.setState({ drill: s.drill + 1, buffer: '', reveal: false, camRun: false, srcOn: false }); },
+      toggleReveal: () => this.setState({ reveal: !s.reveal }),
+      revealBtn: s.reveal ? 'Hide' : 'Reveal',
+
+      /* sending drill */
+      sdLetter: sdT,
+      sdHint: s.sdHint ? MAP[sdT] : '\u00b7 \u00b7 \u00b7',
+      sdHintInk: s.sdHint ? 'var(--accent)' : 'var(--text-subtle)',
+      sdBuf: s.sdBuf || '\u2014',
+      sdState: s.sdResult === 'right' ? 'Correct' : s.sdResult === 'wrong' ? 'Not that one' : 'Waiting',
+      sdTone: s.sdResult === 'right' ? 'success' : s.sdResult === 'wrong' ? 'danger' : 'neutral',
+      sdDown: this.sdDown, sdUp: this.sdUp, sdNext: this.sdNext, sdReset: this.sdReset, sdShowHint: this.sdShowHint,
+      sdPressOpacity: s.sdOn ? 0.86 : 1,
+
+      /* settings */
+      noop: () => {},
+      iconStar: React.createElement(window.PersonalUIDesignSystem_06a1d8.Icon, { name: 'star', size: 20, color: 'var(--text-muted)' }),
+      iconCoffee: React.createElement(window.PersonalUIDesignSystem_06a1d8.Icon, { name: 'coffee', size: 20, color: 'var(--text-muted)' }),
+      iconCode: React.createElement(window.PersonalUIDesignSystem_06a1d8.Icon, { name: 'code', size: 20, color: 'var(--text-muted)' }),
+      toneSwitch: mkSwitch('tone'),
+      loopSwitch: mkSwitch('loop'),
+      awakeSwitch: mkSwitch('awake'),
+      savedRows: SAVED.map(p => ({ t: p.t, code: p.code, pick: () => { this.go('send'); this.setState({ txMorse: p.code }); this.play(p.code, 'tx'); } })),
+    };
+  }
+}
+</script>
+</body>
+</html>

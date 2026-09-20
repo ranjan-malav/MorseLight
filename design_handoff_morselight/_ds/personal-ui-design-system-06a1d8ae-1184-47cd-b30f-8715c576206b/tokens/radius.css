@@ -1,0 +1,17 @@
+:root{
+--radius-xs:6px;
+--radius-sm:10px;
+--radius-md:14px;
+--radius-lg:20px;
+--radius-xl:28px;
+--radius-2xl:36px;
+--radius-full:999px;
+
+/* roles: heavily rounded corner language */
+--radius-control:999px;
+--radius-field:16px;
+--radius-card:24px;
+--radius-sheet:28px;
+--radius-chip:999px;
+--radius-tile:20px;
+}

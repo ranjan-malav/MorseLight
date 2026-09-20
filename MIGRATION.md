@@ -1,6 +1,6 @@
 # MorseLight — Modernization & Compose Migration Plan
 
-**Status:** Phase 2 complete (DataStore done) + Phase 3 foundation done. Emulator smoke test passed; real-device test pending (user). Phase 4 (Compose screens) is next.
+**Status:** Phases 0–2 done; Phase 3 foundation done (theme to be re-based on the new design system). **Scope expanded 2026-09-20:** a full redesign (`design_handoff_morselight/`) now drives the UI, and the transmit/decode logic is being reworked to the handoff's cleaner engine (user request). See §7 Redesign. Real-device test pending.
 **Started:** 2026-09-20
 **Owner:** Ranjan Malav
 **Goal:** Bring a 2021-era app (AGP 4.2 / Kotlin 1.5 / targetSdk 30 / XML + Fragments) up to a
@@ -122,9 +122,87 @@ Going straight to AGP 9 from 4.2.2 means handling these on top of the normal upg
 | **D3** | Keep Koin or drop DI framework | **Drop Koin.** It exists solely to inject one `SharedPreferenceUtils` singleton. Replaced by a `SettingsRepository` created in `Application`. Removes a dependency and its 2.x→4.x migration entirely. | ✅ Decided 2026-09-20 |
 | **D4** | SharedPreferences → DataStore | **Yes.** `SettingsRepository` on DataStore with a one-time migration of the existing `speed`/`react_size`/`perceptibility` values. Flow API feeds Compose state. | ✅ Decided 2026-09-20 |
 | **D5** | Keep portrait lock | Recommended: **drop `screenOrientation="portrait"`.** API 36 ignores orientation restrictions on large screens anyway; better to lay out responsively than be letterboxed. | Open |
-| **D6** | Visual redesign scope | Recommended: **Material 3 with the existing teal brand palette**, dynamic color off (brand identity matters here), light + dark, keep Nunito Sans. Not a ground-up redesign. | Open |
+| **D6** | Visual redesign scope | **Superseded by D7.** The earlier recommendation (keep teal, light reskin) is replaced by the `design_handoff_morselight/` redesign. | ⛔ Superseded 2026-09-20 |
+| **D7** | Adopt the Personal UI redesign handoff | **Yes.** Ground-up redesign on the *Personal UI* design system: single **signal-blue** accent `#1E5EFF` (replaces teal — a Play-Store brand change), **Plus Jakarta Sans** + **JetBrains Mono** (replaces Nunito Sans), Material-elevation + iOS control geometry, light+dark. Also adopt the handoff's **improved transmit/decode logic** (user request). See §7. | ✅ Decided 2026-09-20 |
 
 ---
+
+## 7. Redesign — Personal UI handoff + logic rework (added 2026-09-20)
+
+Source: `design_handoff_morselight/` (HTML design references — recreate faithfully in Compose,
+do **not** port markup). Authoritative tokens: `_ds/personal-ui-design-system-*/tokens/*.css`.
+Full screen specs + rationale: that folder's `README.md`. Screenshots: `screens/` (light+dark;
+icons render as grey blocks — open `MorseLight.dc.html` for the real thing).
+
+> ⚠️ Mockups are being revised (2026-09-20): **Settings is merging into the Learn screen.** Screen
+> list below reflects the current handoff; treat Settings as a section of Learn once the update lands.
+
+### 7.1 Design system (replaces the teal M3 theme built in Phase 3)
+- **Accent:** signal-blue `--accent` `#1E5EFF` (light) / `#5A85FF` (dark). Single accent; drives
+  primary action, active tab, focus. **This is a brand change** from teal — update Play listing.
+- **Surfaces:** `--bg-app`, `--surface-card`, `--surface-sunken`, `--surface-raised` (light→dark in
+  `tokens/colors.css` + `dark.css`). Read-only output uses **sunken** cards, never bordered fields.
+- **Status colors:** success `#0B8A5C`, warning `#B26A00`, danger `#C8304C`, info (system) violet.
+- **Type:** **Plus Jakarta Sans** (400/500/600/700/800) UI + display; **JetBrains Mono** (morse
+  strings, codes). Ramp 11·12·13·15·17·20·22·28·34·44, body 17/1.45. → bundle both into `res/font`
+  (Google Fonts; replaces Nunito Sans).
+- **Radii:** control 999 · field 16 · tile 20 · card 24 · sheet 28. Heavily rounded.
+- **Elevation / the halo+shadow effects the user called out** (`tokens/elevation.css`):
+  soft cool-tinted `--shadow-1..4`; **`--shadow-accent`** blue glow under the filled primary; the
+  **torch/key disc glow** `0 0 46px -6px var(--accent)` when lit; `--inset-field` inner shadow on
+  inputs. Implement via Compose `Modifier.shadow`/`drawBehind` + a radial glow layer (M3 elevation
+  alone won't give the colored halo).
+- **Motion:** `--dur-fast 140 / base 220 / slow 320`, `--ease-standard cubic-bezier(.2,0,0,1)`;
+  light on/off 50–70ms linear so keying feels instant; all collapse under reduced-motion.
+- **Icons:** Lucide in the handoff → use **Material Symbols** equivalents at matching sizes.
+
+### 7.2 The text-span color change the user called out
+The **Morse string** colours **per symbol, three ways**, live while transmitting:
+**sent = success**, **current = accent** (held through the off-gap so the element stays lit),
+**pending = subtle**; idle = body colour. Compose: `buildAnnotatedString` with a `SpanStyle` per
+symbol index, driven by `txIdx`/`txDone` from the transmit engine. Progress bar underneath is
+repainted ~60×/s — **no opacity transition** (a re-triggered one never completes).
+
+### 7.3 Logic rework (user requests: improve decoding + improve transmission)
+The handoff's `MorseFrame.dc.html` logic class is correct and **replaces** the old, hand-written
+logic. This supersedes the Phase-2 `MorseEncoder`/`MorseDecoder` that were kept faithful to the
+**old** behaviour. New `morse/` domain (all pure/unit-testable, coroutine-driven — no `Handler`s):
+
+- **`MorseCode`** — `encode(text)`: `word → per-char MAP → join(" ") → join(" / ")`, standard ITU
+  string (`.... . .-.. .-.. --- / .-- ---`). `decode(morse)`: split on ` / ` then whitespace →
+  reverse-map. Far simpler/robust than today's moving-average timing-cluster guess.
+- **`TransmitEngine`** — **ITU-R M.1677**, `unit = 1200 / wpm` ms. Build an event list
+  `{tUnits, on, symbolIndex}` (dot 1u, dash 3u, +1u intra-gap; char gap 3u, word gap 7u), tick at
+  16 ms comparing elapsed units, emit `{torchOn, symbolIndex, doneIndex, pct}`. **Replaces the old
+  speed 1–10 / (3/speed)s model** with a real WPM model (5–25 wpm, default 12). Optional loop +
+  620 Hz sidetone.
+- **`KeyClassifier`** (manual key) — on down: gap since last release ≥6u → word ` / `, ≥2u → char
+  ` `; on up: <2u → dot, else dash; idle timers commit a char sep at 3.5u and a word sep at 8u.
+  Feeds `decode`. **Replaces** the fragile timing-difference clustering.
+- **Camera decode** — per-frame **mean luminance inside the detection box**, thresholded by a
+  **Sensitivity** slider; a crossing = a pulse fed to the same gap classifier. **Replaces** the
+  moving-average natural-break `DecoderUtils` clustering (audit B9). `LuminosityAnalyzer` cleanup
+  (B5) folds in here. Detection-box size is user-adjustable, **moved out of the viewfinder**.
+- **Settings migration:** old `speed` (1–10) → **wpm** (map, e.g. `wpm ≈ round(5 + (speed-1)*2)`),
+  keep `perceptibility`→sensitivity and `react_size`→detection-box. Add `keyTone`, `loop`,
+  `keepAwake`. Extend `SettingsRepository`.
+- New unit tests for `MorseCode` (encode/decode round-trip), `TransmitEngine` event list at several
+  wpm, and `KeyClassifier` gap/duration classification.
+
+### 7.4 Screens (per current handoff; Settings folding into Learn)
+Main tabs **Send · Receive · Learn**; sub-screens use a back button (no tab bar).
+| Screen | Status vs today | Notes |
+|---|---|---|
+| **Send** | redesign of existing | one torch disc (glow), message input, three-state morse card + progress, wpm slider, Signal/Send/SOS pills |
+| **Receive — Manual key** | redesign | segmented Manual|Camera; decoded card + raw buffer; key disc (press-hold) |
+| **Receive — Camera** | redesign + logic rework | viewfinder w/ detection box; **tuning card moved out of viewfinder** (Sensitivity, Detection area); decoded card |
+| **Learn hub** | redesign; **absorbs Settings** | progress card, drill/chart links, timing card, + Settings section (Preferences switches, Support links, About) |
+| **Reference chart** | **net-new** | searchable A–Z/0–9 grid, tap plays; only scrolling screen |
+| **Decoding drill** | **net-new** | play masked target, copy by hand, match check |
+| **Sending drill** | **net-new** | prompt a character, key it, correct/advance |
+
+**Net-new features** (drills, reference chart, sidetone, loop, keep-awake) are product surface
+beyond a migration — sequencing is a scope decision (see the question raised to the user).
 
 ## 4. Phases
 
@@ -208,7 +286,11 @@ Goal: pull all logic out of Activities/Fragments so Compose screens are thin.
 - [x] **Unit tests**: `MorseEncoderTest` (5) + `MorseDecoderTest` (5), all passing. Test deps added in Phase 1 (never previously declared).
 - [x] **Verify:** `:app:assembleDebug` + `:app:testDebugUnitTest` green (11 tests, 0 failures). On-device check folded into the pending Phase 1 smoke test.
 
-### Phase 3 — Compose foundation — infra + theme done; MainActivity/nav conversion opens Phase 4
+### Phase 3 — Design-system foundation — Compose enabled; theme now RE-BASED on Personal UI (§7)
+> **Rework:** the teal M3 theme built here is replaced by the Personal UI tokens (signal-blue, Plus
+> Jakarta Sans + JetBrains Mono, elevation/glow, radii, motion) and a reusable component set
+> (TorchDisc w/ halo, three-state MorseString, sunken Card, pill Buttons, SegmentedControl, Slider,
+> Badge, ProgressRing, GroupedList, ViewfinderBox). See §7.1–7.2.
 - [x] `buildFeatures { compose = true }`; Compose BOM 2026.09.00 + `org.jetbrains.kotlin.plugin.compose` (pinned to AGP's built-in Kotlin 2.2.10). ViewBinding kept alongside until Phase 5.
 - [x] `ui/theme/` — Color.kt (teal palette), Type.kt (Nunito Sans `FontFamily` from res/font), Theme.kt (M3 light+dark, dynamic color off). A `@Preview` proves it compiles and renders.
 - [ ] `MainActivity` → `ComponentActivity` + `setContent {}` + `enableEdgeToEdge()` — **moved to the start of Phase 4.** Doing it now would replace the working fragment UI with empty shells (and can't be smoke-tested here); it lands with the first real screen.
@@ -216,8 +298,9 @@ Goal: pull all logic out of Activities/Fragments so Compose screens are thin.
 - [ ] Shared components: `TorchStatusIndicator`, `LabelledContainer` (replaces the custom View), `MenuRow` (replaces `AccountOptionView`), `SpeedSlider`, `MorseReadout`
 - [x] **Verify (foundation):** `:app:assembleDebug` green with Compose enabled; theme + preview compile. App still runs the fragment UI (nav-shell verification happens in Phase 4).
 
-### Phase 4 — Screen-by-screen port
-Port one screen at a time, deleting the Fragment + XML as each lands.
+### Phase 4 — Screen-by-screen port → **now targets the §7.4 redesign screens** (not a like-for-like port)
+Start with MainActivity→ComponentActivity + nav shell, then port one screen at a time (Learn/Send
+first), deleting the Fragment + XML as each lands. Net-new screens (drills, chart) per §7.4 scope decision.
 - [ ] **Send** — `SendViewModel` + `SendScreen`; press-and-hold torch via `pointerInput`/`detectTapGestures`
 - [ ] **Learn** — simplest screen, good warm-up; keep the ko-fi/GitHub/rate/share/mail intents
 - [ ] **Morse detail** — image + linkified text
@@ -306,3 +389,4 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-20 | 3 | **Compose foundation (non-breaking half).** Enabled Compose (BOM 2026.09.00, compiler plugin on Kotlin 2.2.10), added `ui/theme` (teal M3 light+dark, Nunito Sans) with a compiling `@Preview`. Build green; fragment UI still live. MainActivity→ComponentActivity + nav shell deferred to Phase 4 start so the app is never left as empty shells. |
 | 2026-09-20 | 2 | **DataStore done (D4).** `SettingsRepository` on DataStore with one-time SharedPreferences migration; `SharedPreferenceUtils` removed; 3 fragments rewired (temporary runBlocking bridge). Build green. |
 | 2026-09-20 | 1–3 | **Emulator smoke test passed** (API 33). Send encode + live char readout + transmit state machine correct; nav to Receive/Learn works; DataStore defaults read; no crashes. Real-device test deferred to user. |
+| 2026-09-20 | plan | **Redesign folded into roadmap (§7).** `design_handoff_morselight/` adopted: Personal UI design system (signal-blue, Plus Jakarta Sans + JetBrains Mono, elevation/glow, radii), three-state morse coloring, and a reworked transmit/decode engine (WPM/ITU-R M.1677, gap-based keying, luminance camera decode) that replaces the old hand-written logic per user request. D7 added; D6 superseded. Phase 3 theme to be re-based; Phase 4 retargeted to the new screens. Settings merging into Learn (mockups being revised). |

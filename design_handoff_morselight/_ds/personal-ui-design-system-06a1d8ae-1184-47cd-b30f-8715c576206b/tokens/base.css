@@ -1,0 +1,14 @@
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg-app);color:var(--text-body);font:var(--type-body);letter-spacing:var(--tracking-body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3,h4,p,figure{margin:0}
+h1{font:var(--type-display);letter-spacing:var(--tracking-display);color:var(--text-heading)}
+h2{font:var(--type-title-1);letter-spacing:var(--tracking-title);color:var(--text-heading)}
+h3{font:var(--type-title-3);color:var(--text-heading)}
+a{color:var(--text-link);text-decoration:none;transition:color var(--dur-fast) var(--ease-standard)}
+a:hover{color:var(--text-link-hover);text-decoration:underline;text-underline-offset:2px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px;border-radius:inherit}
+::selection{background:var(--accent-soft);color:var(--accent-on-soft)}
+code,kbd,samp{font:var(--type-mono)}
+.tabular{font-variant-numeric:tabular-nums}
