@@ -15,10 +15,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
-import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecoderUtils
-import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.DecoderUtils.getMorseForMessage
-import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.charToMorse
-import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.charToUnits
+import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.MorseEncoder
+import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.MorseDecoder
+import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.MorseDecoder.getMorseForMessage
 import com.ranjan.malav.morselight_flashlightwithmorsecode.databinding.ActivityMorseTutorialBinding
 import java.util.*
 
@@ -130,7 +129,7 @@ class MorseTutorialActivity : AppCompatActivity() {
         }
 
         binding.decodeButton.setOnClickListener {
-            val morseMessage = DecoderUtils.findMorseFromTimings(timings, diffTimings)
+            val morseMessage = MorseDecoder.findMorseFromTimings(timings, diffTimings)
             if (morseMessage.isNotBlank()) {
                 if (!morseMessage.contains("-")) {
                     // All the units are of same size, it could be . or -
@@ -140,12 +139,12 @@ class MorseTutorialActivity : AppCompatActivity() {
                     )
                     binding.decodedMessage.text = getString(
                         R.string.dot_message_or_dash_message,
-                        DecoderUtils.decryptMorse(morseMessage),
-                        DecoderUtils.decryptMorse(dashedMessage)
+                        MorseDecoder.decryptMorse(morseMessage),
+                        MorseDecoder.decryptMorse(dashedMessage)
                     )
                 } else {
                     binding.incomingMessage.text = morseMessage
-                    binding.decodedMessage.text = DecoderUtils.decryptMorse(morseMessage)
+                    binding.decodedMessage.text = MorseDecoder.decryptMorse(morseMessage)
                 }
             }
         }
@@ -170,31 +169,10 @@ class MorseTutorialActivity : AppCompatActivity() {
         handler.postDelayed(timer1Sec, 2000)
         handler.postDelayed(timer0Sec, 2950)
         handler.postDelayed({
-            // Speed can be from 1 to 10, 3 means 1 unit = 3/3 sec, 10 means 1 unit = 3/10 sec
-            // 1 means 1 unit = 3/1 sec. Default speed is 3 which means 1 sec = 1 unit.
-            val transmissionSpeed = 1f
-            val timeUnits = StringBuilder()
-            val morseCode = StringBuilder()
-
-            // Add character morse timings to string builder
-            for (char in charMessage) {
-                if (char == ' ') {
-                    timeUnits.replace(timeUnits.length - 1, timeUnits.length, "")
-                }
-                timeUnits.append(charToUnits[char])
-                morseCode.append(charToMorse[char])
-            }
-            // Remove last character because we have added 3 units for space after every character
-            timeUnits.replace(timeUnits.length - 1, timeUnits.length, "")
-
-            var delay = 0L
-            val onOffDelays = arrayListOf<Long>()
-            binding.morseEncodedMessage.text = morseCode.toString()
-            for (i in timeUnits.indices) {
-                onOffDelays.add((delay * 1000 * transmissionSpeed).toLong())
-                val unit = timeUnits[i].toString().toInt()
-                delay += unit
-            }
+            // Tutorial plays at a fixed cadence: MorseEncoder speed 3 => 1 unit = 1 second.
+            val tx = MorseEncoder.encode(charMessage, 3)
+            val onOffDelays = tx.onOffDelays
+            binding.morseEncodedMessage.text = tx.morseCode
 
             for (i in onOffDelays.indices) {
                 if (!isFlashOn) {
@@ -213,7 +191,7 @@ class MorseTutorialActivity : AppCompatActivity() {
                     )
                 }
             }
-            handler2.postDelayed(cleanUpRunnable, (delay * 1000 * transmissionSpeed).toLong())
+            handler2.postDelayed(cleanUpRunnable, tx.finalOffDelay)
         }, 3000)
     }
 

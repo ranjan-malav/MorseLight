@@ -16,6 +16,8 @@ import com.google.firebase.Firebase
 import com.ranjan.malav.morselight_flashlightwithmorsecode.MainViewModel
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.*
+import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.MorseEncoder
+import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.charToMorse
 import com.ranjan.malav.morselight_flashlightwithmorsecode.databinding.FragmentSendBinding
 import java.util.*
 
@@ -183,60 +185,17 @@ class SendFragment : Fragment(R.layout.fragment_send) {
         binding.sosButton.text = getString(R.string.stop)
         binding.signalButton.isEnabled = false
 
-        // Speed can be from 1 to 10, 3 means 1 unit = 3/3 sec, 10 means 1 unit = 3/10 sec
-        // 1 means 1 unit = 3/1 sec. Default speed is 3 which means 1 sec = 1 unit.
-        val transmissionSpeed: Float = 3f / speed
-        val timeUnits = StringBuilder()
-        val morseCode = StringBuilder()
-        val charUnits = arrayListOf<Int>()
-        val characters = arrayListOf<Char>()
-        // Add character morse timings to string builder
-        var index = 0
-        for (char in charMessage) {
-            if (char == ' ') {
-                timeUnits.replace(timeUnits.length - 1, timeUnits.length, "")
-            }
-            timeUnits.append(charToUnits[char])
-            morseCode.append(charToMorse[char])
-            if (charUnits.isNotEmpty()) {
-                if (char == ' ') {
-                    charUnits.add(charToTotalUnits[char]!!)
-                } else {
-                    charUnits[index - 1] = charUnits[index - 1] + 3
-                    charUnits.add(charToTotalUnits[char]!!)
-                }
-            } else {
-                charUnits.add(charToTotalUnits[char]!!)
-            }
-            index++
-        }
-        // Remove last character because we have added 3 units for space after every character
-        timeUnits.replace(timeUnits.length - 1, timeUnits.length, "")
-
-        var delay = 0L
-        val onOffDelays = arrayListOf<Long>()
+        val tx = MorseEncoder.encode(charMessage, speed)
         if (!isOnlySignal) {
-            binding.encodedMorseCode.text = morseCode.toString()
+            binding.encodedMorseCode.text = tx.morseCode
             binding.messageInput.editText?.setText(message)
         }
-        for (i in timeUnits.indices) {
-            onOffDelays.add((delay * 1000 * transmissionSpeed).toLong())
-            val unit = timeUnits[i].toString().toInt()
-            delay += unit
-        }
-
-        var charDelay = 0
-        if (shouldUpdateCurrentChar) {
-            for (i in charUnits.indices) {
-                val unit = charUnits[i]
-                characters.add(charMessage[i])
-                charDelay += unit
-            }
-        }
+        val characters: ArrayList<Char> =
+            if (shouldUpdateCurrentChar) ArrayList(charMessage) else arrayListOf()
         isFlashOn = false
         callback?.playWithFlash(
-            onOffDelays, charUnits, characters, speed,
-            shouldUpdateCurrentChar, (delay * 1000 * transmissionSpeed).toLong()
+            tx.onOffDelays, tx.charUnits, characters, speed,
+            shouldUpdateCurrentChar, tx.finalOffDelay
         )
     }
 

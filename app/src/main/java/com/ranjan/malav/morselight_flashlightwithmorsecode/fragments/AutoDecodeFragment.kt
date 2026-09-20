@@ -13,6 +13,8 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.ranjan.malav.morselight_flashlightwithmorsecode.MainViewModel
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.*
+import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.MorseEncoder
+import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.MorseDecoder
 import com.ranjan.malav.morselight_flashlightwithmorsecode.databinding.FragmentAutoDecodeBinding
 import java.util.*
 
@@ -167,7 +169,7 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), ImageAnalysi
     private fun decodeNotedTimings() {
         val timingsCopy = arrayListOf<Long>()
         timingsCopy.addAll(timings)
-        val morseMessage = DecoderUtils.findMorseFromTimings(timings, diffTimings)
+        val morseMessage = MorseDecoder.findMorseFromTimings(timings, diffTimings)
         if (morseMessage.isNotBlank()) {
             val decryptedMessage = if (!morseMessage.contains("-")) {
                 // All the units are of same size, it could be . or -
@@ -177,12 +179,12 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), ImageAnalysi
                 )
                 getString(
                     R.string.dot_message_or_dash_message,
-                    DecoderUtils.decryptMorse(morseMessage),
-                    DecoderUtils.decryptMorse(dashedMessage)
+                    MorseDecoder.decryptMorse(morseMessage),
+                    MorseDecoder.decryptMorse(dashedMessage)
                 )
             } else {
                 binding.incomingMessage.text = morseMessage
-                DecoderUtils.decryptMorse(morseMessage)
+                MorseDecoder.decryptMorse(morseMessage)
             }
             binding.decodedMessage.text = decryptedMessage
             binding.reportButton.visible()
@@ -249,48 +251,11 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), ImageAnalysi
         binding.startStopButton.text = getString(R.string.stop)
         binding.signalButton.isEnabled = false
 
-        // Speed can be from 1 to 10, 3 means 1 unit = 3/3 sec, 10 means 1 unit = 3/10 sec
-        // 1 means 1 unit = 3/1 sec. Default speed is 3 which means 1 sec = 1 unit.
-        val transmissionSpeed: Float = 3f / speed
-        val timeUnits = StringBuilder()
-        val morseCode = StringBuilder()
-        val charUnits = arrayListOf<Int>()
-        val characters = arrayListOf<Char>()
-        // Add character morse timings to string builder
-        var index = 0
-        for (char in charMessage) {
-            if (char == ' ') {
-                timeUnits.replace(timeUnits.length - 1, timeUnits.length, "")
-            }
-            timeUnits.append(charToUnits[char])
-            morseCode.append(charToMorse[char])
-            if (charUnits.isNotEmpty()) {
-                if (char == ' ') {
-                    charUnits.add(charToTotalUnits[char]!!)
-                } else {
-                    charUnits[index - 1] = charUnits[index - 1] + 3
-                    charUnits.add(charToTotalUnits[char]!!)
-                }
-            } else {
-                charUnits.add(charToTotalUnits[char]!!)
-            }
-            index++
-        }
-        // Remove last character because we have added 3 units for space after every character
-        timeUnits.replace(timeUnits.length - 1, timeUnits.length, "")
-
-        var delay = 0L
-        val onOffDelays = arrayListOf<Long>()
-        for (i in timeUnits.indices) {
-            onOffDelays.add((delay * 1000 * transmissionSpeed).toLong())
-            val unit = timeUnits[i].toString().toInt()
-            delay += unit
-        }
-
+        val tx = MorseEncoder.encode(charMessage, speed)
         isFlashOn = false
         callback?.playWithFlash(
-            onOffDelays, charUnits, characters, speed,
-            false, (delay * 1000 * transmissionSpeed).toLong()
+            tx.onOffDelays, tx.charUnits, arrayListOf(), speed,
+            false, tx.finalOffDelay
         )
     }
 

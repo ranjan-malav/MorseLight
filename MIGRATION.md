@@ -1,6 +1,6 @@
 # MorseLight — Modernization & Compose Migration Plan
 
-**Status:** Phase 1 complete (build green) — on-device smoke test pending; Phase 2 not started
+**Status:** Phase 2 partial — morse domain extracted + tested (build green). DataStore/Torch/Luminosity pieces deferred. On-device smoke test still pending.
 **Started:** 2026-09-20
 **Owner:** Ranjan Malav
 **Goal:** Bring a 2021-era app (AGP 4.2 / Kotlin 1.5 / targetSdk 30 / XML + Fragments) up to a
@@ -197,16 +197,16 @@ Goal: same app, same XML UI, modern toolchain. Biggest-risk phase, because of AG
 - Deprecation warning left: `Preview.Builder.setTargetAspectRatio` — belongs to the Phase 4 CameraX rewrite.
 - **ActivityResult permissions migration deferred to Phase 3/4**, when `MainActivity` becomes a `ComponentActivity`. The deprecated `requestPermissions`/`onRequestPermissionsResult` still compile (warnings only), so this does not block a green build.
 
-### Phase 2 — Extract the domain layer (UI-independent)
+### Phase 2 — Extract the domain layer (UI-independent) — morse core done; DataStore/Torch/Luminosity pending
 Goal: pull all logic out of Activities/Fragments so Compose screens are thin.
-- [ ] `morse/MorseTables.kt` — move `charToUnits`, `charToTotalUnits`, `charToMorse`, `morseToChar` out of `Extensions.kt`
-- [ ] `morse/MorseEncoder.kt` — the ~50-line encode block that is **duplicated verbatim in 4 places** (`SendFragment`, `ManualDecodeFragment`, `AutoDecodeFragment`, `MorseTutorialActivity`) collapses into one function returning on/off delays + char units
-- [ ] `morse/MorseDecoder.kt` — port `DecoderUtils` (also drop its stray `kotlinx.android.synthetic` import, which is dead code)
-- [ ] `torch/TorchController.kt` — CameraX torch + wake lock, owned by the app rather than `MainActivity`; replace the 3 `Handler`s with a single coroutine on a `Dispatchers.Default` timeline
-- [ ] `camera/LuminosityAnalyzer.kt` — keep, but reduce per-frame allocation (`data.map { }` allocates a boxed `List<Int>` of the whole frame on every frame; index the `ByteBuffer` directly)
-- [ ] `data/SettingsRepository.kt` — DataStore (D4), with migration from the existing `SharedPreferences` file (keys: `speed`, `react_size`, `perceptibility`)
-- [ ] **Unit tests** for `MorseEncoder` / `MorseDecoder` (pure functions — the best test ROI in this codebase)
-- [ ] **Verify:** existing XML UI still works against the new domain layer
+- [x] `morse/MorseTables.kt` — tables moved out of `Extensions.kt` (now immutable `val`s).
+- [x] `morse/MorseEncoder.kt` — the 4× duplicated encode block (B1) collapsed into `MorseEncoder.encode()` returning `Transmission(onOffDelays, charUnits, morseCode, finalOffDelay)`. All 4 callers delegate; behaviour verified identical by tests.
+- [x] `morse/MorseDecoder.kt` — `DecoderUtils` ported; dead debug scaffolding removed (B8); stray synthetic import already gone in Phase 1.
+- [ ] `torch/TorchController.kt` — **deferred to Phase 4.** The torch/handler timeline is entangled with `MainActivity` becoming a `ComponentActivity`; cleaner to do once during the Compose rewrite than twice.
+- [ ] `camera/LuminosityAnalyzer.kt` — **deferred to Phase 4** (B5). Best changed and exercised alongside the Auto-decode camera rewrite, on-device.
+- [ ] `data/SettingsRepository.kt` — **blocked on decision D4** (SharedPreferences → DataStore, still open). `SharedPreferenceUtils` stays until D4 is settled.
+- [x] **Unit tests**: `MorseEncoderTest` (5) + `MorseDecoderTest` (5), all passing. Test deps added in Phase 1 (never previously declared).
+- [x] **Verify:** `:app:assembleDebug` + `:app:testDebugUnitTest` green (11 tests, 0 failures). On-device check folded into the pending Phase 1 smoke test.
 
 ### Phase 3 — Compose foundation
 - [ ] Enable `buildFeatures { compose = true }`, add Compose BOM + the Compose compiler plugin
@@ -302,3 +302,4 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-20 | 0 | ✅ Signing blocker resolved: Play App Signing confirmed enabled ("Releases signed by Play"). Lost key was the upload key only; replaced via upload key reset in Phase 6. No phase is blocked. |
 | 2026-09-20 | 0 | Keystore hunt closed. Full home sweep found no MorseLight key; `~/Downloads/bhojan_android_key.jks` (different app) rejected every remembered password. Proceeding with the upload key reset. |
 | 2026-09-20 | 1 | **Phase 1 build green.** AGP 9.4.1 / Gradle 9.7.1 / Kotlin 2.2.10 built-in; Koin removed; synthetics → ViewBinding (9 files); Firebase BOM 34. Deviations: compileSdk 37 (targetSdk still 36), nonTransitiveRClass=false, IPv4 forced for downloads. On-device smoke test still pending. |
+| 2026-09-20 | 2 | **Morse domain extracted.** New `morse/` package: `MorseTables`, `MorseEncoder` (dedupes B1 across 4 files), `MorseDecoder` (ex-`DecoderUtils`, B8 removed). 10 new unit tests pass; build green. Deferred: `SettingsRepository` (blocked on D4), `TorchController` + `LuminosityAnalyzer` (moved to Phase 4, done best on-device during the camera rewrite). |
