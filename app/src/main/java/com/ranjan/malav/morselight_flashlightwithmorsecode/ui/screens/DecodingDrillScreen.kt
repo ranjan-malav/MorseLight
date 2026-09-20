@@ -21,6 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -82,7 +86,8 @@ fun DecodingDrillScreen(vm: DecodingDrillViewModel, modifier: Modifier = Modifie
             Box(
                 Modifier.weight(1f).height(64.dp).clip(RoundedCornerShape(MorseRadius.control))
                     .background(c.accent)
-                    .pointerInput(Unit) { detectTapGestures(onPress = { vm.copyDown(); tryAwaitRelease(); vm.copyUp() }) },
+                    .pointerInput(Unit) { detectTapGestures(onPress = { vm.copyDown(); tryAwaitRelease(); vm.copyUp() }) }
+                    .semantics { role = Role.Button; contentDescription = "Hold to copy the incoming message" },
                 contentAlignment = Alignment.Center,
             ) { Text("Hold to copy", style = MaterialTheme.typography.labelLarge, color = c.textOnAccent) }
             SoftPill("Reset", vm::resetCopy, tone = PillTone.Neutral)

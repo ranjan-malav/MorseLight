@@ -19,6 +19,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -71,7 +75,8 @@ fun SendingDrillScreen(vm: SendingDrillViewModel, modifier: Modifier = Modifier)
                 Modifier.fillMaxWidth().height(64.dp).padding(bottom = 16.dp)
                     .clip(RoundedCornerShape(MorseRadius.control))
                     .background(if (ui.keyOn) c.accentPress else c.accent)
-                    .pointerInput(Unit) { detectTapGestures(onPress = { vm.keyDown(); tryAwaitRelease(); vm.keyUp() }) },
+                    .pointerInput(Unit) { detectTapGestures(onPress = { vm.keyDown(); tryAwaitRelease(); vm.keyUp() }) }
+                    .semantics { role = Role.Button; contentDescription = "Hold to key the character" },
                 contentAlignment = Alignment.Center,
             ) { Text("Hold to key", style = MaterialTheme.typography.labelLarge, color = c.textOnAccent, textAlign = TextAlign.Center) }
         }
