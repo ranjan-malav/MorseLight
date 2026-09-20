@@ -36,4 +36,5 @@
     <color name="maroon">#C10000</color>
     <color name="maroon_20p">#33C10000</color>
     <color name="amber">#FABD20</color>
+    <color name="window_background">#F6F7F9</color>
 </resources>
