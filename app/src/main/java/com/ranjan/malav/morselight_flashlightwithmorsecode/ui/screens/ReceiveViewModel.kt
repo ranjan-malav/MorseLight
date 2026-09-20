@@ -45,10 +45,9 @@ class ReceiveViewModel(
     private var classifier = KeyClassifier(unitMillis(wpm))
     private var idleJob: Job? = null
 
-    // camera pulse tracking
+    // camera pulse tracking: EMA of the ambient "dark" level (forgets old samples, seeds on first frame)
     private var camLightOn = false
-    private var lowAvg = 0.0
-    private var lowCount = 0
+    private var baseline = -1.0
 
     init {
         viewModelScope.launch {
@@ -94,7 +93,7 @@ class ReceiveViewModel(
 
     fun reset() {
         classifier.reset()
-        camLightOn = false; lowAvg = 0.0; lowCount = 0
+        camLightOn = false; baseline = -1.0
         _ui.update { it.copy(buffer = "", decoded = "", reading = false) }
     }
 
@@ -104,9 +103,10 @@ class ReceiveViewModel(
     // ---- camera decode: threshold crossings become key events ----
     private fun onLuminance(luma: Double) {
         if (_ui.value.mode != RxMode.Camera) return
-        // establish a rolling baseline of the "dark" level
-        if (!camLightOn) { lowAvg = (lowAvg * lowCount + luma) / (lowCount + 1); lowCount++ }
-        val threshold = lowAvg * (1 + _ui.value.sensitivity / 100.0)
+        if (baseline < 0) { baseline = luma; return } // seed on first frame (avoids a false first pulse)
+        // Track the ambient dark level with an exponential moving average while the light is off.
+        if (!camLightOn) baseline = baseline * 0.95 + luma * 0.05
+        val threshold = baseline * (1 + _ui.value.sensitivity / 100.0)
         _ui.update { it.copy(luminance = luma) }
         if (luma > threshold && !camLightOn) {
             camLightOn = true
