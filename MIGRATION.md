@@ -1,6 +1,20 @@
 # MorseLight — Modernization & Compose Migration Plan
 
-**Status:** Phases 0–3 done. **Phase 4 nearly complete:** all 7 screens live (Send, Receive manual+camera, More, Reference chart, both drills) + camera preview + first UI-fidelity polish, verified on emulator. Remaining: Phase 5 resource cleanup, deeper polish, Phase 6 release prep. **Scope expanded 2026-09-20:** a full redesign (`design_handoff_morselight/`) now drives the UI, and the transmit/decode logic is being reworked to the handoff's cleaner engine (user request). See §7 Redesign. Real-device test pending.
+**Status:** Phases 0–5 complete; Phase 6 (release prep) largely done; Phase 7 (polish) partial. The
+app is a full Jetpack Compose redesign on the reworked WPM engine, verified on the emulator, minified
+release building at **4.1 MB**, **20 unit tests + 1 Compose UI test green**, lint clean (5 intentional
+warnings). **Blocked only on the upload-key reset (user) and a real-device pass (user).**
+
+### Remaining before release
+- [ ] **Upload key reset** (user) — commands in Phase 6; then fill `keystore.properties`.
+- [ ] **Real-device smoke test** (user) — the emulator can't verify actual torch output or the camera
+      feed into the viewfinder; both are wired and the analysis stream is confirmed live.
+- [x] 16 KB native-lib page-size check — **passes** (`zipalign -c -P 16` verification successful; all CameraX/DataStore/graphics `.so` are 16 KB-aligned). Ship as an **App Bundle** (`bundleRelease`) so Play splits the 4 bundled ABIs per device.
+- [ ] Play Console: refresh listing + screenshots for the signal-blue rebrand; confirm Data Safety.
+- [ ] Optional follow-ups: i18n (UI strings are currently inline English — the redesign replaced all
+      old copy; extract to `strings.xml` when translations are available), deeper mockup fidelity,
+      Compose previews, a fuller TalkBack pass.
+ **Scope expanded 2026-09-20:** a full redesign (`design_handoff_morselight/`) now drives the UI, and the transmit/decode logic is being reworked to the handoff's cleaner engine (user request). See §7 Redesign. Real-device test pending.
 **Started:** 2026-09-20
 **Owner:** Ranjan Malav
 **Goal:** Bring a 2021-era app (AGP 4.2 / Kotlin 1.5 / targetSdk 30 / XML + Fragments) up to a
@@ -403,3 +417,4 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-20 | 6 | **Phase 6 (release prep, partial).** versionCode 12 / versionName 4.0.0. Enabled R8 minify + resource shrinking with keep rules (Crashlytics line numbers, Firebase, CameraX, coroutines, data classes); `enableOnBackInvokedCallback` for predictive back. Verified the minified release: **4.1 MB** (debug 30 MB), signed with the debug key for testing — installs and renders identically, no R8 runtime breakage. Still pending: upload key reset (blocker resolved, action on user), real signing config, 16 KB .so audit, Play listing/screenshots for the new brand. |
 | 2026-09-20 | 4 | **Wired the three preference switches** (were persisted but inert). Key tone: 620 Hz `Sidetone` (AudioTrack sine) played while the light is on during transmit + manual keying, gated by the setting. Loop transmission: SendViewModel repeats the message (800 ms gap) while enabled. Keep screen awake: MainActivity toggles `FLAG_KEEP_SCREEN_ON` from the setting. Build green; verified on emulator (transmit + sidetone, no AudioTrack errors, no crash). |
 | 2026-09-20 | 7 | **Lint cleanup.** Trimmed the leftover teal `colors.xml` (→ just `window_background`), `strings.xml` (→ the 3 referenced strings), deleted unused `dimens.xml`, and fixed 3 `UseKtx` warnings (`Uri.parse` → `toUri`). Lint down from **164 warnings to 5** (remaining are intentional: targetSdk 36, predictive-back attr, a dependency-update notice). |
+| 2026-09-20 | 6-7 | **Release-readiness checks.** Clean build green: 20 unit tests + 1 Compose UI test, debug + minified release + lint. Release APK 4.1 MB. 16 KB page-size verification passed on all native libs. About card shows the version from BuildConfig (4.0.0). New signal-blue adaptive launcher icon. CI gained an instrumented-test job. Remaining is user-side: upload-key reset, real-device pass, and the Play listing refresh for the rebrand. |
