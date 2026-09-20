@@ -6,8 +6,11 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.data.SettingsReposito
 import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.MorseCode
 import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.TransmitEngine
 import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.TransmitState
+import com.ranjan.malav.morselight_flashlightwithmorsecode.torch.Sidetone
 import com.ranjan.malav.morselight_flashlightwithmorsecode.torch.TorchController
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +25,8 @@ data class SendUiState(
     val wpm: Int = 12,
     val morse: String = MorseCode.encode("HELLO"),
     val tx: TransmitState = TransmitState(),
+    val keyTone: Boolean = true,
+    val loop: Boolean = false,
 ) {
     val transmitting get() = tx.running
     val torchOn get() = tx.torchOn
@@ -36,15 +41,20 @@ class SendViewModel(
     private val _ui = MutableStateFlow(SendUiState())
     val ui: StateFlow<SendUiState> = _ui.asStateFlow()
 
+    private val sidetone = Sidetone()
+
     private val engine = TransmitEngine(
-        setTorch = { on -> torch.setTorch(on) },
+        setTorch = { on -> torch.setTorch(on); if (on) sidetone.on() else sidetone.off() },
         onState = { st -> _ui.update { it.copy(tx = st) } },
     )
     private var job: Job? = null
 
     init {
         viewModelScope.launch {
-            settings.settings.collect { s -> _ui.update { it.copy(wpm = s.wpm) } }
+            settings.settings.collect { s ->
+                sidetone.setEnabled(s.keyTone)
+                _ui.update { it.copy(wpm = s.wpm, keyTone = s.keyTone, loop = s.loop) }
+            }
         }
     }
 
@@ -60,6 +70,7 @@ class SendViewModel(
     fun setManualTorch(on: Boolean) {
         if (_ui.value.transmitting) return
         torch.setTorch(on)
+        if (on) sidetone.on() else sidetone.off()
         _ui.update { it.copy(tx = it.tx.copy(torchOn = on)) }
     }
 
@@ -75,7 +86,12 @@ class SendViewModel(
         if (morse.isBlank()) return
         val wpm = _ui.value.wpm
         job?.cancel()
-        job = viewModelScope.launch { engine.transmit(morse, wpm) }
+        job = viewModelScope.launch {
+            do {
+                engine.transmit(morse, wpm)
+                if (_ui.value.loop && isActive) delay(800)
+            } while (_ui.value.loop && isActive)
+        }
     }
 
     private fun stop() {
@@ -88,5 +104,6 @@ class SendViewModel(
     override fun onCleared() {
         job?.cancel()
         torch.setTorch(false)
+        sidetone.release()
     }
 }
