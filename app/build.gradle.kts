@@ -1,3 +1,13 @@
+import java.util.Properties
+
+// Release signing reads a gitignored keystore.properties when present (see keystore.properties.template).
+// Without it, assembleRelease produces an unsigned APK — fine for CI and local R8 testing.
+val keystorePropsFile = rootProject.file("keystore.properties")
+val keystoreProps = Properties().apply {
+    if (keystorePropsFile.exists()) keystorePropsFile.inputStream().use { load(it) }
+}
+val hasKeystore = keystorePropsFile.exists()
+
 plugins {
     alias(libs.plugins.android.application)
     // Kotlin is provided by AGP's built-in Kotlin support (no kotlin-android plugin).
@@ -20,8 +30,20 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        if (hasKeystore) {
+            create("release") {
+                storeFile = file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (hasKeystore) signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
