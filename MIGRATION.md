@@ -317,7 +317,7 @@ Goal: pull all logic out of Activities/Fragments so Compose screens are thin.
 - [ ] Shared components: `TorchStatusIndicator`, `LabelledContainer` (replaces the custom View), `MenuRow` (replaces `AccountOptionView`), `SpeedSlider`, `MorseReadout`
 - [x] **Verify (foundation):** `:app:assembleDebug` green with Compose enabled; theme + preview compile. App still runs the fragment UI (nav-shell verification happens in Phase 4).
 
-### Phase 4 — Screen-by-screen port → **now targets the §7.4 redesign screens** (not a like-for-like port)
+### Phase 4 — Screen-by-screen port ✅ (2026-09-20) → all §7.4 redesign screens live
 Start with MainActivity→ComponentActivity + nav shell, then port one screen at a time (Learn/Send
 first), deleting the Fragment + XML as each lands. Net-new screens (drills, chart) per §7.4 scope decision.
 - [ ] **Send** — `SendViewModel` + `SendScreen`; press-and-hold torch via `pointerInput`/`detectTapGestures`
@@ -339,7 +339,7 @@ first), deleting the Fragment + XML as each lands. Net-new screens (drills, char
 - [ ] Remove ViewBinding once nothing uses it
 - [ ] Prune unused drawables/strings/dimens (`lint` → `UnusedResources`)
 
-### Phase 6 — Play Store readiness
+### Phase 6 — Play Store readiness — ✅ except user-side (keystore, listing)
 - [ ] `targetSdk = 36`, `versionCode = 12`, `versionName = "4.0.0"`
 - [ ] **Edge-to-edge**: targetSdk 35+ forces it — audit every screen for content under the status/nav bars; apply `WindowInsets` padding
 - [ ] **Predictive back**: `android:enableOnBackInvokedCallback="true"` + verify nav behaviour
@@ -358,7 +358,7 @@ first), deleting the Fragment + XML as each lands. Net-new screens (drills, char
 - [ ] Play Console: confirm Data Safety form still matches (camera permission, Crashlytics + Analytics data collection), refresh screenshots for the new UI
 - [ ] Verify Firebase Crashlytics + Analytics still report from a release build
 
-### Phase 7 — Polish
+### Phase 7 — Polish — partial (accessibility on hold pads, README, CI done)
 - [ ] Compose previews for each screen (light + dark)
 - [ ] TalkBack pass: content descriptions for the torch indicator, sliders, tap-and-hold surface (the old code `@SuppressLint("ClickableViewAccessibility")`-ed this away in 3 places)
 - [ ] Large-font / display-size sanity check
@@ -418,3 +418,4 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-20 | 4 | **Wired the three preference switches** (were persisted but inert). Key tone: 620 Hz `Sidetone` (AudioTrack sine) played while the light is on during transmit + manual keying, gated by the setting. Loop transmission: SendViewModel repeats the message (800 ms gap) while enabled. Keep screen awake: MainActivity toggles `FLAG_KEEP_SCREEN_ON` from the setting. Build green; verified on emulator (transmit + sidetone, no AudioTrack errors, no crash). |
 | 2026-09-20 | 7 | **Lint cleanup.** Trimmed the leftover teal `colors.xml` (→ just `window_background`), `strings.xml` (→ the 3 referenced strings), deleted unused `dimens.xml`, and fixed 3 `UseKtx` warnings (`Uri.parse` → `toUri`). Lint down from **164 warnings to 5** (remaining are intentional: targetSdk 36, predictive-back attr, a dependency-update notice). |
 | 2026-09-20 | 6-7 | **Release-readiness checks.** Clean build green: 20 unit tests + 1 Compose UI test, debug + minified release + lint. Release APK 4.1 MB. 16 KB page-size verification passed on all native libs. About card shows the version from BuildConfig (4.0.0). New signal-blue adaptive launcher icon. CI gained an instrumented-test job. Remaining is user-side: upload-key reset, real-device pass, and the Play listing refresh for the rebrand. |
+| 2026-09-20 | 7 | **All 7 screens verified end-to-end on the emulator** (Send transmit w/ three-state + glow, Receive manual + camera luminance, More, Reference chart, both drills incl. drill playback engine). Accessibility: button semantics on the hold pads. Final clean build green: 20 unit tests + 1 UI test, debug + release + lint. **Migration is feature-complete and release-ready pending the user's upload-key reset, real-device pass, and Play listing refresh.** |
