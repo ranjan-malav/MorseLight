@@ -14,15 +14,16 @@ android {
         applicationId = "com.ranjan.malav.morselight_flashlightwithmorsecode"
         minSdk = 26
         targetSdk = 36
-        versionCode = 11
-        versionName = "3.0.0"
+        versionCode = 12
+        versionName = "4.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
