@@ -12,6 +12,11 @@ import androidx.fragment.app.activityViewModels
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.ranjan.malav.morselight_flashlightwithmorsecode.MainViewModel
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
+import androidx.lifecycle.lifecycleScope
+import com.ranjan.malav.morselight_flashlightwithmorsecode.data.SettingsRepository
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.*
 import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.MorseEncoder
 import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.MorseDecoder
@@ -26,7 +31,10 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), ImageAnalysi
     private var _binding: FragmentAutoDecodeBinding? = null
     private val binding get() = _binding!!
 
-    private val sharedPref by lazy { SharedPreferenceUtils(requireContext()) }
+    private val settings by lazy { SettingsRepository(requireContext().applicationContext) }
+    // Temporary bridge: the initial read blocks briefly on DataStore's first file read.
+    // Acceptable here because these Fragments are replaced by Compose screens in Phase 4;
+    // the Compose ViewModels will collect SettingsRepository.settings as a Flow instead.
     private var isFlashOn = false
     private var ignoreClicks = false
     private var transmissionSpeed: Int = 3
@@ -45,9 +53,6 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), ImageAnalysi
 
     companion object {
         private const val TAG = "AutoDecode"
-        private const val SPEED = "speed"
-        private const val REACT_SIZE = "react_size"
-        private const val PERCEPTIBILITY = "perceptibility"
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,9 +60,10 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), ImageAnalysi
 
         _binding = FragmentAutoDecodeBinding.bind(view)
 
-        transmissionSpeed = sharedPref.getInt(SPEED, 3)
-        percentageRectSize = sharedPref.getInt(REACT_SIZE, 50)
-        perceptibility = sharedPref.getInt(PERCEPTIBILITY, 30)
+        val initial = runBlocking { settings.settings.first() }
+        transmissionSpeed = initial.speed
+        percentageRectSize = initial.reactSize
+        perceptibility = initial.perceptibility
 
         binding.sizeSlider.value = percentageRectSize / 100f
         callback?.updateRectAreaPerc(percentageRectSize)
@@ -109,12 +115,12 @@ class AutoDecodeFragment : Fragment(R.layout.fragment_auto_decode), ImageAnalysi
 
         binding.perceptibilitySlider.addOnChangeListener { _, value, _ ->
             perceptibility = value.toInt()
-            sharedPref.setInt(PERCEPTIBILITY, perceptibility)
+            viewLifecycleOwner.lifecycleScope.launch { settings.setPerceptibility(perceptibility) }
         }
 
         binding.sizeSlider.addOnChangeListener { _, value, _ ->
             percentageRectSize = (value * 100).toInt()
-            sharedPref.setInt(REACT_SIZE, percentageRectSize)
+            viewLifecycleOwner.lifecycleScope.launch { settings.setReactSize(percentageRectSize) }
             setRectConstraints(value)
             callback?.updateRectAreaPerc(percentageRectSize)
         }

@@ -1,6 +1,6 @@
 # MorseLight — Modernization & Compose Migration Plan
 
-**Status:** Phase 3 partial — Compose enabled + brand M3 theme in place (build green, fragment UI still live). MainActivity/nav conversion opens Phase 4. On-device smoke test still pending.
+**Status:** Phase 2 complete (DataStore done) + Phase 3 foundation done. Emulator smoke test passed; real-device test pending (user). Phase 4 (Compose screens) is next.
 **Started:** 2026-09-20
 **Owner:** Ranjan Malav
 **Goal:** Bring a 2021-era app (AGP 4.2 / Kotlin 1.5 / targetSdk 30 / XML + Fragments) up to a
@@ -180,7 +180,7 @@ Goal: same app, same XML UI, modern toolchain. Biggest-risk phase, because of AG
 - [ ] **Replace Kotlin synthetics with ViewBinding** in all 8 files that use them. Unavoidable even though these views die in Phase 5 — synthetics don't exist in modern Kotlin.
 - [ ] Fix deprecations: `onBackPressed()` → `OnBackPressedDispatcher`, `LiveData.observe(owner) {}` 2-arg lambda form, `requestPermissions`/`onRequestPermissionsResult` → `ActivityResultContracts`
 - [x] **Verify:** `./gradlew :app:assembleDebug` green; `:app:testDebugUnitTest` green. APK: 14 MB, minSdk 26 / targetSdk 36 / compileSdk 37.
-- [ ] ⏳ **On-device smoke test pending** — no device/emulator was attached during the migration. Run all 6 flows (Send, Manual/Auto decode, Learn, Detail, Tutorial) before closing Phase 1.
+- [x] **Emulator smoke test passed (API 33, arm64):** app installs and launches, no crashes in logcat. Verified Send (typed message → correct Morse output `.... . .-.. .-.. ... --- ...`, live "H = ...." char readout, START/SOS → STOP state machine), bottom-nav to Receive and Learn, camera-permission grant, and DataStore default read (speed slider at default 3). ⏳ **Real-device test still pending (user will run).** Torch output itself can't be verified on an emulator.
 
 **Phase 1 outcome (2026-09-20):**
 - Toolchain jumped 4.2.2 → **AGP 9.4.1**, Gradle 6.7.1 → **9.7.1**, Kotlin 1.5.10 → **2.2.10 (AGP built-in)**. `kotlin-android`, `kotlin-kapt`, `kotlin-android-extensions` all removed.
@@ -197,14 +197,14 @@ Goal: same app, same XML UI, modern toolchain. Biggest-risk phase, because of AG
 - Deprecation warning left: `Preview.Builder.setTargetAspectRatio` — belongs to the Phase 4 CameraX rewrite.
 - **ActivityResult permissions migration deferred to Phase 3/4**, when `MainActivity` becomes a `ComponentActivity`. The deprecated `requestPermissions`/`onRequestPermissionsResult` still compile (warnings only), so this does not block a green build.
 
-### Phase 2 — Extract the domain layer (UI-independent) — morse core done; DataStore/Torch/Luminosity pending
+### Phase 2 — Extract the domain layer (UI-independent) — morse core + DataStore done; Torch/Luminosity moved to Phase 4
 Goal: pull all logic out of Activities/Fragments so Compose screens are thin.
 - [x] `morse/MorseTables.kt` — tables moved out of `Extensions.kt` (now immutable `val`s).
 - [x] `morse/MorseEncoder.kt` — the 4× duplicated encode block (B1) collapsed into `MorseEncoder.encode()` returning `Transmission(onOffDelays, charUnits, morseCode, finalOffDelay)`. All 4 callers delegate; behaviour verified identical by tests.
 - [x] `morse/MorseDecoder.kt` — `DecoderUtils` ported; dead debug scaffolding removed (B8); stray synthetic import already gone in Phase 1.
 - [ ] `torch/TorchController.kt` — **deferred to Phase 4.** The torch/handler timeline is entangled with `MainActivity` becoming a `ComponentActivity`; cleaner to do once during the Compose rewrite than twice.
 - [ ] `camera/LuminosityAnalyzer.kt` — **deferred to Phase 4** (B5). Best changed and exercised alongside the Auto-decode camera rewrite, on-device.
-- [ ] `data/SettingsRepository.kt` — **blocked on decision D4** (SharedPreferences → DataStore, still open). `SharedPreferenceUtils` stays until D4 is settled.
+- [x] `data/SettingsRepository.kt` — DataStore-backed, exposes `Flow<Settings>` + suspend setters. One-time `SharedPreferencesMigration` imports the existing `speed`/`react_size`/`perceptibility` values from the old prefs file, then deletes it. `SharedPreferenceUtils` removed. Legacy fragments read via a documented temporary `runBlocking` bridge (replaced by Flow collection in the Phase 4 ViewModels); writes go through `lifecycleScope`.
 - [x] **Unit tests**: `MorseEncoderTest` (5) + `MorseDecoderTest` (5), all passing. Test deps added in Phase 1 (never previously declared).
 - [x] **Verify:** `:app:assembleDebug` + `:app:testDebugUnitTest` green (11 tests, 0 failures). On-device check folded into the pending Phase 1 smoke test.
 
@@ -304,3 +304,5 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-20 | 1 | **Phase 1 build green.** AGP 9.4.1 / Gradle 9.7.1 / Kotlin 2.2.10 built-in; Koin removed; synthetics → ViewBinding (9 files); Firebase BOM 34. Deviations: compileSdk 37 (targetSdk still 36), nonTransitiveRClass=false, IPv4 forced for downloads. On-device smoke test still pending. |
 | 2026-09-20 | 2 | **Morse domain extracted.** New `morse/` package: `MorseTables`, `MorseEncoder` (dedupes B1 across 4 files), `MorseDecoder` (ex-`DecoderUtils`, B8 removed). 10 new unit tests pass; build green. Deferred: `SettingsRepository` (blocked on D4), `TorchController` + `LuminosityAnalyzer` (moved to Phase 4, done best on-device during the camera rewrite). |
 | 2026-09-20 | 3 | **Compose foundation (non-breaking half).** Enabled Compose (BOM 2026.09.00, compiler plugin on Kotlin 2.2.10), added `ui/theme` (teal M3 light+dark, Nunito Sans) with a compiling `@Preview`. Build green; fragment UI still live. MainActivity→ComponentActivity + nav shell deferred to Phase 4 start so the app is never left as empty shells. |
+| 2026-09-20 | 2 | **DataStore done (D4).** `SettingsRepository` on DataStore with one-time SharedPreferences migration; `SharedPreferenceUtils` removed; 3 fragments rewired (temporary runBlocking bridge). Build green. |
+| 2026-09-20 | 1–3 | **Emulator smoke test passed** (API 33). Send encode + live char readout + transmit state machine correct; nav to Receive/Learn works; DataStore defaults read; no crashes. Real-device test deferred to user. |

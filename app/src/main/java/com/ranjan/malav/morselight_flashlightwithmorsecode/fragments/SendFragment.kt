@@ -15,6 +15,11 @@ import com.google.firebase.analytics.analytics
 import com.google.firebase.Firebase
 import com.ranjan.malav.morselight_flashlightwithmorsecode.MainViewModel
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
+import androidx.lifecycle.lifecycleScope
+import com.ranjan.malav.morselight_flashlightwithmorsecode.data.SettingsRepository
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.*
 import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.MorseEncoder
 import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.charToMorse
@@ -27,7 +32,10 @@ class SendFragment : Fragment(R.layout.fragment_send) {
     private var _binding: FragmentSendBinding? = null
     private val binding get() = _binding!!
 
-    private val sharedPref by lazy { SharedPreferenceUtils(requireContext()) }
+    private val settings by lazy { SettingsRepository(requireContext().applicationContext) }
+    // Temporary bridge: the initial read blocks briefly on DataStore's first file read.
+    // Acceptable here because these Fragments are replaced by Compose screens in Phase 4;
+    // the Compose ViewModels will collect SettingsRepository.settings as a Flow instead.
     private var isFlashOn = false
     private var ignoreClicks = false
     private var transmissionSpeed: Int = 3
@@ -36,7 +44,6 @@ class SendFragment : Fragment(R.layout.fragment_send) {
 
     companion object {
         private const val TAG = "SendFragment"
-        private const val SPEED = "speed"
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -45,12 +52,12 @@ class SendFragment : Fragment(R.layout.fragment_send) {
 
         _binding = FragmentSendBinding.bind(view)
 
-        transmissionSpeed = sharedPref.getInt(SPEED, 3)
+        transmissionSpeed = runBlocking { settings.settings.first() }.speed
         binding.speedSlider.value = transmissionSpeed.toFloat()
 
         binding.speedSlider.addOnChangeListener { _, value, _ ->
             transmissionSpeed = value.toInt()
-            sharedPref.setInt(SPEED, transmissionSpeed)
+            viewLifecycleOwner.lifecycleScope.launch { settings.setSpeed(transmissionSpeed) }
             ignoreClicks = false
         }
 

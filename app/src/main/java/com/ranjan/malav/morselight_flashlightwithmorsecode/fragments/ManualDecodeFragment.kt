@@ -13,6 +13,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.ranjan.malav.morselight_flashlightwithmorsecode.MainViewModel
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
+import androidx.lifecycle.lifecycleScope
+import com.ranjan.malav.morselight_flashlightwithmorsecode.data.SettingsRepository
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.*
 import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.MorseEncoder
 import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.MorseDecoder.decryptMorse
@@ -26,7 +31,10 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode) {
     private var _binding: FragmentManualDecodeBinding? = null
     private val binding get() = _binding!!
 
-    private val sharedPref by lazy { SharedPreferenceUtils(requireContext()) }
+    private val settings by lazy { SettingsRepository(requireContext().applicationContext) }
+    // Temporary bridge: the initial read blocks briefly on DataStore's first file read.
+    // Acceptable here because these Fragments are replaced by Compose screens in Phase 4;
+    // the Compose ViewModels will collect SettingsRepository.settings as a Flow instead.
     private var isFlashOn = false
     private var ignoreClicks = false
     private var transmissionSpeed: Int = 3
@@ -37,7 +45,6 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode) {
 
     companion object {
         private const val TAG = "ManualDecode"
-        private const val SPEED = "speed"
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -46,7 +53,7 @@ class ManualDecodeFragment : Fragment(R.layout.fragment_manual_decode) {
 
         _binding = FragmentManualDecodeBinding.bind(view)
 
-        transmissionSpeed = sharedPref.getInt(SPEED, 3)
+        transmissionSpeed = runBlocking { settings.settings.first() }.speed
 
         binding.tapAndHoldButton.setOnTouchListener { _, event ->
             if (ignoreClicks) {
