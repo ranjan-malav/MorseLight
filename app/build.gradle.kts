@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     // Kotlin is provided by AGP's built-in Kotlin support (no kotlin-android plugin).
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
 }
@@ -30,6 +31,8 @@ android {
     }
 
     buildFeatures {
+        compose = true
+        // ViewBinding stays until the XML screens are removed in Phase 5.
         viewBinding = true
         // Temporary XML views still reference BuildConfig.APPLICATION_ID; off by default in AGP 9.
         buildConfig = true
@@ -48,6 +51,18 @@ kotlin {
 }
 
 dependencies {
+    // Compose
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.material.icons.extended)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
+    debugImplementation(libs.compose.ui.tooling)
+
     // AndroidX / Material
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

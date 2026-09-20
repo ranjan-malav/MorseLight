@@ -1,6 +1,6 @@
 # MorseLight — Modernization & Compose Migration Plan
 
-**Status:** Phase 2 partial — morse domain extracted + tested (build green). DataStore/Torch/Luminosity pieces deferred. On-device smoke test still pending.
+**Status:** Phase 3 partial — Compose enabled + brand M3 theme in place (build green, fragment UI still live). MainActivity/nav conversion opens Phase 4. On-device smoke test still pending.
 **Started:** 2026-09-20
 **Owner:** Ranjan Malav
 **Goal:** Bring a 2021-era app (AGP 4.2 / Kotlin 1.5 / targetSdk 30 / XML + Fragments) up to a
@@ -120,7 +120,7 @@ Going straight to AGP 9 from 4.2.2 means handling these on top of the normal upg
 | **D1** | AGP 8.13.2 vs AGP 9.4.1 | **AGP 9.4.1.** Future-proofs the build rather than doing the 8→9 jump again in a year. Cost: AGP 9's breaking changes land on top of the migration — see §2.1. | ✅ Decided 2026-09-20 |
 | **D2** | minSdk 21 → 24 or 26 | **26 (Android 8.0).** Cleanest modern baseline: full Java 8 APIs, no core library desugaring, and the `SDK_INT >= M` permission branch in `MainActivity` disappears. | ✅ Decided 2026-09-20 |
 | **D3** | Keep Koin or drop DI framework | **Drop Koin.** It exists solely to inject one `SharedPreferenceUtils` singleton. Replaced by a `SettingsRepository` created in `Application`. Removes a dependency and its 2.x→4.x migration entirely. | ✅ Decided 2026-09-20 |
-| **D4** | SharedPreferences → DataStore | Recommended: **yes.** Settings feed Compose state; DataStore's `Flow` API is the natural fit. Must include a one-time read of the old prefs so existing users keep their speed/perceptibility settings. | Open |
+| **D4** | SharedPreferences → DataStore | **Yes.** `SettingsRepository` on DataStore with a one-time migration of the existing `speed`/`react_size`/`perceptibility` values. Flow API feeds Compose state. | ✅ Decided 2026-09-20 |
 | **D5** | Keep portrait lock | Recommended: **drop `screenOrientation="portrait"`.** API 36 ignores orientation restrictions on large screens anyway; better to lay out responsively than be letterboxed. | Open |
 | **D6** | Visual redesign scope | Recommended: **Material 3 with the existing teal brand palette**, dynamic color off (brand identity matters here), light + dark, keep Nunito Sans. Not a ground-up redesign. | Open |
 
@@ -208,13 +208,13 @@ Goal: pull all logic out of Activities/Fragments so Compose screens are thin.
 - [x] **Unit tests**: `MorseEncoderTest` (5) + `MorseDecoderTest` (5), all passing. Test deps added in Phase 1 (never previously declared).
 - [x] **Verify:** `:app:assembleDebug` + `:app:testDebugUnitTest` green (11 tests, 0 failures). On-device check folded into the pending Phase 1 smoke test.
 
-### Phase 3 — Compose foundation
-- [ ] Enable `buildFeatures { compose = true }`, add Compose BOM + the Compose compiler plugin
-- [ ] `ui/theme/` — Color.kt (port the teal palette from `colors.xml`), Type.kt (Nunito Sans via `FontFamily`), Theme.kt (M3 light + dark `ColorScheme` mapped from `themes.xml` / `values-night/themes.xml`)
-- [ ] `MainActivity` → `ComponentActivity` + `setContent {}` + `enableEdgeToEdge()`
-- [ ] Navigation Compose: bottom bar with Send / Receive / Learn; nested routes for Detail + Tutorial
+### Phase 3 — Compose foundation — infra + theme done; MainActivity/nav conversion opens Phase 4
+- [x] `buildFeatures { compose = true }`; Compose BOM 2026.09.00 + `org.jetbrains.kotlin.plugin.compose` (pinned to AGP's built-in Kotlin 2.2.10). ViewBinding kept alongside until Phase 5.
+- [x] `ui/theme/` — Color.kt (teal palette), Type.kt (Nunito Sans `FontFamily` from res/font), Theme.kt (M3 light+dark, dynamic color off). A `@Preview` proves it compiles and renders.
+- [ ] `MainActivity` → `ComponentActivity` + `setContent {}` + `enableEdgeToEdge()` — **moved to the start of Phase 4.** Doing it now would replace the working fragment UI with empty shells (and can't be smoke-tested here); it lands with the first real screen.
+- [ ] Navigation Compose bottom bar (Send/Receive/Learn) + nested Detail/Tutorial routes — **Phase 4 start**, with the MainActivity conversion.
 - [ ] Shared components: `TorchStatusIndicator`, `LabelledContainer` (replaces the custom View), `MenuRow` (replaces `AccountOptionView`), `SpeedSlider`, `MorseReadout`
-- [ ] **Verify:** app launches into an empty Compose shell with working navigation
+- [x] **Verify (foundation):** `:app:assembleDebug` green with Compose enabled; theme + preview compile. App still runs the fragment UI (nav-shell verification happens in Phase 4).
 
 ### Phase 4 — Screen-by-screen port
 Port one screen at a time, deleting the Fragment + XML as each lands.
@@ -303,3 +303,4 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-20 | 0 | Keystore hunt closed. Full home sweep found no MorseLight key; `~/Downloads/bhojan_android_key.jks` (different app) rejected every remembered password. Proceeding with the upload key reset. |
 | 2026-09-20 | 1 | **Phase 1 build green.** AGP 9.4.1 / Gradle 9.7.1 / Kotlin 2.2.10 built-in; Koin removed; synthetics → ViewBinding (9 files); Firebase BOM 34. Deviations: compileSdk 37 (targetSdk still 36), nonTransitiveRClass=false, IPv4 forced for downloads. On-device smoke test still pending. |
 | 2026-09-20 | 2 | **Morse domain extracted.** New `morse/` package: `MorseTables`, `MorseEncoder` (dedupes B1 across 4 files), `MorseDecoder` (ex-`DecoderUtils`, B8 removed). 10 new unit tests pass; build green. Deferred: `SettingsRepository` (blocked on D4), `TorchController` + `LuminosityAnalyzer` (moved to Phase 4, done best on-device during the camera rewrite). |
+| 2026-09-20 | 3 | **Compose foundation (non-breaking half).** Enabled Compose (BOM 2026.09.00, compiler plugin on Kotlin 2.2.10), added `ui/theme` (teal M3 light+dark, Nunito Sans) with a compiling `@Preview`. Build green; fragment UI still live. MainActivity→ComponentActivity + nav shell deferred to Phase 4 start so the app is never left as empty shells. |
