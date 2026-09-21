@@ -105,6 +105,12 @@ class SendViewModel(
         _ui.update { it.copy(tx = TransmitState()) }
     }
 
+    /** Stop any transmission — called when the Send screen leaves composition (e.g. tab change),
+     *  so the torch can't keep flashing on a screen with no Stop button. */
+    fun stopTransmit() {
+        if (_ui.value.transmitting) stop()
+    }
+
     override fun onCleared() {
         job?.cancel()
         torch.setTorch(false)

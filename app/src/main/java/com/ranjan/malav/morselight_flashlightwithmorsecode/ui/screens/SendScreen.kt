@@ -16,6 +16,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +46,9 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseLightTh
 @Composable
 fun SendScreen(vm: SendViewModel, modifier: Modifier = Modifier) {
     val ui by vm.ui.collectAsStateWithLifecycle()
+    // Stop transmitting if the user navigates away (the ViewModel survives in the nav back stack,
+    // so its coroutine would otherwise keep driving the real torch with no reachable Stop button).
+    DisposableEffect(Unit) { onDispose { vm.stopTransmit() } }
     SendContent(
         ui = ui,
         onMessageChange = vm::onMessageChange,
