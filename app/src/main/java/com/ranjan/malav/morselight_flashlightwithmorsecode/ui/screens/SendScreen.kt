@@ -122,8 +122,14 @@ fun SendContent(
                 )
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     StatusBadge(
-                        if (ui.transmitting) stringResource(R.string.state_transmitting) else if (ui.torchOn) stringResource(R.string.state_keying) else stringResource(R.string.state_idle),
-                        tone = if (ui.transmitting) BadgeTone.Accent else BadgeTone.Neutral,
+                        if (ui.transmitting) stringResource(R.string.state_transmitting)
+                        else if (ui.torchOn) stringResource(R.string.state_keying)
+                        else stringResource(R.string.state_idle),
+                        tone = when {
+                            ui.transmitting -> BadgeTone.Accent
+                            ui.torchOn -> BadgeTone.Success   // held / keying by hand
+                            else -> BadgeTone.Neutral
+                        },
                     )
                     Text(stringResource(R.string.hold_to_key_by_hand), style = MaterialTheme.typography.bodyMedium, color = c.textMuted)
                 }
