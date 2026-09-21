@@ -6,7 +6,7 @@ release building at **4.1 MB**, **20 unit tests + 1 Compose UI test green**, lin
 warnings). **Blocked only on the upload-key reset (user) and a real-device pass (user).**
 
 ### Remaining before release
-- [ ] **Upload key reset** (user) — commands in Phase 6; then fill `keystore.properties`.
+- [~] **Upload key reset** — request **submitted to Play** (2026-09-21), awaiting Google (~1–2 business days). On approval: fill the gitignored `keystore.properties` from `keystore.properties.template` with the new `morselight-upload.jks`.
 - [ ] **Real-device smoke test** (user) — the emulator can't verify actual torch output or the camera
       feed into the viewfinder; both are wired and the analysis stream is confirmed live.
 - [x] 16 KB native-lib page-size check — **passes** (`zipalign -c -P 16` verification successful; all CameraX/DataStore/graphics `.so` are 16 KB-aligned). Ship as an **App Bundle** (`bundleRelease`) so Play splits the 4 bundled ABIs per device.
@@ -248,7 +248,7 @@ Each phase should end on a **green build + working app**, and get its own commit
 Goal: same app, same XML UI, modern toolchain. Biggest-risk phase, because of AGP 9 (§2.1).
 
 **Toolchain**
-- [x] Run Studio's *AGP Upgrade Assistant* and/or `android skills add agp-9-upgrade` as a first pass, then hand-finish
+- [x] Toolchain migrated to AGP 9.4.1 — **done by hand** (the AGP Upgrade Assistant / `agp-9-upgrade` skill was not used; the manual path reached the same end state and is what the rest of Phase 1 documents).
 - [x] Gradle wrapper → 9.7.1 (`gradle-wrapper.properties` + regenerate the wrapper jar)
 - [x] Root `build.gradle` → `build.gradle.kts`; delete `buildscript{}`, `jcenter()`, `allprojects{}`, `kotlin_version`
 - [x] `settings.gradle` → `settings.gradle.kts` with `pluginManagement` + `dependencyResolutionManagement` (`google()`, `mavenCentral()`)
@@ -422,3 +422,4 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-20 | 7 | **UI layer made fully previewable/testable.** All 7 screens refactored to stateless `XxxContent(state, callbacks)` + thin `XxxScreen(vm)` wrappers, each with a `@Preview` (Receive uses a `cameraContent` slot so previews skip CameraX). Added 4 morse integration tests (encode→timeline, keying→decode). Fixed lint to 3 intentional warnings. **Final state: 28 commits, 24 unit + 1 UI test, clean debug + 4.1 MB release build, all verified on the emulator.** Migration complete; remaining is user-side (upload-key reset, real-device pass, Play listing). |
 | 2026-09-21 | 7 | **i18n done + todos reconciled.** Extracted all 86 UI strings to `strings.xml` (translation-ready; nav titles via `@StringRes`), verified rendering unchanged on the emulator. Marked 54 completed todos across Phases 1–7 as done. Remaining unchecked items are all user-side (upload-key reset, App Bundle upload, Play listing, release-signed Firebase check, real-device large-font pass) or optional (translations, Baseline Profile, AGP 10, Hilt). |
 | 2026-09-21 | 6-7 | **App Bundle + large-font verified.** `bundleRelease` produces a 7.4 MB `.aab`. UI holds up at 1.3× font scale (no clipping). Only genuinely user-side items now remain: upload-key reset, `.aab`/listing upload to Play, release-signed Firebase check, real-device torch/camera pass. |
+| 2026-09-21 | 6 | Upload-key reset **request submitted** to Play Console (routine, Play App Signing is on). Awaiting Google. Corrected the Phase 1 AGP-assistant checkbox to reflect the toolchain was migrated by hand. |

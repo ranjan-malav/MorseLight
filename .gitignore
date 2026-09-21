@@ -20,6 +20,8 @@ local.properties
 *.jks
 *.keystore
 keystore.properties
+*.pem
+upload_certificate.pem
 
 # Build artifacts / diagnostics
 *.apk
