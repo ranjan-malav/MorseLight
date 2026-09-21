@@ -129,7 +129,7 @@ fun MorseApp(container: AppContainer) {
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = c.accent, selectedTextColor = c.accent,
                             unselectedIconColor = c.textSubtle, unselectedTextColor = c.textSubtle,
-                            indicatorColor = c.accentSoft,
+                            indicatorColor = androidx.compose.ui.graphics.Color.Transparent,
                         ),
                     )
                 }
