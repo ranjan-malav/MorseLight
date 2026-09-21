@@ -11,9 +11,12 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseTheme
 
 /**
  * The morse dot-dash string with three-state per-symbol colouring (README §7.2):
- * sent = success, current = accent (held through the off-gap), pending = subtle. Idle (not
- * transmitting) paints the whole string in the body colour. [currentIndex]/[doneIndex] are symbol
- * positions in [morse], as emitted by TransmitState.
+ * sent = success, current = accent (held through the off-gap), pending = subtle. Idle paints the
+ * whole string in the body colour.
+ *
+ * The annotated-string structure is identical in both states — one [SpanStyle] per character
+ * regardless of transmitting — so the layout never shifts when colours change (a per-character span
+ * applies the style's letterSpacing differently than a single whole-string span would).
  */
 @Composable
 fun MorseString(
@@ -25,17 +28,14 @@ fun MorseString(
 ) {
     val c = MorseTheme.colors
     val text = buildAnnotatedString {
-        if (!transmitting) {
-            withStyle(SpanStyle(color = c.morseIdle)) { append(morse) }
-        } else {
-            morse.forEachIndexed { i, ch ->
-                val color = when {
-                    i <= doneIndex -> c.morseSent
-                    i == currentIndex -> c.morseCurrent
-                    else -> c.morsePending
-                }
-                withStyle(SpanStyle(color = color)) { append(ch) }
+        morse.forEachIndexed { i, ch ->
+            val color = when {
+                !transmitting -> c.morseIdle
+                i <= doneIndex -> c.morseSent
+                i == currentIndex -> c.morseCurrent
+                else -> c.morsePending
             }
+            withStyle(SpanStyle(color = color)) { append(ch) }
         }
     }
     Text(text = text, style = MorseTextStyle, modifier = modifier)
