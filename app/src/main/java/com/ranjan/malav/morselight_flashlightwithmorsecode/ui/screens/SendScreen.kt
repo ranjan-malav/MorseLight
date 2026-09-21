@@ -97,7 +97,7 @@ fun SendContent(
                     )
                 }
                 MorseString(
-                    morse = ui.morse, transmitting = ui.transmitting,
+                    morse = ui.displayMorse, transmitting = ui.transmitting,
                     currentIndex = ui.tx.symbolIndex, doneIndex = ui.tx.doneIndex,
                 )
             }

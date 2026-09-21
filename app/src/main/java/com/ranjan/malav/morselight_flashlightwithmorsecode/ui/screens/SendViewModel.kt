@@ -24,12 +24,15 @@ data class SendUiState(
     val message: String = "HELLO",
     val wpm: Int = 12,
     val morse: String = MorseCode.encode("HELLO"),
+    val txMorse: String = "",   // what is actually being transmitted (message / Signal / SOS)
     val tx: TransmitState = TransmitState(),
     val keyTone: Boolean = true,
     val loop: Boolean = false,
 ) {
     val transmitting get() = tx.running
     val torchOn get() = tx.torchOn
+    /** The string shown in the morse card: the transmitted morse while sending, else the message's. */
+    val displayMorse get() = if (transmitting) txMorse else morse
     val symbolCount get() = morse.count { it == '.' || it == '-' }
 }
 
@@ -85,6 +88,7 @@ class SendViewModel(
     private fun play(morse: String) {
         if (morse.isBlank()) return
         val wpm = _ui.value.wpm
+        _ui.update { it.copy(txMorse = morse) }
         job?.cancel()
         job = viewModelScope.launch {
             do {
