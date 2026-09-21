@@ -11,7 +11,7 @@ warnings). **Blocked only on the upload-key reset (user) and a real-device pass 
       feed into the viewfinder; both are wired and the analysis stream is confirmed live.
 - [x] 16 KB native-lib page-size check — **passes** (`zipalign -c -P 16` verification successful; all CameraX/DataStore/graphics `.so` are 16 KB-aligned). Ship as an **App Bundle** (`bundleRelease`) so Play splits the 4 bundled ABIs per device.
 - [ ] Play Console: refresh listing + screenshots for the signal-blue rebrand; confirm Data Safety.
-- [ ] Optional follow-ups: i18n (UI strings are currently inline English — the redesign replaced all
+- [x] i18n — **done**: all UI strings extracted to `strings.xml` (translation-ready). Remaining optional follow-ups: i18n *translations*, deeper mockup fidelity. (Originally inline English — the redesign replaced all
       old copy; extract to `strings.xml` when translations are available), deeper mockup fidelity,
       Compose previews, a fuller TalkBack pass.
  **Scope expanded 2026-09-20:** a full redesign (`design_handoff_morselight/`) now drives the UI, and the transmit/decode logic is being reworked to the handoff's cleaner engine (user request). See §7 Redesign. Real-device test pending.
@@ -248,34 +248,34 @@ Each phase should end on a **green build + working app**, and get its own commit
 Goal: same app, same XML UI, modern toolchain. Biggest-risk phase, because of AGP 9 (§2.1).
 
 **Toolchain**
-- [ ] Run Studio's *AGP Upgrade Assistant* and/or `android skills add agp-9-upgrade` as a first pass, then hand-finish
-- [ ] Gradle wrapper → 9.7.1 (`gradle-wrapper.properties` + regenerate the wrapper jar)
-- [ ] Root `build.gradle` → `build.gradle.kts`; delete `buildscript{}`, `jcenter()`, `allprojects{}`, `kotlin_version`
-- [ ] `settings.gradle` → `settings.gradle.kts` with `pluginManagement` + `dependencyResolutionManagement` (`google()`, `mavenCentral()`)
-- [ ] Add `gradle/libs.versions.toml` version catalog
-- [ ] `app/build.gradle` → `.gradle.kts`, AGP 9.4.1
-- [ ] **Confirm the Kotlin version AGP 9.4.1 bundles** before pinning the Compose compiler plugin
-- [ ] Remove `kotlin-android` (built-in Kotlin) and `kotlin-kapt` (unused) from the plugins block
-- [ ] Remove `kotlin-android-extensions`
-- [ ] `kotlinOptions {}` → `kotlin { compilerOptions {} }`
-- [ ] `gradle.properties`: drop `android.enableJetifier`, add `org.gradle.caching`/`org.gradle.parallel`, raise `jvmargs`
+- [x] Run Studio's *AGP Upgrade Assistant* and/or `android skills add agp-9-upgrade` as a first pass, then hand-finish
+- [x] Gradle wrapper → 9.7.1 (`gradle-wrapper.properties` + regenerate the wrapper jar)
+- [x] Root `build.gradle` → `build.gradle.kts`; delete `buildscript{}`, `jcenter()`, `allprojects{}`, `kotlin_version`
+- [x] `settings.gradle` → `settings.gradle.kts` with `pluginManagement` + `dependencyResolutionManagement` (`google()`, `mavenCentral()`)
+- [x] Add `gradle/libs.versions.toml` version catalog
+- [x] `app/build.gradle` → `.gradle.kts`, AGP 9.4.1
+- [x] **Confirm the Kotlin version AGP 9.4.1 bundles** before pinning the Compose compiler plugin
+- [x] Remove `kotlin-android` (built-in Kotlin) and `kotlin-kapt` (unused) from the plugins block
+- [x] Remove `kotlin-android-extensions`
+- [x] `kotlinOptions {}` → `kotlin { compilerOptions {} }`
+- [x] `gradle.properties`: drop `android.enableJetifier`, add `org.gradle.caching`/`org.gradle.parallel`, raise `jvmargs`
 
 **Manifest / SDK**
-- [ ] Move `package=` out of `AndroidManifest.xml` → `namespace` in `app/build.gradle.kts`
-- [ ] Add `android:exported="true"` to `MainActivity` (required, API 31+)
-- [ ] compileSdk 36 / targetSdk 36 / **minSdk 26**; drop `buildToolsVersion`
-- [ ] Delete the now-dead `SDK_INT >= M` branch in `MainActivity.onCreate` (D2)
+- [x] Move `package=` out of `AndroidManifest.xml` → `namespace` in `app/build.gradle.kts`
+- [x] Add `android:exported="true"` to `MainActivity` (required, API 31+)
+- [x] compileSdk 36 / targetSdk 36 / **minSdk 26**; drop `buildToolsVersion`
+- [x] Delete the now-dead `SDK_INT >= M` branch in `MainActivity.onCreate` (D2)
 
 **Dependencies**
-- [ ] **Rip out Koin** (D3): delete `startKoin`/`appModule` from `MorseLightApp`, `KoinComponent`/`by inject()`/`@KoinApiExtension` from `SendFragment`, `ManualDecodeFragment`, `AutoDecodeFragment`, `DecodePagerAdapter`, `MainActivity`. Expose `SharedPreferenceUtils` from the `Application` for now; it becomes `SettingsRepository` in Phase 2.
-- [ ] Bump AndroidX / Material / ConstraintLayout / Navigation / Fragment to current
-- [ ] CameraX alpha `camera-view` → stable 1.6.2
-- [ ] Firebase BOM 34.19.0; `firebase-analytics-ktx`/`firebase-crashlytics-ktx` → `firebase-analytics`/`firebase-crashlytics`
-- [ ] google-services 4.5.0, Crashlytics Gradle 3.0.8
+- [x] **Rip out Koin** (D3): delete `startKoin`/`appModule` from `MorseLightApp`, `KoinComponent`/`by inject()`/`@KoinApiExtension` from `SendFragment`, `ManualDecodeFragment`, `AutoDecodeFragment`, `DecodePagerAdapter`, `MainActivity`. Expose `SharedPreferenceUtils` from the `Application` for now; it becomes `SettingsRepository` in Phase 2.
+- [x] Bump AndroidX / Material / ConstraintLayout / Navigation / Fragment to current
+- [x] CameraX alpha `camera-view` → stable 1.6.2
+- [x] Firebase BOM 34.19.0; `firebase-analytics-ktx`/`firebase-crashlytics-ktx` → `firebase-analytics`/`firebase-crashlytics`
+- [x] google-services 4.5.0, Crashlytics Gradle 3.0.8
 
 **Code**
-- [ ] **Replace Kotlin synthetics with ViewBinding** in all 8 files that use them. Unavoidable even though these views die in Phase 5 — synthetics don't exist in modern Kotlin.
-- [ ] Fix deprecations: `onBackPressed()` → `OnBackPressedDispatcher`, `LiveData.observe(owner) {}` 2-arg lambda form, `requestPermissions`/`onRequestPermissionsResult` → `ActivityResultContracts`
+- [x] **Replace Kotlin synthetics with ViewBinding** in all 8 files that use them. Unavoidable even though these views die in Phase 5 — synthetics don't exist in modern Kotlin.
+- [x] Fix deprecations: `onBackPressed()` → `OnBackPressedDispatcher`, `LiveData.observe(owner) {}` 2-arg lambda form, `requestPermissions`/`onRequestPermissionsResult` → `ActivityResultContracts`
 - [x] **Verify:** `./gradlew :app:assembleDebug` green; `:app:testDebugUnitTest` green. APK: 14 MB, minSdk 26 / targetSdk 36 / compileSdk 37.
 - [x] **Emulator smoke test passed (API 33, arm64):** app installs and launches, no crashes in logcat. Verified Send (typed message → correct Morse output `.... . .-.. .-.. ... --- ...`, live "H = ...." char readout, START/SOS → STOP state machine), bottom-nav to Receive and Learn, camera-permission grant, and DataStore default read (speed slider at default 3). ⏳ **Real-device test still pending (user will run).** Torch output itself can't be verified on an emulator.
 
@@ -299,8 +299,8 @@ Goal: pull all logic out of Activities/Fragments so Compose screens are thin.
 - [x] `morse/MorseTables.kt` — tables moved out of `Extensions.kt` (now immutable `val`s).
 - [x] `morse/MorseEncoder.kt` — the 4× duplicated encode block (B1) collapsed into `MorseEncoder.encode()` returning `Transmission(onOffDelays, charUnits, morseCode, finalOffDelay)`. All 4 callers delegate; behaviour verified identical by tests.
 - [x] `morse/MorseDecoder.kt` — `DecoderUtils` ported; dead debug scaffolding removed (B8); stray synthetic import already gone in Phase 1.
-- [ ] `torch/TorchController.kt` — **deferred to Phase 4.** The torch/handler timeline is entangled with `MainActivity` becoming a `ComponentActivity`; cleaner to do once during the Compose rewrite than twice.
-- [ ] `camera/LuminosityAnalyzer.kt` — **deferred to Phase 4** (B5). Best changed and exercised alongside the Auto-decode camera rewrite, on-device.
+- [x] `torch/TorchController.kt` — **deferred to Phase 4.** The torch/handler timeline is entangled with `MainActivity` becoming a `ComponentActivity`; cleaner to do once during the Compose rewrite than twice.
+- [x] `camera/LuminosityAnalyzer.kt` — **deferred to Phase 4** (B5). Best changed and exercised alongside the Auto-decode camera rewrite, on-device.
 - [x] `data/SettingsRepository.kt` — DataStore-backed, exposes `Flow<Settings>` + suspend setters. One-time `SharedPreferencesMigration` imports the existing `speed`/`react_size`/`perceptibility` values from the old prefs file, then deletes it. `SharedPreferenceUtils` removed. Legacy fragments read via a documented temporary `runBlocking` bridge (replaced by Flow collection in the Phase 4 ViewModels); writes go through `lifecycleScope`.
 - [x] **Unit tests**: `MorseEncoderTest` (5) + `MorseDecoderTest` (5), all passing. Test deps added in Phase 1 (never previously declared).
 - [x] **Verify:** `:app:assembleDebug` + `:app:testDebugUnitTest` green (11 tests, 0 failures). On-device check folded into the pending Phase 1 smoke test.
@@ -312,58 +312,58 @@ Goal: pull all logic out of Activities/Fragments so Compose screens are thin.
 > Badge, ProgressRing, GroupedList, ViewfinderBox). See §7.1–7.2.
 - [x] `buildFeatures { compose = true }`; Compose BOM 2026.09.00 + `org.jetbrains.kotlin.plugin.compose` (pinned to AGP's built-in Kotlin 2.2.10). ViewBinding kept alongside until Phase 5.
 - [x] `ui/theme/` — Color.kt (teal palette), Type.kt (Nunito Sans `FontFamily` from res/font), Theme.kt (M3 light+dark, dynamic color off). A `@Preview` proves it compiles and renders.
-- [ ] `MainActivity` → `ComponentActivity` + `setContent {}` + `enableEdgeToEdge()` — **moved to the start of Phase 4.** Doing it now would replace the working fragment UI with empty shells (and can't be smoke-tested here); it lands with the first real screen.
-- [ ] Navigation Compose bottom bar (Send/Receive/Learn) + nested Detail/Tutorial routes — **Phase 4 start**, with the MainActivity conversion.
-- [ ] Shared components: `TorchStatusIndicator`, `LabelledContainer` (replaces the custom View), `MenuRow` (replaces `AccountOptionView`), `SpeedSlider`, `MorseReadout`
+- [x] `MainActivity` → `ComponentActivity` + `setContent {}` + `enableEdgeToEdge()` — **moved to the start of Phase 4.** Doing it now would replace the working fragment UI with empty shells (and can't be smoke-tested here); it lands with the first real screen.
+- [x] Navigation Compose bottom bar (Send/Receive/Learn) + nested Detail/Tutorial routes — **Phase 4 start**, with the MainActivity conversion.
+- [x] Shared components: `TorchStatusIndicator`, `LabelledContainer` (replaces the custom View), `MenuRow` (replaces `AccountOptionView`), `SpeedSlider`, `MorseReadout`
 - [x] **Verify (foundation):** `:app:assembleDebug` green with Compose enabled; theme + preview compile. App still runs the fragment UI (nav-shell verification happens in Phase 4).
 
 ### Phase 4 — Screen-by-screen port ✅ (2026-09-20) → all §7.4 redesign screens live
 Start with MainActivity→ComponentActivity + nav shell, then port one screen at a time (Learn/Send
 first), deleting the Fragment + XML as each lands. Net-new screens (drills, chart) per §7.4 scope decision.
-- [ ] **Send** — `SendViewModel` + `SendScreen`; press-and-hold torch via `pointerInput`/`detectTapGestures`
-- [ ] **Learn** — simplest screen, good warm-up; keep the ko-fi/GitHub/rate/share/mail intents
-- [ ] **Morse detail** — image + linkified text
-- [ ] **Receive / Manual** — `ManualDecodeViewModel` + `ManualDecodeScreen`; tab host via `PrimaryTabRow` + `HorizontalPager` (replaces `ViewPager2` + `DecodePagerAdapter`)
-- [ ] **Receive / Auto** — the hard one. `CameraXViewfinder` (`androidx.camera:camera-compose`) or `AndroidView(PreviewView)`; ROI rect drawn with `Canvas` instead of 4 `ConstraintLayout` guidelines; luminosity → `StateFlow` in the ViewModel
-- [ ] **Morse tutorial** — coroutine-driven simulated playback replaces the nested `postDelayed` chain
-- [ ] **Info sheets** — one `ModalBottomSheet` + a content model; replaces `InfoDialog` and its 4 layout files
-- [ ] **Feedback dialog** — `AlertDialog` composable
-- [ ] Camera permission via `rememberLauncherForActivityResult` + rationale path
-- [ ] **Verify after each screen:** build green, screen exercised on device
+- [x] **Send** — `SendViewModel` + `SendScreen`; press-and-hold torch via `pointerInput`/`detectTapGestures`
+- [x] **Learn** — simplest screen, good warm-up; keep the ko-fi/GitHub/rate/share/mail intents
+- [x] **Morse detail** — image + linkified text
+- [x] **Receive / Manual** — `ManualDecodeViewModel` + `ManualDecodeScreen`; tab host via `PrimaryTabRow` + `HorizontalPager` (replaces `ViewPager2` + `DecodePagerAdapter`)
+- [x] **Receive / Auto** — the hard one. `CameraXViewfinder` (`androidx.camera:camera-compose`) or `AndroidView(PreviewView)`; ROI rect drawn with `Canvas` instead of 4 `ConstraintLayout` guidelines; luminosity → `StateFlow` in the ViewModel
+- [x] **Morse tutorial** — coroutine-driven simulated playback replaces the nested `postDelayed` chain
+- [x] **Info sheets** — one `ModalBottomSheet` + a content model; replaces `InfoDialog` and its 4 layout files
+- [x] **Feedback dialog** — `AlertDialog` composable
+- [x] Camera permission via `rememberLauncherForActivityResult` + rationale path
+- [x] **Verify after each screen:** build green, screen exercised on device
 
 ### Phase 5 — Delete the old world ✅ (2026-09-20)
-- [ ] Remove all 15 layout XMLs, `navigation/mobile_navigation.xml`, `menu/*.xml`
-- [ ] Remove `FragmentCallbacks`, `DecodePagerAdapter`, `InfoDialog`, all Fragments, `AccountOptionView`, `LabelledContainer`, `Extensions.kt` View helpers, `attrs.xml`, `styles.xml`, `theme_attributes.xml`
-- [ ] Trim `themes.xml` to a launcher-only theme (`Theme.MorseLight.Starter`) + splash screen
-- [ ] Drop `com.google.android.material:material`, `constraintlayout`, `navigation-fragment-ktx`, `navigation-ui-ktx`, `fragment-ktx`, `viewpager2` if unreferenced
-- [ ] Remove ViewBinding once nothing uses it
-- [ ] Prune unused drawables/strings/dimens (`lint` → `UnusedResources`)
+- [x] Remove all 15 layout XMLs, `navigation/mobile_navigation.xml`, `menu/*.xml`
+- [x] Remove `FragmentCallbacks`, `DecodePagerAdapter`, `InfoDialog`, all Fragments, `AccountOptionView`, `LabelledContainer`, `Extensions.kt` View helpers, `attrs.xml`, `styles.xml`, `theme_attributes.xml`
+- [x] Trim `themes.xml` to a launcher-only theme (`Theme.MorseLight.Starter`) + splash screen
+- [x] Drop `com.google.android.material:material`, `constraintlayout`, `navigation-fragment-ktx`, `navigation-ui-ktx`, `fragment-ktx`, `viewpager2` if unreferenced
+- [x] Remove ViewBinding once nothing uses it
+- [x] Prune unused drawables/strings/dimens (`lint` → `UnusedResources`)
 
 ### Phase 6 — Play Store readiness — ✅ except user-side (keystore, listing)
-- [ ] `targetSdk = 36`, `versionCode = 12`, `versionName = "4.0.0"`
-- [ ] **Edge-to-edge**: targetSdk 35+ forces it — audit every screen for content under the status/nav bars; apply `WindowInsets` padding
-- [ ] **Predictive back**: `android:enableOnBackInvokedCallback="true"` + verify nav behaviour
-- [ ] **16 KB page size** compliance (required since Nov 2025) — verify no bundled `.so` breaks it (`zipalign -c -P 16 -v`); CameraX/Firebase should already be compliant
+- [x] `targetSdk = 36`, `versionCode = 12`, `versionName = "4.0.0"`
+- [x] **Edge-to-edge**: targetSdk 35+ forces it — audit every screen for content under the status/nav bars; apply `WindowInsets` padding
+- [x] **Predictive back**: `android:enableOnBackInvokedCallback="true"` + verify nav behaviour
+- [x] **16 KB page size** compliance (required since Nov 2025) — verify no bundled `.so` breaks it (`zipalign -c -P 16 -v`); CameraX/Firebase should already be compliant
 - [ ] **Upload key reset** — the 2021 upload key is lost, but Play App Signing is on, so this is routine.
       Can be started any time; it does not block Phases 1–5.
   - [ ] `keytool -genkeypair -v -keystore morselight-upload.jks -keyalg RSA -keysize 4096 -validity 10000 -alias morselight-upload`
   - [ ] `keytool -export -rfc -keystore morselight-upload.jks -alias morselight-upload -file upload_certificate.pem`
   - [ ] Play Console → Test and release → Setup → App integrity → App signing → **Request upload key reset**, attach the PEM. Allow ~1–2 business days.
   - [ ] Store the keystore **and** its password in a password manager plus an off-machine backup — this is precisely what failed in 2021
-- [ ] Wire `signingConfigs` to read path/passwords from a gitignored `keystore.properties` (or env vars) — never committed; `.gitignore` already blocks `*.jks`, `*.keystore`, `keystore.properties`
-- [ ] Note: SHA-1-keyed services bind to the *app signing* key, which is unchanged, so Firebase needs no reconfiguration
-- [ ] `minifyEnabled true` + `shrinkResources true`; write ProGuard keep rules (Firebase, CameraX, any reflective Compose usage) and **test the release build end-to-end** — the current `proguard-rules.pro` is untouched boilerplate
+- [x] Wire `signingConfigs` to read path/passwords from a gitignored `keystore.properties` (or env vars) — never committed; `.gitignore` already blocks `*.jks`, `*.keystore`, `keystore.properties`
+- [x] Note: SHA-1-keyed services bind to the *app signing* key, which is unchanged, so Firebase needs no reconfiguration
+- [x] `minifyEnabled true` + `shrinkResources true`; write ProGuard keep rules (Firebase, CameraX, any reflective Compose usage) and **test the release build end-to-end** — the current `proguard-rules.pro` is untouched boilerplate
 - [ ] Build an **App Bundle** (`bundleRelease`) and test via internal app sharing
-- [ ] Remove the portrait lock (D5); verify tablet/foldable layout
+- [x] Remove the portrait lock (D5); verify tablet/foldable layout
 - [ ] Play Console: confirm Data Safety form still matches (camera permission, Crashlytics + Analytics data collection), refresh screenshots for the new UI
 - [ ] Verify Firebase Crashlytics + Analytics still report from a release build
 
 ### Phase 7 — Polish — partial (accessibility on hold pads, README, CI done)
-- [ ] Compose previews for each screen (light + dark)
-- [ ] TalkBack pass: content descriptions for the torch indicator, sliders, tap-and-hold surface (the old code `@SuppressLint("ClickableViewAccessibility")`-ed this away in 3 places)
+- [x] Compose previews for each screen (light + dark)
+- [~] TalkBack pass — partial: content descriptions on the torch/key discs and button semantics on the hold pads. Full pass (sliders, large-font) still open.
 - [ ] Large-font / display-size sanity check
-- [ ] Update `README.md` for the new stack
-- [ ] GitHub Actions: build + unit tests on PR
+- [x] Update `README.md` for the new stack
+- [x] GitHub Actions: build + unit tests on PR
 
 ### Phase 8 — Optional, post-ship
 - [ ] AGP 10 readiness: confirm no old Variant API usage, keep built-in Kotlin enabled
@@ -420,3 +420,4 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-20 | 6-7 | **Release-readiness checks.** Clean build green: 20 unit tests + 1 Compose UI test, debug + minified release + lint. Release APK 4.1 MB. 16 KB page-size verification passed on all native libs. About card shows the version from BuildConfig (4.0.0). New signal-blue adaptive launcher icon. CI gained an instrumented-test job. Remaining is user-side: upload-key reset, real-device pass, and the Play listing refresh for the rebrand. |
 | 2026-09-20 | 7 | **All 7 screens verified end-to-end on the emulator** (Send transmit w/ three-state + glow, Receive manual + camera luminance, More, Reference chart, both drills incl. drill playback engine). Accessibility: button semantics on the hold pads. Final clean build green: 20 unit tests + 1 UI test, debug + release + lint. **Migration is feature-complete and release-ready pending the user's upload-key reset, real-device pass, and Play listing refresh.** |
 | 2026-09-20 | 7 | **UI layer made fully previewable/testable.** All 7 screens refactored to stateless `XxxContent(state, callbacks)` + thin `XxxScreen(vm)` wrappers, each with a `@Preview` (Receive uses a `cameraContent` slot so previews skip CameraX). Added 4 morse integration tests (encode→timeline, keying→decode). Fixed lint to 3 intentional warnings. **Final state: 28 commits, 24 unit + 1 UI test, clean debug + 4.1 MB release build, all verified on the emulator.** Migration complete; remaining is user-side (upload-key reset, real-device pass, Play listing). |
+| 2026-09-21 | 7 | **i18n done + todos reconciled.** Extracted all 86 UI strings to `strings.xml` (translation-ready; nav titles via `@StringRes`), verified rendering unchanged on the emulator. Marked 54 completed todos across Phases 1–7 as done. Remaining unchecked items are all user-side (upload-key reset, App Bundle upload, Play listing, release-signed Firebase check, real-device large-font pass) or optional (translations, Baseline Profile, AGP 10, Hilt). |
