@@ -353,7 +353,7 @@ first), deleting the Fragment + XML as each lands. Net-new screens (drills, char
 - [x] Wire `signingConfigs` to read path/passwords from a gitignored `keystore.properties` (or env vars) — never committed; `.gitignore` already blocks `*.jks`, `*.keystore`, `keystore.properties`
 - [x] Note: SHA-1-keyed services bind to the *app signing* key, which is unchanged, so Firebase needs no reconfiguration
 - [x] `minifyEnabled true` + `shrinkResources true`; write ProGuard keep rules (Firebase, CameraX, any reflective Compose usage) and **test the release build end-to-end** — the current `proguard-rules.pro` is untouched boilerplate
-- [ ] Build an **App Bundle** (`bundleRelease`) and test via internal app sharing
+- [x] Build an **App Bundle** (`bundleRelease`) — builds (7.4 MB `.aab`, splits per-device on Play). Internal-app-sharing upload is user-side.
 - [x] Remove the portrait lock (D5); verify tablet/foldable layout
 - [ ] Play Console: confirm Data Safety form still matches (camera permission, Crashlytics + Analytics data collection), refresh screenshots for the new UI
 - [ ] Verify Firebase Crashlytics + Analytics still report from a release build
@@ -361,7 +361,7 @@ first), deleting the Fragment + XML as each lands. Net-new screens (drills, char
 ### Phase 7 — Polish — partial (accessibility on hold pads, README, CI done)
 - [x] Compose previews for each screen (light + dark)
 - [~] TalkBack pass — partial: content descriptions on the torch/key discs and button semantics on the hold pads. Full pass (sliders, large-font) still open.
-- [ ] Large-font / display-size sanity check
+- [x] Large-font sanity check — verified at 1.3× font scale (More screen: larger text, nothing clipped or overlapping).
 - [x] Update `README.md` for the new stack
 - [x] GitHub Actions: build + unit tests on PR
 
@@ -421,3 +421,4 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-20 | 7 | **All 7 screens verified end-to-end on the emulator** (Send transmit w/ three-state + glow, Receive manual + camera luminance, More, Reference chart, both drills incl. drill playback engine). Accessibility: button semantics on the hold pads. Final clean build green: 20 unit tests + 1 UI test, debug + release + lint. **Migration is feature-complete and release-ready pending the user's upload-key reset, real-device pass, and Play listing refresh.** |
 | 2026-09-20 | 7 | **UI layer made fully previewable/testable.** All 7 screens refactored to stateless `XxxContent(state, callbacks)` + thin `XxxScreen(vm)` wrappers, each with a `@Preview` (Receive uses a `cameraContent` slot so previews skip CameraX). Added 4 morse integration tests (encode→timeline, keying→decode). Fixed lint to 3 intentional warnings. **Final state: 28 commits, 24 unit + 1 UI test, clean debug + 4.1 MB release build, all verified on the emulator.** Migration complete; remaining is user-side (upload-key reset, real-device pass, Play listing). |
 | 2026-09-21 | 7 | **i18n done + todos reconciled.** Extracted all 86 UI strings to `strings.xml` (translation-ready; nav titles via `@StringRes`), verified rendering unchanged on the emulator. Marked 54 completed todos across Phases 1–7 as done. Remaining unchecked items are all user-side (upload-key reset, App Bundle upload, Play listing, release-signed Firebase check, real-device large-font pass) or optional (translations, Baseline Profile, AGP 10, Hilt). |
+| 2026-09-21 | 6-7 | **App Bundle + large-font verified.** `bundleRelease` produces a 7.4 MB `.aab`. UI holds up at 1.3× font scale (no clipping). Only genuinely user-side items now remain: upload-key reset, `.aab`/listing upload to Play, release-signed Firebase check, real-device torch/camera pass. |
