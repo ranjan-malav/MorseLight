@@ -350,7 +350,7 @@ first), deleting the Fragment + XML as each lands. Net-new screens (drills, char
   - [x] `keytool -export -rfc … -file upload_certificate.pem` — cert exported (gitignored).
   - [x] Play Console → App integrity → App signing → **Request upload key reset** with the PEM — **submitted**.
   - [ ] On approval: fill gitignored `keystore.properties` from the template so release signs automatically.
-  - [ ] **Back up `morselight-upload.jks` + its password** (password manager + off-machine) — this is exactly what failed in 2021.
+  - [x] **Backed up `morselight-upload.jks` + its password** (password manager + off-machine) — 2026-09-21. The 2021 failure mode is now covered.
 - [x] Wire `signingConfigs` to read path/passwords from a gitignored `keystore.properties` (or env vars) — never committed; `.gitignore` already blocks `*.jks`, `*.keystore`, `keystore.properties`
 - [x] Note: SHA-1-keyed services bind to the *app signing* key, which is unchanged, so Firebase needs no reconfiguration
 - [x] `minifyEnabled true` + `shrinkResources true`; write ProGuard keep rules (Firebase, CameraX, any reflective Compose usage) and **test the release build end-to-end** — the current `proguard-rules.pro` is untouched boilerplate
