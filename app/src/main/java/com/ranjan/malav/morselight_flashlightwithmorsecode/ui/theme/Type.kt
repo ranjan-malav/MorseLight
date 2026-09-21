@@ -55,5 +55,8 @@ val EyebrowStyle = TextStyle(
 
 /** Morse string / code role (JetBrains Mono, 22/700 on the Send card). */
 val MorseTextStyle = TextStyle(
-    fontFamily = JetBrainsMono, fontWeight = FontWeight(700), fontSize = 22.sp, lineHeight = 30.sp, letterSpacing = 0.06.em,
+    // No letterSpacing: with per-symbol colouring, a non-zero value renders differently between a
+    // single style run (idle) and multiple runs (transmitting), causing a layout shift. Monospace
+    // keeps the string readable without it.
+    fontFamily = JetBrainsMono, fontWeight = FontWeight(700), fontSize = 22.sp, lineHeight = 30.sp,
 )
