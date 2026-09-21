@@ -344,12 +344,13 @@ first), deleting the Fragment + XML as each lands. Net-new screens (drills, char
 - [x] **Edge-to-edge**: targetSdk 35+ forces it — audit every screen for content under the status/nav bars; apply `WindowInsets` padding
 - [x] **Predictive back**: `android:enableOnBackInvokedCallback="true"` + verify nav behaviour
 - [x] **16 KB page size** compliance (required since Nov 2025) — verify no bundled `.so` breaks it (`zipalign -c -P 16 -v`); CameraX/Firebase should already be compliant
-- [ ] **Upload key reset** — the 2021 upload key is lost, but Play App Signing is on, so this is routine.
-      Can be started any time; it does not block Phases 1–5.
-  - [ ] `keytool -genkeypair -v -keystore morselight-upload.jks -keyalg RSA -keysize 4096 -validity 10000 -alias morselight-upload`
-  - [ ] `keytool -export -rfc -keystore morselight-upload.jks -alias morselight-upload -file upload_certificate.pem`
-  - [ ] Play Console → Test and release → Setup → App integrity → App signing → **Request upload key reset**, attach the PEM. Allow ~1–2 business days.
-  - [ ] Store the keystore **and** its password in a password manager plus an off-machine backup — this is precisely what failed in 2021
+- [~] **Upload key reset** — the 2021 upload key is lost, but Play App Signing is on, so this is routine.
+      **Request submitted 2026-09-21; awaiting Google (~1–2 business days).**
+  - [x] `keytool -genkeypair` — new `morselight-upload.jks` generated (gitignored).
+  - [x] `keytool -export -rfc … -file upload_certificate.pem` — cert exported (gitignored).
+  - [x] Play Console → App integrity → App signing → **Request upload key reset** with the PEM — **submitted**.
+  - [ ] On approval: fill gitignored `keystore.properties` from the template so release signs automatically.
+  - [ ] **Back up `morselight-upload.jks` + its password** (password manager + off-machine) — this is exactly what failed in 2021.
 - [x] Wire `signingConfigs` to read path/passwords from a gitignored `keystore.properties` (or env vars) — never committed; `.gitignore` already blocks `*.jks`, `*.keystore`, `keystore.properties`
 - [x] Note: SHA-1-keyed services bind to the *app signing* key, which is unchanged, so Firebase needs no reconfiguration
 - [x] `minifyEnabled true` + `shrinkResources true`; write ProGuard keep rules (Firebase, CameraX, any reflective Compose usage) and **test the release build end-to-end** — the current `proguard-rules.pro` is untouched boilerplate
