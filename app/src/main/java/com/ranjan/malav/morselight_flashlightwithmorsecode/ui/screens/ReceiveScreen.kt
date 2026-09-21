@@ -15,9 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.RadioButtonChecked
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -32,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.torch.TorchController
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.CameraPreview
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SegmentedControl
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SunkenCard
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.TorchDisc
@@ -73,16 +71,12 @@ fun ReceiveContent(
         modifier = modifier.fillMaxSize().padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-            SegmentedButton(
-                selected = ui.mode == RxMode.Manual, onClick = { onSetMode(RxMode.Manual) },
-                shape = SegmentedButtonDefaults.itemShape(0, 2),
-            ) { Text(stringResource(R.string.rx_manual)) }
-            SegmentedButton(
-                selected = ui.mode == RxMode.Camera, onClick = { onSetMode(RxMode.Camera) },
-                shape = SegmentedButtonDefaults.itemShape(1, 2),
-            ) { Text(stringResource(R.string.rx_camera)) }
-        }
+        SegmentedControl(
+            options = listOf(stringResource(R.string.rx_manual), stringResource(R.string.rx_camera)),
+            selectedIndex = if (ui.mode == RxMode.Manual) 0 else 1,
+            onSelect = { onSetMode(if (it == 0) RxMode.Manual else RxMode.Camera) },
+            modifier = Modifier.fillMaxWidth(),
+        )
 
         // Decoded output card
         SunkenCard(Modifier.fillMaxWidth()) {
