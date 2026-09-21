@@ -139,7 +139,7 @@ fun SendContent(
         LabeledSlider(
             title = stringResource(R.string.transmission_speed), valueLabel = stringResource(R.string.wpm_value, ui.wpm),
             value = ui.wpm.toFloat(), onValueChange = { onWpmChange(it.toInt()) },
-            valueRange = 5f..25f, steps = 25 - 5 - 1,
+            valueRange = 1f..25f, steps = 0,
         )
 
         Row(
