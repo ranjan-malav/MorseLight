@@ -18,8 +18,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.charToMorse
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.CardSurface
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.JetBrainsMono
@@ -41,7 +43,7 @@ fun ReferenceChartScreen(modifier: Modifier = Modifier) {
     Column(modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         OutlinedTextField(
             value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Search character or code") }, singleLine = true,
+            placeholder = { Text(stringResource(R.string.chart_search_hint)) }, singleLine = true,
             shape = RoundedCornerShape(MorseRadius.field),
         )
         LazyVerticalGrid(columns = GridCells.Fixed(2), verticalArrangement = Arrangement.spacedBy(8.dp),

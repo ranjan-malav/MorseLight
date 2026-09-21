@@ -1,6 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MorseLight</string>
-    <string name="no_browser_app">Browser app is not installed.</string>
     <string name="no_play_store">Play Store app is not installed.</string>
+    <string name="no_browser_app">Browser app is not installed.</string>
+
+    <!-- Chrome / nav -->
+    <string name="eyebrow_app">MorseLight</string>
+    <string name="nav_send">Send</string>
+    <string name="nav_receive">Receive</string>
+    <string name="nav_more">More</string>
+    <string name="action_back">Back</string>
+
+    <!-- Send -->
+    <string name="send_hint">Type your message</string>
+    <string name="label_morse">Morse</string>
+    <string name="symbols_count">%1$d symbols</string>
+    <string name="percent_sent">%1$d%% sent</string>
+    <string name="torch_on">On</string>
+    <string name="torch_off">Off</string>
+    <string name="torch_cd_on">Flashlight on. Hold to key by hand.</string>
+    <string name="torch_cd_off">Flashlight off. Hold to key by hand.</string>
+    <string name="state_idle">Idle</string>
+    <string name="state_keying">Keying</string>
+    <string name="state_transmitting">Transmitting</string>
+    <string name="hold_to_key_by_hand">Hold to key by hand</string>
+    <string name="transmission_speed">Transmission speed</string>
+    <string name="wpm_value">%1$d wpm</string>
+    <string name="action_signal">Signal</string>
+    <string name="action_send">Send</string>
+    <string name="action_stop">Stop</string>
+    <string name="action_sos">SOS</string>
+
+    <!-- Receive -->
+    <string name="rx_manual">Manual key</string>
+    <string name="rx_camera">Camera</string>
+    <string name="label_decoded">Decoded</string>
+    <string name="action_reset">Reset</string>
+    <string name="nothing_copied">Nothing copied yet</string>
+    <string name="rx_manual_hint">Hold while the sender\'s light is on. Short is a dot, long is a dash.</string>
+    <string name="key_hold">Hold</string>
+    <string name="key_cd">Key: hold while the sender\'s light is on</string>
+    <string name="rx_waiting">Waiting</string>
+    <string name="rx_reading">Reading</string>
+    <string name="lum_value">lum %1$d</string>
+    <string name="sensitivity">Sensitivity</string>
+    <string name="percent">%1$d%%</string>
+    <string name="detection_area">Detection area</string>
+
+    <!-- More -->
+    <string name="progress_learned">%1$d of %2$d learned</string>
+    <string name="progress_lesson">Lesson 4 covers K, R and S.</string>
+    <string name="progress_streak">%1$d day streak</string>
+    <string name="donate_title">Buy me a coffee</string>
+    <string name="donate_subtitle">Support development</string>
+    <string name="more_decoding_drill">Decoding drill</string>
+    <string name="more_decoding_drill_sub">Copy a played message by hand</string>
+    <string name="more_sending_drill">Sending drill</string>
+    <string name="more_sending_drill_sub">Key a prompted character</string>
+    <string name="more_reference_chart">Reference chart</string>
+    <string name="more_reference_chart_sub">Every letter and number</string>
+    <string name="pref_section">Preferences</string>
+    <string name="pref_key_tone">Key tone</string>
+    <string name="pref_key_tone_sub">Sidetone while the light is on</string>
+    <string name="pref_loop">Loop transmission</string>
+    <string name="pref_loop_sub">Repeat the message until stopped</string>
+    <string name="pref_awake">Keep screen awake</string>
+    <string name="pref_awake_sub">While sending or receiving</string>
+    <string name="support_section">Support</string>
+    <string name="support_rate">Rate this app</string>
+    <string name="support_rate_sub">Leave a review on the Play Store</string>
+    <string name="support_source">Source code</string>
+    <string name="support_source_sub">MorseLight is open source</string>
+    <string name="about_text">MorseLight %1$s. Timing follows ITU-R M.1677, one unit at 12 wpm.</string>
+
+    <!-- Reference chart -->
+    <string name="chart_search_hint">Search character or code</string>
+
+    <!-- Decoding drill -->
+    <string name="label_target">Target</string>
+    <string name="badge_ready">Ready</string>
+    <string name="badge_playing">Playing</string>
+    <string name="badge_match">Match</string>
+    <string name="action_play">Play</string>
+    <string name="action_next">Next</string>
+    <string name="action_reveal">Reveal</string>
+    <string name="action_hide">Hide</string>
+    <string name="label_your_copy">Your copy</string>
+    <string name="copy_hint">Hold the pad below to copy</string>
+    <string name="hold_to_copy">Hold to copy</string>
+    <string name="hold_to_copy_cd">Hold to copy the incoming message</string>
+
+    <!-- Sending drill -->
+    <string name="send_this_character">Send this character</string>
+    <string name="badge_waiting">Waiting</string>
+    <string name="badge_correct">Correct</string>
+    <string name="badge_wrong">Not that one</string>
+    <string name="label_you_keyed">You keyed</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_hint">Hint</string>
+    <string name="action_skip">Skip</string>
+    <string name="hold_to_key">Hold to key</string>
+    <string name="hold_to_key_cd">Hold to key the character</string>
 </resources>

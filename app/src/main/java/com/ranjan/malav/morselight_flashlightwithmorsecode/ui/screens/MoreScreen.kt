@@ -26,12 +26,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ranjan.malav.morselight_flashlightwithmorsecode.data.Settings
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.BadgeTone
 import com.ranjan.malav.morselight_flashlightwithmorsecode.BuildConfig
+import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.CardSurface
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.StatusBadge
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
@@ -95,9 +97,9 @@ fun MoreContent(
                     Text("12", style = MaterialTheme.typography.titleMedium, color = c.accentOnSoft)
                 }
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("12 of 36 learned", style = MaterialTheme.typography.titleMedium, color = c.textHeading)
-                    Text("Lesson 4 covers K, R and S.", style = MaterialTheme.typography.bodyMedium, color = c.textMuted)
-                    StatusBadge("6 day streak", tone = BadgeTone.Success)
+                    Text(stringResource(R.string.progress_learned, 12, 36), style = MaterialTheme.typography.titleMedium, color = c.textHeading)
+                    Text(stringResource(R.string.progress_lesson), style = MaterialTheme.typography.bodyMedium, color = c.textMuted)
+                    StatusBadge(stringResource(R.string.progress_streak, 6), tone = BadgeTone.Success)
                 }
             }
         }
@@ -108,51 +110,51 @@ fun MoreContent(
                 .clickable(onClick = onDonate).padding(16.dp),
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text("Buy me a coffee", style = MaterialTheme.typography.titleMedium, color = c.warningOnSoft)
-                Text("Support development", style = MaterialTheme.typography.bodyMedium, color = c.textMuted)
+                Text(stringResource(R.string.donate_title), style = MaterialTheme.typography.titleMedium, color = c.warningOnSoft)
+                Text(stringResource(R.string.donate_subtitle), style = MaterialTheme.typography.bodyMedium, color = c.textMuted)
             }
         }
 
         // Learn / practice
         CardSurface(Modifier.fillMaxWidth(), padding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
             Column {
-                NavRow("Decoding drill", "Copy a played message by hand", onOpenDecodingDrill)
+                NavRow(stringResource(R.string.more_decoding_drill), stringResource(R.string.more_decoding_drill_sub), onOpenDecodingDrill)
                 HorizontalDivider(color = c.borderSubtle)
-                NavRow("Sending drill", "Key a prompted character", onOpenSendingDrill)
+                NavRow(stringResource(R.string.more_sending_drill), stringResource(R.string.more_sending_drill_sub), onOpenSendingDrill)
                 HorizontalDivider(color = c.borderSubtle)
-                NavRow("Reference chart", "Every letter and number", onOpenReferenceChart)
+                NavRow(stringResource(R.string.more_reference_chart), stringResource(R.string.more_reference_chart_sub), onOpenReferenceChart)
             }
         }
 
         // Preferences
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Eyebrow("Preferences")
+            Eyebrow(stringResource(R.string.pref_section))
             CardSurface(Modifier.fillMaxWidth(), padding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
                 Column {
-                    SwitchRow("Key tone", "Sidetone while the light is on", s.keyTone, onKeyTone)
+                    SwitchRow(stringResource(R.string.pref_key_tone), stringResource(R.string.pref_key_tone_sub), s.keyTone, onKeyTone)
                     HorizontalDivider(color = c.borderSubtle)
-                    SwitchRow("Loop transmission", "Repeat the message until stopped", s.loop, onLoop)
+                    SwitchRow(stringResource(R.string.pref_loop), stringResource(R.string.pref_loop_sub), s.loop, onLoop)
                     HorizontalDivider(color = c.borderSubtle)
-                    SwitchRow("Keep screen awake", "While sending or receiving", s.keepAwake, onKeepAwake)
+                    SwitchRow(stringResource(R.string.pref_awake), stringResource(R.string.pref_awake_sub), s.keepAwake, onKeepAwake)
                 }
             }
         }
 
         // Support
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Eyebrow("Support")
+            Eyebrow(stringResource(R.string.support_section))
             CardSurface(Modifier.fillMaxWidth(), padding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
                 Column {
-                    NavRow("Rate this app", "Leave a review on the Play Store", onRate)
+                    NavRow(stringResource(R.string.support_rate), stringResource(R.string.support_rate_sub), onRate)
                     HorizontalDivider(color = c.borderSubtle)
-                    NavRow("Source code", "MorseLight is open source", onSource)
+                    NavRow(stringResource(R.string.support_source), stringResource(R.string.support_source_sub), onSource)
                 }
             }
         }
 
         SunkenCard(Modifier.fillMaxWidth().padding(bottom = 24.dp)) {
             Text(
-                "MorseLight ${BuildConfig.VERSION_NAME}. Timing follows ITU-R M.1677, one unit at 12 wpm.",
+                stringResource(R.string.about_text, BuildConfig.VERSION_NAME),
                 style = MaterialTheme.typography.bodyMedium, color = c.infoOnSoft,
             )
         }

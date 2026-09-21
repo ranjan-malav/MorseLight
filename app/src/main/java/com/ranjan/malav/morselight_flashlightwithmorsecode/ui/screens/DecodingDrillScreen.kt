@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.Role
@@ -28,6 +29,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.BadgeTone
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.PillTone
@@ -58,15 +60,16 @@ fun DecodingDrillContent(
     modifier: Modifier = Modifier,
 ) {
     val c = MorseTheme.colors
+    val copyCd = stringResource(R.string.hold_to_copy_cd)
 
     Column(modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // Target card
         SunkenCard(Modifier.fillMaxWidth()) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Eyebrow("Target", Modifier.weight(1f))
+                    Eyebrow(stringResource(R.string.label_target), Modifier.weight(1f))
                     StatusBadge(
-                        when { ui.matched -> "Match"; ui.playing -> "Playing"; else -> "Ready" },
+                        when { ui.matched -> stringResource(R.string.badge_match); ui.playing -> stringResource(R.string.badge_playing); else -> stringResource(R.string.badge_ready) },
                         tone = when { ui.matched -> BadgeTone.Success; ui.playing -> BadgeTone.Accent; else -> BadgeTone.Neutral },
                     )
                 }
@@ -75,23 +78,23 @@ fun DecodingDrillContent(
                     style = MaterialTheme.typography.headlineMedium, color = c.textHeading,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SoftPill(if (ui.playing) "Stop" else "Play", onPlay, tone = PillTone.Accent)
-                    SoftPill("Next", onNext, tone = PillTone.Neutral)
-                    SoftPill(if (ui.reveal) "Hide" else "Reveal", onToggleReveal, tone = PillTone.Neutral)
+                    SoftPill(if (ui.playing) stringResource(R.string.action_stop) else stringResource(R.string.action_play), onPlay, tone = PillTone.Accent)
+                    SoftPill(stringResource(R.string.action_next), onNext, tone = PillTone.Neutral)
+                    SoftPill(if (ui.reveal) stringResource(R.string.action_hide) else stringResource(R.string.action_reveal), onToggleReveal, tone = PillTone.Neutral)
                 }
             }
         }
 
         // Mocked sender disc
         Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
-            TorchDisc(on = ui.senderOn, label = if (ui.senderOn) "On" else "Off")
+            TorchDisc(on = ui.senderOn, label = if (ui.senderOn) stringResource(R.string.torch_on) else stringResource(R.string.torch_off))
         }
 
         // Your copy
         SunkenCard(Modifier.fillMaxWidth()) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Eyebrow("Your copy")
-                Text(ui.copied.ifBlank { "Hold the pad below to copy" },
+                Eyebrow(stringResource(R.string.label_your_copy))
+                Text(ui.copied.ifBlank { stringResource(R.string.copy_hint) },
                     style = MaterialTheme.typography.titleLarge,
                     color = if (ui.copied.isBlank()) c.textSubtle else c.textHeading)
             }
@@ -103,10 +106,10 @@ fun DecodingDrillContent(
                 Modifier.weight(1f).height(64.dp).clip(RoundedCornerShape(MorseRadius.control))
                     .background(c.accent)
                     .pointerInput(Unit) { detectTapGestures(onPress = { onCopyDown(); tryAwaitRelease(); onCopyUp() }) }
-                    .semantics { role = Role.Button; contentDescription = "Hold to copy the incoming message" },
+                    .semantics { role = Role.Button; contentDescription = copyCd },
                 contentAlignment = Alignment.Center,
-            ) { Text("Hold to copy", style = MaterialTheme.typography.labelLarge, color = c.textOnAccent) }
-            SoftPill("Reset", onReset, tone = PillTone.Neutral)
+            ) { Text(stringResource(R.string.hold_to_copy), style = MaterialTheme.typography.labelLarge, color = c.textOnAccent) }
+            SoftPill(stringResource(R.string.action_reset), onReset, tone = PillTone.Neutral)
         }
     }
 }

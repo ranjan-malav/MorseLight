@@ -26,8 +26,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.torch.TorchController
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.CameraPreview
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
@@ -75,22 +77,22 @@ fun ReceiveContent(
             SegmentedButton(
                 selected = ui.mode == RxMode.Manual, onClick = { onSetMode(RxMode.Manual) },
                 shape = SegmentedButtonDefaults.itemShape(0, 2),
-            ) { Text("Manual key") }
+            ) { Text(stringResource(R.string.rx_manual)) }
             SegmentedButton(
                 selected = ui.mode == RxMode.Camera, onClick = { onSetMode(RxMode.Camera) },
                 shape = SegmentedButtonDefaults.itemShape(1, 2),
-            ) { Text("Camera") }
+            ) { Text(stringResource(R.string.rx_camera)) }
         }
 
         // Decoded output card
         SunkenCard(Modifier.fillMaxWidth()) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Eyebrow("Decoded", Modifier.weight(1f))
-                    TextButton(onClick = onReset) { Text("Reset") }
+                    Eyebrow(stringResource(R.string.label_decoded), Modifier.weight(1f))
+                    TextButton(onClick = onReset) { Text(stringResource(R.string.action_reset)) }
                 }
                 Text(
-                    ui.decoded.ifBlank { "Nothing copied yet" },
+                    ui.decoded.ifBlank { stringResource(R.string.nothing_copied) },
                     style = MaterialTheme.typography.titleLarge,
                     color = if (ui.decoded.isBlank()) c.textSubtle else c.textHeading,
                 )
@@ -114,28 +116,28 @@ fun ReceiveContent(
                         .border(2.dp, c.accent, RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(if (ui.reading) "Reading" else "Waiting",
+                    Text(if (ui.reading) stringResource(R.string.rx_reading) else stringResource(R.string.rx_waiting),
                         style = MaterialTheme.typography.labelMedium, color = c.textOnAccent)
                 }
             }
-            Text("lum ${ui.luminance.toInt()}",
+            Text(stringResource(R.string.lum_value, ui.luminance.toInt()),
                 style = MaterialTheme.typography.bodyMedium.copy(fontFamily = JetBrainsMono), color = c.textMuted)
             SunkenCard(Modifier.fillMaxWidth()) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    LabeledSlider("Sensitivity", "${ui.sensitivity}%", ui.sensitivity.toFloat(),
+                    LabeledSlider(stringResource(R.string.sensitivity), stringResource(R.string.percent, ui.sensitivity), ui.sensitivity.toFloat(),
                         { onSensitivity(it.toInt()) }, 0f..100f, 0)
-                    LabeledSlider("Detection area", "${ui.detectionArea}", ui.detectionArea.toFloat(),
+                    LabeledSlider(stringResource(R.string.detection_area), "${ui.detectionArea}", ui.detectionArea.toFloat(),
                         { onDetectionArea(it.toInt()) }, 30f..90f, 0)
                 }
             }
         } else {
-            Text("Hold while the sender's light is on. Short is a dot, long is a dash.",
+            Text(stringResource(R.string.rx_manual_hint),
                 style = MaterialTheme.typography.bodyMedium, color = c.textMuted,
                 modifier = Modifier.fillMaxWidth())
             Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.BottomCenter) {
                 TorchDisc(
-                    on = ui.keyOn, label = "Hold", icon = Icons.Outlined.RadioButtonChecked,
-                    contentDescription = "Key: hold while the sender's light is on",
+                    on = ui.keyOn, label = stringResource(R.string.key_hold), icon = Icons.Outlined.RadioButtonChecked,
+                    contentDescription = stringResource(R.string.key_cd),
                     modifier = Modifier.padding(bottom = 16.dp).pointerInput(Unit) {
                         detectTapGestures(onPress = {
                             onKeyDown(); tryAwaitRelease(); onKeyUp()

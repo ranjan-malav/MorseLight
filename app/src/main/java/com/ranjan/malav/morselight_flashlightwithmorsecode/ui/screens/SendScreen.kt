@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,6 +37,7 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Labeled
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseRadius
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseTheme
 import androidx.compose.material3.MaterialTheme
+import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import androidx.compose.ui.tooling.preview.Preview
 import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.TransmitState
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseLightTheme
@@ -76,7 +78,7 @@ fun SendContent(
             value = ui.message,
             onValueChange = onMessageChange,
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Type your message") },
+            placeholder = { Text(stringResource(R.string.send_hint)) },
             shape = RoundedCornerShape(MorseRadius.field),
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
             colors = OutlinedTextFieldDefaults.colors(
@@ -87,10 +89,10 @@ fun SendContent(
         SunkenCard(Modifier.fillMaxWidth()) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(Modifier.fillMaxWidth()) {
-                    Eyebrow("Morse", Modifier.weight(1f))
+                    Eyebrow(stringResource(R.string.label_morse), Modifier.weight(1f))
                     Text(
-                        if (ui.transmitting) "${(ui.tx.percent * 100).toInt()}% sent"
-                        else "${ui.symbolCount} symbols",
+                        if (ui.transmitting) stringResource(R.string.percent_sent, (ui.tx.percent * 100).toInt())
+                        else stringResource(R.string.symbols_count, ui.symbolCount),
                         style = MaterialTheme.typography.labelMedium, color = c.textSubtle,
                     )
                 }
@@ -106,8 +108,8 @@ fun SendContent(
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 TorchDisc(
                     on = ui.torchOn,
-                    label = if (ui.torchOn) "On" else "Off",
-                    contentDescription = "Flashlight ${if (ui.torchOn) "on" else "off"}. Hold to key by hand.",
+                    label = if (ui.torchOn) stringResource(R.string.torch_on) else stringResource(R.string.torch_off),
+                    contentDescription = if (ui.torchOn) stringResource(R.string.torch_cd_on) else stringResource(R.string.torch_cd_off),
                     modifier = Modifier.pointerInput(ui.transmitting) {
                         if (!ui.transmitting) detectTapGestures(
                             onPress = {
@@ -120,16 +122,16 @@ fun SendContent(
                 )
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     StatusBadge(
-                        if (ui.transmitting) "Transmitting" else if (ui.torchOn) "Keying" else "Idle",
+                        if (ui.transmitting) stringResource(R.string.state_transmitting) else if (ui.torchOn) stringResource(R.string.state_keying) else stringResource(R.string.state_idle),
                         tone = if (ui.transmitting) BadgeTone.Accent else BadgeTone.Neutral,
                     )
-                    Text("Hold to key by hand", style = MaterialTheme.typography.bodyMedium, color = c.textMuted)
+                    Text(stringResource(R.string.hold_to_key_by_hand), style = MaterialTheme.typography.bodyMedium, color = c.textMuted)
                 }
             }
         }
 
         LabeledSlider(
-            title = "Transmission speed", valueLabel = "${ui.wpm} wpm",
+            title = stringResource(R.string.transmission_speed), valueLabel = stringResource(R.string.wpm_value, ui.wpm),
             value = ui.wpm.toFloat(), onValueChange = { onWpmChange(it.toInt()) },
             valueRange = 5f..25f, steps = 25 - 5 - 1,
         )
@@ -139,14 +141,14 @@ fun SendContent(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            SoftPill("Signal", onClick = onSignal, tone = PillTone.Accent, enabled = !ui.transmitting)
+            SoftPill(stringResource(R.string.action_signal), onClick = onSignal, tone = PillTone.Accent, enabled = !ui.transmitting)
             FilledPill(
-                if (ui.transmitting) "Stop" else "Send",
+                if (ui.transmitting) stringResource(R.string.action_stop) else stringResource(R.string.action_send),
                 onClick = onToggleSend,
                 modifier = Modifier.weight(1f),
                 tone = if (ui.transmitting) PillTone.Danger else PillTone.Accent,
             )
-            SoftPill("SOS", onClick = onSos, tone = PillTone.Danger, enabled = !ui.transmitting)
+            SoftPill(stringResource(R.string.action_sos), onClick = onSos, tone = PillTone.Danger, enabled = !ui.transmitting)
         }
         Spacer(Modifier.height(0.dp))
     }

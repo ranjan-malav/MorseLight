@@ -27,6 +27,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.annotation.StringRes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -37,6 +39,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.app.AppContainer
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.screens.DecodingDrillScreen
@@ -54,13 +57,13 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseTheme
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.launchWeb
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.rateApp
 
-private sealed class Dest(val route: String, val title: String) {
-    data object Send : Dest("send", "Send")
-    data object Receive : Dest("receive", "Receive")
-    data object More : Dest("more", "More")
-    data object Chart : Dest("chart", "Reference chart")
-    data object DecodingDrill : Dest("ddrill", "Decoding drill")
-    data object SendingDrill : Dest("sdrill", "Sending drill")
+private sealed class Dest(val route: String, @StringRes val titleRes: Int) {
+    data object Send : Dest("send", R.string.nav_send)
+    data object Receive : Dest("receive", R.string.nav_receive)
+    data object More : Dest("more", R.string.nav_more)
+    data object Chart : Dest("chart", R.string.more_reference_chart)
+    data object DecodingDrill : Dest("ddrill", R.string.more_decoding_drill)
+    data object SendingDrill : Dest("sdrill", R.string.more_sending_drill)
 }
 
 private data class Tab(val dest: Dest, val icon: ImageVector)
@@ -92,13 +95,13 @@ fun MorseApp(container: AppContainer) {
             TopAppBar(
                 title = {
                     Column {
-                        Eyebrow("MorseLight")
-                        Text(current.title, style = androidx.compose.material3.MaterialTheme.typography.headlineMedium, color = c.textHeading)
+                        Eyebrow(stringResource(R.string.eyebrow_app))
+                        Text(stringResource(current.titleRes), style = androidx.compose.material3.MaterialTheme.typography.headlineMedium, color = c.textHeading)
                     }
                 },
                 navigationIcon = {
                     if (!isTab) IconButton(onClick = { nav.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back", tint = c.textBody)
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), tint = c.textBody)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = c.bgApp),
@@ -121,8 +124,8 @@ fun MorseApp(container: AppContainer) {
                                 launchSingleTop = true; restoreState = true
                             }
                         },
-                        icon = { Icon(tab.icon, tab.dest.title) },
-                        label = { Text(tab.dest.title) },
+                        icon = { Icon(tab.icon, stringResource(tab.dest.titleRes)) },
+                        label = { Text(stringResource(tab.dest.titleRes)) },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = c.accent, selectedTextColor = c.accent,
                             unselectedIconColor = c.textSubtle, unselectedTextColor = c.textSubtle,

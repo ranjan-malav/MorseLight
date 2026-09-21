@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.Role
@@ -26,6 +27,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.BadgeTone
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SoftPill
@@ -55,17 +57,18 @@ fun SendingDrillContent(
     modifier: Modifier = Modifier,
 ) {
     val c = MorseTheme.colors
+    val holdCd = stringResource(R.string.hold_to_key_cd)
 
     Column(modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         SunkenCard(Modifier.fillMaxWidth()) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()) {
-                Eyebrow("Send this character")
+                Eyebrow(stringResource(R.string.send_this_character))
                 Text(ui.target.toString(), style = MaterialTheme.typography.displayLarge, color = c.textHeading)
                 Text(if (ui.showHint) ui.code else "· · · · ·",
                     style = MaterialTheme.typography.titleLarge.copy(fontFamily = JetBrainsMono), color = c.accent)
                 StatusBadge(
-                    when (ui.result) { SdResult.Correct -> "Correct"; SdResult.Wrong -> "Not that one"; else -> "Waiting" },
+                    when (ui.result) { SdResult.Correct -> stringResource(R.string.badge_correct); SdResult.Wrong -> stringResource(R.string.badge_wrong); else -> stringResource(R.string.badge_waiting) },
                     tone = when (ui.result) { SdResult.Correct -> BadgeTone.Success; SdResult.Wrong -> BadgeTone.Danger; else -> BadgeTone.Neutral },
                 )
             }
@@ -73,16 +76,16 @@ fun SendingDrillContent(
 
         SunkenCard(Modifier.fillMaxWidth()) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Eyebrow("You keyed")
+                Eyebrow(stringResource(R.string.label_you_keyed))
                 Text(ui.buffer.ifBlank { "—" },
                     style = MaterialTheme.typography.titleLarge.copy(fontFamily = JetBrainsMono), color = c.textHeading)
             }
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SoftPill("Clear", onClear, tone = PillTone.Neutral)
-            SoftPill(if (ui.showHint) "Hide" else "Hint", onToggleHint, tone = PillTone.Neutral)
-            SoftPill("Skip", onSkip, tone = PillTone.Neutral)
+            SoftPill(stringResource(R.string.action_clear), onClear, tone = PillTone.Neutral)
+            SoftPill(if (ui.showHint) stringResource(R.string.action_hide) else stringResource(R.string.action_hint), onToggleHint, tone = PillTone.Neutral)
+            SoftPill(stringResource(R.string.action_skip), onSkip, tone = PillTone.Neutral)
         }
 
         Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.BottomCenter) {
@@ -91,9 +94,9 @@ fun SendingDrillContent(
                     .clip(RoundedCornerShape(MorseRadius.control))
                     .background(if (ui.keyOn) c.accentPress else c.accent)
                     .pointerInput(Unit) { detectTapGestures(onPress = { onKeyDown(); tryAwaitRelease(); onKeyUp() }) }
-                    .semantics { role = Role.Button; contentDescription = "Hold to key the character" },
+                    .semantics { role = Role.Button; contentDescription = holdCd },
                 contentAlignment = Alignment.Center,
-            ) { Text("Hold to key", style = MaterialTheme.typography.labelLarge, color = c.textOnAccent, textAlign = TextAlign.Center) }
+            ) { Text(stringResource(R.string.hold_to_key), style = MaterialTheme.typography.labelLarge, color = c.textOnAccent, textAlign = TextAlign.Center) }
         }
     }
 }
