@@ -55,8 +55,11 @@ val EyebrowStyle = TextStyle(
 
 /** Morse string / code role (JetBrains Mono, 22/700 on the Send card). */
 val MorseTextStyle = TextStyle(
-    // No letterSpacing: with per-symbol colouring, a non-zero value renders differently between a
-    // single style run (idle) and multiple runs (transmitting), causing a layout shift. Monospace
-    // keeps the string readable without it.
+    // Disable ligatures + contextual alternates: JetBrains Mono combines repeated glyphs (".." , "--")
+    // into ligatures. Idle (one style run) forms them; per-symbol colouring during transmit splits the
+    // string into runs, breaking the ligatures at run boundaries and widening the pair — the layout
+    // shift the user saw on same-character sequences. A morse string must never ligate anyway.
+    // letterSpacing is left at 0 for the same single-run-vs-multi-run reason.
     fontFamily = JetBrainsMono, fontWeight = FontWeight(700), fontSize = 22.sp, lineHeight = 30.sp,
+    fontFeatureSettings = "liga 0, calt 0, dlig 0, clig 0",
 )
