@@ -27,7 +27,7 @@ private fun jbm(weight: Int) = Font(
 val PlusJakarta = FontFamily(pjs(400), pjs(500), pjs(600), pjs(700), pjs(800))
 
 /** JetBrains Mono — morse strings and codes. */
-val JetBrainsMono = FontFamily(jbm(400), jbm(500), jbm(600))
+val JetBrainsMono = FontFamily(jbm(400), jbm(500), jbm(600), jbm(700))
 
 // iOS-derived ramp (tokens/typography.css): 11·12·13·15·17·20·22·28·34·44, body 17/1.45.
 val AppTypography = Typography(
