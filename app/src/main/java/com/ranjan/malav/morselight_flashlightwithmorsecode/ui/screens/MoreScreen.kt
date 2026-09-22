@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
+import androidx.compose.material.icons.outlined.Coffee
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -104,11 +105,19 @@ fun MoreContent(
             }
         }
 
-        // Donation banner (amber wash)
-        Box(
+        // Donation banner (amber wash) with a coffee mark in a white circle.
+        Row(
             Modifier.fillMaxWidth().clip(RoundedCornerShape(MorseRadius.card)).background(c.warningSoft)
                 .clickable(onClick = onDonate).padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
         ) {
+            Box(
+                Modifier.size(40.dp).clip(RoundedCornerShape(percent = 50)).background(c.surfaceCard),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.Outlined.Coffee, contentDescription = null, tint = c.warning, modifier = Modifier.size(20.dp))
+            }
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(stringResource(R.string.donate_title), style = MaterialTheme.typography.titleMedium, color = c.warningOnSoft)
                 Text(stringResource(R.string.donate_subtitle), style = MaterialTheme.typography.bodyMedium, color = c.textMuted)
