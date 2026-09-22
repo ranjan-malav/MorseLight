@@ -1,21 +1,13 @@
 # MorseLight — Modernization & Compose Migration Plan
 
 **Status:** Phases 0–5 complete; Phase 6 (release prep) largely done; Phase 7 (polish) partial. The
-app is a full Jetpack Compose redesign on the reworked WPM engine, verified on the emulator, minified
-release building at **4.1 MB**, **20 unit tests + 1 Compose UI test green**, lint clean (5 intentional
-warnings). **Blocked only on the upload-key reset (user) and a real-device pass (user).**
+app is a full Jetpack Compose redesign on the reworked WPM engine, **verified on a real device
+(OnePlus 6, API 30)**, minified release building at **4.1 MB**, unit tests green (incl. the new
+`AdaptiveDecoder` suite) + 1 Compose UI test, lint clean (5 intentional warnings). The engineering
+work is essentially done — **all outstanding items are user-side / optional (see the Pending TODO
+section below).**
 
-### Remaining before release
-- [~] **Upload key reset** — request **submitted to Play** (2026-09-21), awaiting Google (~1–2 business days). On approval: fill the gitignored `keystore.properties` from `keystore.properties.template` with the new `morselight-upload.jks`.
-- [x] **Real-device smoke test done** (OnePlus 6, Android 11 / API 30): torch **physically flashes** (CameraX `TorchControl value=1`), sidetone plays, three-state morse colouring + **no layout shift**, 20 wpm cap active, camera luminance stream live (`lum` updating), all 7 screens render correctly at 1080×2280, no crashes. **Bug found & fixed:** transmission kept flashing the torch after navigating away from Send (ViewModel survives the nav back stack) → now stopped via DisposableEffect. ⏳ Still worth a human eyeball: the camera *preview* image (was dark on a desk) and a real flashing-light decode.
-- [ ] ~~Real-device smoke test (was pending)~~ — the emulator can't verify actual torch output or the camera
-      feed into the viewfinder; both are wired and the analysis stream is confirmed live.
-- [x] 16 KB native-lib page-size check — **passes** (`zipalign -c -P 16` verification successful; all CameraX/DataStore/graphics `.so` are 16 KB-aligned). Ship as an **App Bundle** (`bundleRelease`) so Play splits the 4 bundled ABIs per device.
-- [ ] Play Console: refresh listing + screenshots for the signal-blue rebrand; confirm Data Safety.
-- [x] i18n — **done**: all UI strings extracted to `strings.xml` (translation-ready). Remaining optional follow-ups: i18n *translations*, deeper mockup fidelity. (Originally inline English — the redesign replaced all
-      old copy; extract to `strings.xml` when translations are available), deeper mockup fidelity,
-      Compose previews, a fuller TalkBack pass.
- **Scope expanded 2026-09-20:** a full redesign (`design_handoff_morselight/`) now drives the UI, and the transmit/decode logic is being reworked to the handoff's cleaner engine (user request). See §7 Redesign. Real-device test pending.
+ **Scope expanded 2026-09-20:** a full redesign (`design_handoff_morselight/`) now drives the UI, and the transmit/decode logic is being reworked to the handoff's cleaner engine (user request). See §7 Redesign.
 **Started:** 2026-09-20
 **Owner:** Ranjan Malav
 **Goal:** Bring a 2021-era app (AGP 4.2 / Kotlin 1.5 / targetSdk 30 / XML + Fragments) up to a
@@ -39,6 +31,35 @@ currently Play-Store-compliant build, and rewrite the UI in Jetpack Compose.
 >
 > Conclusion: the 2021 upload key is unrecoverable, and that is fine — the upload key reset makes it
 > irrelevant. Do not spend more time hunting for it.
+
+---
+
+## Pending TODO
+
+All engineering work is complete and pushed. Everything left is **user-side** (Play Console / device)
+or **optional post-ship**. This is the single source of truth for what's outstanding; the phase
+checklists below keep their original checkboxes as a historical record.
+
+### User-side — needed before release
+- [~] **Upload key reset** — request **submitted to Play** (2026-09-21), awaiting Google (~1–2 business
+  days). On approval: fill the gitignored `keystore.properties` from `keystore.properties.template`
+  with the new `morselight-upload.jks`, then `bundleRelease` and upload the signed `.aab`.
+- [ ] **Play Console: refresh the listing** — new screenshots + graphics for the **signal-blue rebrand**
+  and the new launcher icon; confirm the **Data Safety** form still matches (camera permission is now
+  requested only in Receive→Camera; Crashlytics + Analytics data collection).
+- [ ] **Verify Firebase Crashlytics + Analytics** report from a **release-signed** build.
+- [ ] **Real end-to-end flashing-light decode** — two phones: one sends, one reads with the camera
+  (torch + sidetone + manual keying already verified on the OnePlus 6; the camera *preview image* and a
+  live light-to-text decode are the last things worth a human eyeball).
+
+### Optional — post-ship (Phase 8 + polish)
+- [ ] **Translations** — all UI strings are extracted to `strings.xml` (translation-ready); no non-English
+  locales shipped yet.
+- [ ] **Full TalkBack pass** — content descriptions + button semantics are on the discs/hold-pads; a
+  complete pass over sliders and large-font layouts is still open.
+- [ ] **Baseline Profile** for startup.
+- [ ] **AGP 10 readiness** — confirm no old Variant API usage; keep built-in Kotlin enabled.
+- [ ] **Hilt** — only if DI needs ever grow (D3 removed Koin; nothing replaces it for now).
 
 ---
 
@@ -196,11 +217,14 @@ logic. This supersedes the Phase-2 `MorseEncoder`/`MorseDecoder` that were kept 
   620 Hz sidetone.
 - [x] **`KeyClassifier`** (manual key) — done (7 tests).  on down: gap since last release ≥6u → word ` / `, ≥2u → char
   ` `; on up: <2u → dot, else dash; idle timers commit a char sep at 3.5u and a word sep at 8u.
-  Feeds `decode`. **Replaces** the fragile timing-difference clustering.
+  Feeds `decode`. **Replaces** the fragile timing-difference clustering. **⚠️ Superseded on the receive
+  path by `AdaptiveDecoder` (2026-09-22, §7.5)** — `KeyClassifier` now only backs the known-speed
+  Decoding drill.
 - **Camera decode** — per-frame **mean luminance inside the detection box**, thresholded by a
-  **Sensitivity** slider; a crossing = a pulse fed to the same gap classifier. **Replaces** the
+  **Sensitivity** slider; a crossing = a pulse fed to the decoder. **Replaces** the
   moving-average natural-break `DecoderUtils` clustering (audit B9). `LuminosityAnalyzer` cleanup
   (B5) folds in here. Detection-box size is user-adjustable, **moved out of the viewfinder**.
+  (Now feeds the speed-agnostic `AdaptiveDecoder`, §7.5.)
 - **Settings migration (confirmed):** old `speed` (1–10) → **wpm**, mapped to nearest (e.g. `wpm ≈ round(5 + (speed-1)*2)`, spanning ~5–23 wpm),
   keep `perceptibility`→sensitivity and `react_size`→detection-box. Add `keyTone`, `loop`,
   `keepAwake`. Extend `SettingsRepository`.
@@ -223,6 +247,38 @@ gear. Screenshots: `screens/04-more-*`.)*
 
 **Net-new features** (drills, reference chart, sidetone, loop, keep-awake) are product surface
 beyond a migration — sequencing is a scope decision (see the question raised to the user).
+
+### 7.5 Post-device-test rework (2026-09-22, user-driven)
+After the real-device pass, a round of usability + logic fixes (all committed in `e06d42a`, pushed):
+
+- **Adaptive receive decoding (`morse/AdaptiveDecoder.kt`, +6 tests).** The receive path is now
+  **speed-agnostic** — no WPM anywhere. It records raw mark/gap timings and clusters them from their
+  own distribution (dash ≈ 3× dot), so the sender may key at any speed and the receiver just taps /
+  the camera pulses along. A single cluster is genuinely ambiguous, so it shows **both readings**
+  (one tap → `E/T`, two → `I/M`), resolving live as more of the message arrives. Feeds **both** manual
+  keying and camera decode. `KeyClassifier` stays only for the known-speed Decoding drill.
+- **Camera permission deferred.** Torch now runs through **`CameraManager.setTorchMode()`** (no CAMERA
+  permission) — the flashlight works at launch with no prompt. `CAMERA` is requested **only when
+  Receive→Camera is opened** (with an "Allow camera" card). `TorchController` split into permission-free
+  torch vs the CameraX preview/luminance feed; `MainActivity` no longer requests at startup. Torch +
+  deferral both verified on the OnePlus 6.
+- **Camera receive UX.** The viewfinder now shows the **live preview** (was a dead placeholder); a manual
+  **Calibrate** button measures and **locks** a fixed ambient average (no drift); current `lum` shows
+  **green above the threshold / grey at rest** beside the frozen `avg`; **help bottom sheets** on the
+  Sensitivity + Detection-area sliders.
+- **Sending drill.** Adds **words** after A–Z/0–9 (keyed letter-by-letter with per-letter progress
+  colouring), always shows the current letter's code, auto-resets a wrong attempt, adds a **Random**
+  button (a detour that never moves saved progress), and **persists the resume position**
+  (`SettingsRepository.sendingDrillIndex`).
+- **Decoding drill.** Message is always visible, speed dropped to **2 wpm**, a **3-second big translucent
+  countdown** overlay precedes playback, and the transmitted morse is shown with sent/current/pending
+  progress colouring.
+- **More screen.** Removed the placeholder progress card (no real progress model — dropped by choice);
+  added a **coffee mark** to the donation banner.
+- **Nav icons:** Receive → `Sensors`, More → `MoreHoriz`. **Launcher icon** replaced from the new brand
+  mark (per-density adaptive background/foreground/monochrome + legacy PNGs; dedicated monochrome layer).
+- **Verified on device:** keep-screen-awake applies the `FLAG_KEEP_SCREEN_ON` window flag; flashlight
+  physically lights via `setTorchMode`; camera permission is asked only on the camera tab.
 
 ## 4. Phases
 
@@ -426,3 +482,5 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-21 | 6-7 | **App Bundle + large-font verified.** `bundleRelease` produces a 7.4 MB `.aab`. UI holds up at 1.3× font scale (no clipping). Only genuinely user-side items now remain: upload-key reset, `.aab`/listing upload to Play, release-signed Firebase check, real-device torch/camera pass. |
 | 2026-09-21 | 6 | Upload-key reset **request submitted** to Play Console (routine, Play App Signing is on). Awaiting Google. Corrected the Phase 1 AGP-assistant checkbox to reflect the toolchain was migrated by hand. |
 | 2026-09-21 | test | **Real-device test (OnePlus 6, API 30).** Verified torch physically flashes, sidetone, three-state colouring, no layout shift, 20 wpm cap, camera luminance stream, all screens render, no crashes. Found + fixed a bug: transmit continued after navigating away from Send (torch flashing with no Stop button) — now stopped on screen dispose. UI-parity fixes (slider/tabs/segmented/badge/ligatures) all confirmed on device. |
+| 2026-09-22 | test/7 | **wpm cap → 1–10** (past ~10 wpm dots are too fast to key/read by hand); slider + `MAX_WPM` + About copy updated. |
+| 2026-09-22 | 7 | **Post-device rework (§7.5), committed `e06d42a` and pushed.** Speed-agnostic **`AdaptiveDecoder`** replaces the fixed-WPM classifier on the receive path (pure adaptive, `E/T` ambiguity for uniform marks; +6 tests). **Camera permission deferred** — torch via `CameraManager.setTorchMode()` (no permission at launch), `CAMERA` requested only on Receive→Camera. **Camera receive UX**: live preview wired (was a placeholder), manual Calibrate locking a fixed ambient average, green/grey lum vs avg, help bottom sheets. **Sending drill**: words (letter-by-letter), Random button, persistent resume position. **Decoding drill**: visible message, 2 wpm, 3s countdown overlay, morse progress colouring. **More**: dropped the placeholder progress card, added a coffee mark to the donation banner. **Nav icons** Receive→Sensors / More→MoreHoriz; **launcher icon** replaced from the new brand mark. Torch, keep-awake, and deferred permission all re-verified on the OnePlus 6. |
