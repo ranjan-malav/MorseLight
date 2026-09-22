@@ -22,9 +22,9 @@ data class Settings(
     val keepAwake: Boolean = true,
 ) {
     companion object {
-        const val DEFAULT_WPM = 12
+        const val DEFAULT_WPM = 8
         const val MIN_WPM = 1
-        const val MAX_WPM = 20
+        const val MAX_WPM = 10
         const val DEFAULT_REACT_SIZE = 50
         const val DEFAULT_PERCEPTIBILITY = 30
     }
@@ -73,8 +73,9 @@ class SettingsRepository(context: Context) {
 
     val settings: Flow<Settings> = dataStore.data.map { p ->
         Settings(
-            // Clamp to the flashlight-reliable range: the torch HAL / camera framerate can't keep
-            // up much past ~20 wpm (48ms/unit), so the slider caps there and old saved values do too.
+            // Clamp to the usable range (1..10 wpm): past ~10 wpm the dots are too fast to key or
+            // read reliably by hand (and the torch HAL / camera lag compounds it). Old saved values
+            // above the cap are clamped here too.
             wpm = (p[wpmKey] ?: p[speedKey]?.let { speedToWpm(it) } ?: Settings.DEFAULT_WPM)
                 .coerceIn(Settings.MIN_WPM, Settings.MAX_WPM),
             reactSize = p[reactSizeKey] ?: Settings.DEFAULT_REACT_SIZE,
