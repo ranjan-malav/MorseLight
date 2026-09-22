@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.FlashlightOn
-import androidx.compose.material.icons.outlined.Radio
-import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.Sensors
+import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -69,8 +69,8 @@ private sealed class Dest(val route: String, @StringRes val titleRes: Int) {
 private data class Tab(val dest: Dest, val icon: ImageVector)
 private val tabs = listOf(
     Tab(Dest.Send, Icons.Outlined.FlashlightOn),
-    Tab(Dest.Receive, Icons.Outlined.Radio),
-    Tab(Dest.More, Icons.Outlined.Menu),
+    Tab(Dest.Receive, Icons.Outlined.Sensors),
+    Tab(Dest.More, Icons.Outlined.MoreHoriz),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

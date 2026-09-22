@@ -25,7 +25,10 @@ data class ReceiveUiState(
     val sensitivity: Int = 30,
     val detectionArea: Int = 50,
     val luminance: Double = 0.0,
+    val average: Double = 0.0,
     val reading: Boolean = false,
+    val calibrating: Boolean = false,
+    val armed: Boolean = false, // camera detects only after a manual Calibrate
 )
 
 /**
@@ -45,9 +48,14 @@ class ReceiveViewModel(
     private var classifier = KeyClassifier(unitMillis(wpm))
     private var idleJob: Job? = null
 
-    // camera pulse tracking: EMA of the ambient "dark" level (forgets old samples, seeds on first frame)
+    // camera pulse tracking: EMA of the ambient "dark" level (forgets old samples).
+    // On entering camera mode we spend a short window averaging ambient luminosity so the
+    // baseline is stable before we start detecting flashes (mirrors the old app's warm-up).
     private var camLightOn = false
     private var baseline = -1.0
+    private var calibrationEndAt = 0L
+    private var calSum = 0.0
+    private var calCount = 0
 
     init {
         viewModelScope.launch {
@@ -63,7 +71,31 @@ class ReceiveViewModel(
         }
     }
 
-    fun setMode(mode: RxMode) = _ui.update { it.copy(mode = mode) }
+    fun setMode(mode: RxMode) {
+        // Entering the camera we sit idle (preview + live brightness) but do NOT detect until the
+        // user aims and taps Calibrate.
+        if (mode == RxMode.Camera && _ui.value.mode != RxMode.Camera) {
+            classifier.reset()
+            camLightOn = false; baseline = -1.0
+            _ui.update { it.copy(armed = false, calibrating = false, reading = false, buffer = "", decoded = "", average = 0.0) }
+        }
+        _ui.update { it.copy(mode = mode) }
+    }
+
+    /** User-triggered: aim at the source, then measure the ambient baseline and start detecting. */
+    fun recalibrate() {
+        if (_ui.value.mode == RxMode.Camera) startCalibration()
+    }
+
+    /** Short ambient-luminosity warm-up; arms detection when it completes. */
+    private fun startCalibration() {
+        classifier.reset()
+        camLightOn = false
+        baseline = -1.0
+        calSum = 0.0; calCount = 0
+        calibrationEndAt = System.currentTimeMillis() + CALIBRATION_MS
+        _ui.update { it.copy(calibrating = true, armed = false, reading = false, buffer = "", decoded = "") }
+    }
 
     // ---- manual keying ----
     fun keyDown() {
@@ -93,7 +125,9 @@ class ReceiveViewModel(
 
     fun reset() {
         classifier.reset()
-        camLightOn = false; baseline = -1.0
+        camLightOn = false
+        // In camera mode keep the calibrated baseline + armed state; Reset only clears the copy.
+        if (_ui.value.mode != RxMode.Camera) baseline = -1.0
         _ui.update { it.copy(buffer = "", decoded = "", reading = false) }
     }
 
@@ -103,9 +137,30 @@ class ReceiveViewModel(
     // ---- camera decode: threshold crossings become key events ----
     private fun onLuminance(luma: Double) {
         if (_ui.value.mode != RxMode.Camera) return
-        if (baseline < 0) { baseline = luma; return } // seed on first frame (avoids a false first pulse)
-        // Track the ambient dark level with an exponential moving average while the light is off.
-        if (!camLightOn) baseline = baseline * 0.95 + luma * 0.05
+
+        // Warm-up: average ambient luminosity into a stable baseline, then arm detection.
+        if (_ui.value.calibrating) {
+            calSum += luma; calCount++
+            val avg = calSum / calCount
+            if (System.currentTimeMillis() >= calibrationEndAt) {
+                baseline = avg
+                _ui.update { it.copy(luminance = luma, average = avg, calibrating = false, armed = true) }
+            } else {
+                _ui.update { it.copy(luminance = luma, average = avg) }
+            }
+            return
+        }
+
+        // Idle until calibrated: show live brightness but never trip "reading".
+        if (!_ui.value.armed) {
+            _ui.update { it.copy(luminance = luma) }
+            return
+        }
+
+        // The baseline is FIXED at the calibrated ambient average — it must not drift. Letting it
+        // track the live reading would move the on/off threshold and blur the pulse edges. A flash
+        // reads above this fixed average; releasing brings the reading back down near it.
+        if (baseline < 0) { _ui.update { it.copy(luminance = luma) }; return }
         val threshold = baseline * (1 + _ui.value.sensitivity / 100.0)
         _ui.update { it.copy(luminance = luma) }
         if (luma > threshold && !camLightOn) {
@@ -118,5 +173,9 @@ class ReceiveViewModel(
             _ui.update { it.copy(reading = false, buffer = classifier.buffer, decoded = MorseCode.decode(classifier.buffer)) }
             scheduleIdleCommits()
         }
+    }
+
+    private companion object {
+        const val CALIBRATION_MS = 2500L
     }
 }
