@@ -20,6 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -43,15 +46,15 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun SendingDrillScreen(vm: SendingDrillViewModel, modifier: Modifier = Modifier) {
     val ui by vm.ui.collectAsStateWithLifecycle()
-    SendingDrillContent(ui, vm::clear, vm::toggleHint, vm::skip, vm::keyDown, vm::keyUp, modifier)
+    SendingDrillContent(ui, vm::clear, vm::skip, vm::random, vm::keyDown, vm::keyUp, modifier)
 }
 
 @Composable
 fun SendingDrillContent(
     ui: SendingDrillUi,
     onClear: () -> Unit,
-    onToggleHint: () -> Unit,
     onSkip: () -> Unit,
+    onRandom: () -> Unit,
     onKeyDown: () -> Unit,
     onKeyUp: () -> Unit,
     modifier: Modifier = Modifier,
@@ -59,14 +62,29 @@ fun SendingDrillContent(
     val c = MorseTheme.colors
     val holdCd = stringResource(R.string.hold_to_key_cd)
 
+    // The target word, coloured per letter: done = success, current = heading, upcoming = subtle.
+    val word = buildAnnotatedString {
+        ui.target.forEachIndexed { i, ch ->
+            val color = when {
+                i < ui.letterIndex -> c.morseSent
+                i == ui.letterIndex -> c.textHeading
+                else -> c.textSubtle
+            }
+            withStyle(SpanStyle(color = color)) { append(ch) }
+        }
+    }
+
     Column(modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         SunkenCard(Modifier.fillMaxWidth()) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()) {
-                Eyebrow(stringResource(R.string.send_this_character))
-                Text(ui.target.toString(), style = MaterialTheme.typography.displayLarge, color = c.textHeading)
-                Text(if (ui.showHint) ui.code else "· · · · ·",
+                Eyebrow(stringResource(if (ui.isWord) R.string.send_this_word else R.string.send_this_character))
+                Text(word, style = MaterialTheme.typography.displayLarge)
+                // The pattern for the current letter is always shown — this drill practices keying it.
+                Text(ui.code,
                     style = MaterialTheme.typography.titleLarge.copy(fontFamily = JetBrainsMono), color = c.accent)
+                Text(stringResource(R.string.send_drill_hint),
+                    style = MaterialTheme.typography.bodyMedium, color = c.textMuted, textAlign = TextAlign.Center)
                 StatusBadge(
                     when (ui.result) { SdResult.Correct -> stringResource(R.string.badge_correct); SdResult.Wrong -> stringResource(R.string.badge_wrong); else -> stringResource(R.string.badge_waiting) },
                     tone = when (ui.result) { SdResult.Correct -> BadgeTone.Success; SdResult.Wrong -> BadgeTone.Danger; else -> BadgeTone.Neutral },
@@ -84,8 +102,8 @@ fun SendingDrillContent(
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SoftPill(stringResource(R.string.action_clear), onClear, tone = PillTone.Neutral)
-            SoftPill(if (ui.showHint) stringResource(R.string.action_hide) else stringResource(R.string.action_hint), onToggleHint, tone = PillTone.Neutral)
             SoftPill(stringResource(R.string.action_skip), onSkip, tone = PillTone.Neutral)
+            SoftPill(stringResource(R.string.action_random), onRandom, tone = PillTone.Neutral)
         }
 
         Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.BottomCenter) {
@@ -104,5 +122,5 @@ fun SendingDrillContent(
 @Preview(showBackground = true)
 @Composable
 private fun SendingDrillPreview() {
-    MorseLightTheme { SendingDrillContent(SendingDrillUi(showHint = true), {}, {}, {}, {}, {}) }
+    MorseLightTheme { SendingDrillContent(SendingDrillUi(target = "SOS", letterIndex = 1), {}, {}, {}, {}, {}) }
 }

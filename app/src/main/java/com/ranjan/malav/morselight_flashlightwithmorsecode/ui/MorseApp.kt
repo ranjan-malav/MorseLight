@@ -170,7 +170,9 @@ fun MorseApp(container: AppContainer) {
                 DecodingDrillScreen(vm)
             }
             composable(Dest.SendingDrill.route) {
-                val vm: SendingDrillViewModel = viewModel()
+                val vm: SendingDrillViewModel = viewModel(factory = viewModelFactory {
+                    initializer { SendingDrillViewModel(container.settings) }
+                })
                 SendingDrillScreen(vm)
             }
         }

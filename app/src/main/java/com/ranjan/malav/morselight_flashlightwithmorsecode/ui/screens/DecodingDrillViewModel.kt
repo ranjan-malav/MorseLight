@@ -15,18 +15,23 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 private val TARGETS = listOf("LETS GO", "ON MY WAY", "ALL CLEAR", "NEED WATER", "MEET AT NINE")
-private const val DRILL_WPM = 12
+// Slow enough to read the flashes and key along by hand.
+private const val DRILL_WPM = 2
+private const val COUNTDOWN_SECONDS = 3
 
 data class DecodingDrillUi(
     val target: String = TARGETS[0],
     val playing: Boolean = false,
     val senderOn: Boolean = false,
-    val reveal: Boolean = false,
+    val countdown: Int = 0, // >0 while the pre-play lead-in ticks down
+    val currentIndex: Int = -1, // symbol being flashed (accent)
+    val doneIndex: Int = -1,    // last flashed symbol (success)
     val buffer: String = "",
     val copied: String = "",
 ) {
     val matched get() = copied.isNotBlank() && copied == target
-    val masked get() = target.map { if (it == ' ') ' ' else '•' }.joinToString("")
+    // Same encoding the engine transmits, so the engine's symbol indices line up with these chars.
+    val morse: String get() = MorseCode.encode(target)
 }
 
 class DecodingDrillViewModel : ViewModel() {
@@ -41,17 +46,28 @@ class DecodingDrillViewModel : ViewModel() {
     // Sender disc flashes the message; the real torch is untouched during drills.
     private val engine = TransmitEngine(
         setTorch = { on -> _ui.update { it.copy(senderOn = on) } },
-        onState = { st -> if (!st.running) _ui.update { it.copy(playing = false, senderOn = false) } },
+        onState = { st ->
+            if (st.running) {
+                _ui.update { it.copy(currentIndex = st.symbolIndex, doneIndex = st.doneIndex) }
+            } else {
+                _ui.update { it.copy(playing = false, senderOn = false, currentIndex = -1, doneIndex = -1) }
+            }
+        },
     )
 
     fun play() {
-        if (_ui.value.playing) { stop(); return }
+        if (_ui.value.playing || _ui.value.countdown > 0) { stop(); return }
         classifier = KeyClassifier(unitMillis(DRILL_WPM))
-        _ui.update { it.copy(playing = true, buffer = "", copied = "") }
-        playJob = viewModelScope.launch { engine.transmit(MorseCode.encode(_ui.value.target), DRILL_WPM) }
+        _ui.update { it.copy(buffer = "", copied = "") }
+        playJob = viewModelScope.launch {
+            // Lead-in so the reader can settle and move a thumb onto the copy button.
+            for (n in COUNTDOWN_SECONDS downTo 1) { _ui.update { it.copy(countdown = n) }; delay(1000) }
+            _ui.update { it.copy(countdown = 0, playing = true) }
+            engine.transmit(MorseCode.encode(_ui.value.target), DRILL_WPM)
+        }
     }
 
-    private fun stop() { playJob?.cancel(); _ui.update { it.copy(playing = false, senderOn = false) } }
+    private fun stop() { playJob?.cancel(); _ui.update { it.copy(playing = false, senderOn = false, countdown = 0, currentIndex = -1, doneIndex = -1) } }
 
     fun next() {
         stop()
@@ -59,8 +75,6 @@ class DecodingDrillViewModel : ViewModel() {
         classifier.reset()
         _ui.value = DecodingDrillUi(target = TARGETS[index])
     }
-
-    fun toggleReveal() = _ui.update { it.copy(reveal = !it.reveal) }
 
     fun copyDown() { idleJob?.cancel(); classifier.onDown(System.currentTimeMillis()); _ui.update { it.copy(buffer = classifier.buffer) } }
     fun copyUp() {

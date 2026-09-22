@@ -3,11 +3,8 @@ package com.ranjan.malav.morselight_flashlightwithmorsecode.ui.screens
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ranjan.malav.morselight_flashlightwithmorsecode.data.SettingsRepository
-import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.KeyClassifier
-import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.MorseCode
-import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.unitMillis
+import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.AdaptiveDecoder
 import com.ranjan.malav.morselight_flashlightwithmorsecode.torch.TorchController
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,9 +29,9 @@ data class ReceiveUiState(
 )
 
 /**
- * Decoding via the reworked logic (§7.3): manual keying through [KeyClassifier], camera through a
- * mean-luminance threshold that feeds the same classifier. WPM comes from settings so the unit
- * length matches the sender.
+ * Decoding through the speed-agnostic [AdaptiveDecoder]: manual keying and camera pulses both feed
+ * mark/gap timings that are clustered into dots/dashes from their own distribution — the receiver
+ * never sets a WPM. The camera side turns luminance threshold crossings into the same key events.
  */
 class ReceiveViewModel(
     private val torch: TorchController,
@@ -44,9 +41,7 @@ class ReceiveViewModel(
     private val _ui = MutableStateFlow(ReceiveUiState())
     val ui: StateFlow<ReceiveUiState> = _ui.asStateFlow()
 
-    private var wpm = 12
-    private var classifier = KeyClassifier(unitMillis(wpm))
-    private var idleJob: Job? = null
+    private val decoder = AdaptiveDecoder()
 
     // camera pulse tracking: EMA of the ambient "dark" level (forgets old samples).
     // On entering camera mode we spend a short window averaging ambient luminosity so the
@@ -60,8 +55,6 @@ class ReceiveViewModel(
     init {
         viewModelScope.launch {
             settings.settings.collect { s ->
-                wpm = s.wpm
-                classifier = KeyClassifier(unitMillis(wpm))
                 _ui.update { it.copy(sensitivity = s.perceptibility, detectionArea = s.reactSize) }
                 torch.setDetectionArea(s.reactSize)
             }
@@ -75,7 +68,7 @@ class ReceiveViewModel(
         // Entering the camera we sit idle (preview + live brightness) but do NOT detect until the
         // user aims and taps Calibrate.
         if (mode == RxMode.Camera && _ui.value.mode != RxMode.Camera) {
-            classifier.reset()
+            decoder.reset()
             camLightOn = false; baseline = -1.0
             _ui.update { it.copy(armed = false, calibrating = false, reading = false, buffer = "", decoded = "", average = 0.0) }
         }
@@ -89,7 +82,7 @@ class ReceiveViewModel(
 
     /** Short ambient-luminosity warm-up; arms detection when it completes. */
     private fun startCalibration() {
-        classifier.reset()
+        decoder.reset()
         camLightOn = false
         baseline = -1.0
         calSum = 0.0; calCount = 0
@@ -99,32 +92,17 @@ class ReceiveViewModel(
 
     // ---- manual keying ----
     fun keyDown() {
-        idleJob?.cancel()
-        classifier.onDown(System.currentTimeMillis())
-        _ui.update { it.copy(keyOn = true, buffer = classifier.buffer) }
+        decoder.onDown(System.currentTimeMillis())
+        _ui.update { it.copy(keyOn = true) }
     }
 
     fun keyUp() {
-        classifier.onUp(System.currentTimeMillis())
-        _ui.update { it.copy(keyOn = false, buffer = classifier.buffer, decoded = MorseCode.decode(classifier.buffer)) }
-        scheduleIdleCommits()
-    }
-
-    private fun scheduleIdleCommits() {
-        idleJob?.cancel()
-        val u = unitMillis(wpm)
-        idleJob = viewModelScope.launch {
-            kotlinx.coroutines.delay((u * 3.5).toLong())
-            classifier.commitCharacterGap()
-            _ui.update { it.copy(buffer = classifier.buffer, decoded = MorseCode.decode(classifier.buffer)) }
-            kotlinx.coroutines.delay((u * 4.5).toLong())
-            classifier.commitWordGap()
-            _ui.update { it.copy(buffer = classifier.buffer, decoded = MorseCode.decode(classifier.buffer)) }
-        }
+        decoder.onUp(System.currentTimeMillis())
+        _ui.update { it.copy(keyOn = false, buffer = decoder.morse, decoded = decoder.text) }
     }
 
     fun reset() {
-        classifier.reset()
+        decoder.reset()
         camLightOn = false
         // In camera mode keep the calibrated baseline + armed state; Reset only clears the copy.
         if (_ui.value.mode != RxMode.Camera) baseline = -1.0
@@ -165,13 +143,12 @@ class ReceiveViewModel(
         _ui.update { it.copy(luminance = luma) }
         if (luma > threshold && !camLightOn) {
             camLightOn = true
-            classifier.onDown(System.currentTimeMillis())
-            _ui.update { it.copy(reading = true, buffer = classifier.buffer) }
+            decoder.onDown(System.currentTimeMillis())
+            _ui.update { it.copy(reading = true) }
         } else if (luma <= threshold && camLightOn) {
             camLightOn = false
-            classifier.onUp(System.currentTimeMillis())
-            _ui.update { it.copy(reading = false, buffer = classifier.buffer, decoded = MorseCode.decode(classifier.buffer)) }
-            scheduleIdleCommits()
+            decoder.onUp(System.currentTimeMillis())
+            _ui.update { it.copy(reading = false, buffer = decoder.morse, decoded = decoder.text) }
         }
     }
 

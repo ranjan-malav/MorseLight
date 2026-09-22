@@ -37,10 +37,12 @@ private const val KEY_PERCEPTIBILITY = "perceptibility"
 private const val KEY_TONE = "key_tone"
 private const val KEY_LOOP = "loop"
 private const val KEY_AWAKE = "keep_awake"
+private const val KEY_SENDING_DRILL_INDEX = "sending_drill_index"
 
 private val wpmKey = intPreferencesKey(KEY_WPM)
 private val reactSizeKey = intPreferencesKey(KEY_REACT_SIZE)
 private val perceptibilityKey = intPreferencesKey(KEY_PERCEPTIBILITY)
+private val sendingDrillIndexKey = intPreferencesKey(KEY_SENDING_DRILL_INDEX)
 
 /** Map the old speed slider (1..10) to a comparable WPM (~5..23), decision D4/§7.3. */
 internal fun speedToWpm(speed: Int): Int = (5 + (speed - 1) * 2).coerceIn(5, 25)
@@ -85,6 +87,11 @@ class SettingsRepository(context: Context) {
             keepAwake = p[awakeKey] ?: true,
         )
     }
+
+    /** Sending-drill resume position (index into the drill's item list). Persisted so the next
+     *  session starts on the same character; the Random button never writes to it. */
+    val sendingDrillIndex: Flow<Int> = dataStore.data.map { it[sendingDrillIndexKey] ?: 0 }
+    suspend fun setSendingDrillIndex(value: Int) = dataStore.edit { it[sendingDrillIndexKey] = value }
 
     suspend fun setWpm(value: Int) = dataStore.edit { it[wpmKey] = value }
     suspend fun setReactSize(value: Int) = dataStore.edit { it[reactSizeKey] = value }

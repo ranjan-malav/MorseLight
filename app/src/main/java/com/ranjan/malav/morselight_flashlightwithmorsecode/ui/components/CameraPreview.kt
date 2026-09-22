@@ -25,6 +25,6 @@ fun CameraPreview(torch: TorchController, modifier: Modifier = Modifier) {
         },
     )
     DisposableEffect(Unit) {
-        onDispose { torch.restoreTorchOnly() }
+        onDispose { torch.unbindCamera() }
     }
 }

@@ -1,7 +1,8 @@
 package com.ranjan.malav.morselight_flashlightwithmorsecode.torch
 
 import android.content.Context
-import androidx.camera.core.Camera
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraManager
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -17,15 +18,21 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 /**
- * Owns the CameraX back-camera binding and drives the flashlight torch. Also surfaces a
- * mean-luminance stream (for camera decoding). Extracted from the old MainActivity so both the
- * Send (torch) and Receive-camera (luminance) Compose screens can share one binding.
+ * Drives the flashlight and, separately, the camera-decode luminance feed.
+ *
+ * The torch runs through [CameraManager.setTorchMode], which needs **no CAMERA permission** — so the
+ * Send screen works immediately at launch with no prompt. The live preview + mean-luminance analysis
+ * (Receive-camera only) use CameraX and *do* need CAMERA, so they are bound lazily via [bindPreview]
+ * once that tab has permission, and released with [unbindCamera] on leave.
  */
-class TorchController(private val context: Context) {
+class TorchController(context: Context) {
+
+    private val appContext = context.applicationContext
+    private val cameraManager = appContext.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+    private val torchCameraId: String? = findTorchCamera()
 
     private val executor: ExecutorService = Executors.newSingleThreadExecutor()
     private var provider: ProcessCameraProvider? = null
-    private var camera: Camera? = null
     private var analyzer: ImageAnalysis? = null
 
     private val _luminosity = MutableSharedFlow<Double>(
@@ -38,25 +45,28 @@ class TorchController(private val context: Context) {
         considerableArea = 50,
     )
 
-    private var lifecycleOwner: LifecycleOwner? = null
-
-    /** Bind the back camera (torch + luminance only). */
-    fun bind(owner: LifecycleOwner, onReady: () -> Unit = {}) =
-        withProvider(owner) { p, analysis ->
-            camera = p.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, analysis)
-            onReady()
+    private fun findTorchCamera(): String? = runCatching {
+        val ids = cameraManager.cameraIdList
+        ids.firstOrNull { id ->
+            val ch = cameraManager.getCameraCharacteristics(id)
+            ch.get(CameraCharacteristics.FLASH_INFO_AVAILABLE) == true &&
+                ch.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK
+        } ?: ids.firstOrNull { id ->
+            cameraManager.getCameraCharacteristics(id).get(CameraCharacteristics.FLASH_INFO_AVAILABLE) == true
         }
+    }.getOrNull()
 
-    /** Bind the back camera with a live preview surface (Receive-camera screen). */
-    fun bindPreview(owner: LifecycleOwner, previewView: PreviewView) =
-        withProvider(owner) { p, analysis ->
-            val preview = Preview.Builder().build().also { it.surfaceProvider = previewView.surfaceProvider }
-            camera = p.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis)
-        }
+    fun hasFlash(): Boolean = torchCameraId != null
 
-    private fun withProvider(owner: LifecycleOwner, bind: (ProcessCameraProvider, ImageAnalysis) -> Unit) {
-        lifecycleOwner = owner
-        val future = ProcessCameraProvider.getInstance(context)
+    /** Toggle the flashlight. Needs no CAMERA permission. No-op if the device has no flash. */
+    fun setTorch(on: Boolean) {
+        val id = torchCameraId ?: return
+        runCatching { cameraManager.setTorchMode(id, on) }
+    }
+
+    /** Bind a live preview + luminance analysis for the Receive-camera screen (needs CAMERA). */
+    fun bindPreview(owner: LifecycleOwner, previewView: PreviewView) {
+        val future = ProcessCameraProvider.getInstance(appContext)
         future.addListener({
             val p = future.get()
             provider = p
@@ -64,30 +74,24 @@ class TorchController(private val context: Context) {
             val analysis = analyzer ?: ImageAnalysis.Builder().build().also {
                 it.setAnalyzer(executor, lumaAnalyzer)
             }.also { analyzer = it }
-            bind(p, analysis)
-        }, ContextCompat.getMainExecutor(context))
+            val preview = Preview.Builder().build().also { it.surfaceProvider = previewView.surfaceProvider }
+            p.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis)
+        }, ContextCompat.getMainExecutor(appContext))
     }
 
-    /** Restore the torch-only binding (called when the camera preview leaves composition). */
-    fun restoreTorchOnly() {
-        lifecycleOwner?.let { bind(it) }
-    }
-
-    fun hasFlash(): Boolean = camera?.cameraInfo?.hasFlashUnit() == true
-
-    fun setTorch(on: Boolean) {
-        camera?.let { if (it.cameraInfo.hasFlashUnit()) it.cameraControl.enableTorch(on) }
-    }
+    /** Release the camera feed when the camera screen leaves; the torch is unaffected. */
+    fun unbindCamera() { provider?.unbindAll() }
 
     fun setDetectionArea(percentage: Int) = lumaAnalyzer.updateConsiderableArea(percentage)
 
-    fun unbind() {
+    /** Called when the host Activity is destroyed: torch off + release the camera. */
+    fun release() {
+        setTorch(false)
         provider?.unbindAll()
-        camera = null
     }
 
     fun shutdown() {
-        unbind()
+        release()
         executor.shutdown()
     }
 }

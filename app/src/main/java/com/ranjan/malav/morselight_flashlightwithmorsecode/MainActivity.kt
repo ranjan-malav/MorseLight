@@ -1,7 +1,5 @@
 package com.ranjan.malav.morselight_flashlightwithmorsecode
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.lifecycle.lifecycleScope
@@ -12,8 +10,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import com.ranjan.malav.morselight_flashlightwithmorsecode.app.MorseLightApp
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.MorseApp
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseLightTheme
@@ -22,24 +18,13 @@ class MainActivity : ComponentActivity() {
 
     private val container by lazy { (application as MorseLightApp).container }
 
-    private val requestCamera =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) bindTorch()
-        }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_GRANTED
-        ) {
-            bindTorch()
-        } else {
-            requestCamera.launch(Manifest.permission.CAMERA)
-        }
-
+        // No camera permission is requested here: the torch runs through CameraManager (permission
+        // free). CAMERA is asked for only when the Receive-camera tab is opened (see ReceiveScreen).
         setContent {
             MorseLightTheme {
                 MorseApp(container)
@@ -55,12 +40,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun bindTorch() {
-        container.torch.bind(this)
-    }
-
     override fun onDestroy() {
-        container.torch.unbind()
+        container.torch.release()
         super.onDestroy()
     }
 }

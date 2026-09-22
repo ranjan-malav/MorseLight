@@ -44,6 +44,9 @@
     <string name="rx_reading">Reading</string>
     <string name="rx_calibrating">Calibrating…</string>
     <string name="rx_calibrate">Calibrate</string>
+    <string name="camera_permission_title">Camera needed for this mode</string>
+    <string name="camera_permission_body">Decoding a flashing light uses the camera to measure brightness. The flashlight itself doesn\'t need this permission.</string>
+    <string name="action_allow_camera">Allow camera</string>
     <string name="rx_tap_calibrate">Tap Calibrate</string>
     <string name="rx_camera_hint">Point the camera at the sender\'s light and hold steady while it calibrates.</string>
     <string name="lum_value">lum %1$d</string>
@@ -59,9 +62,6 @@
     <string name="detection_area">Detection area</string>
 
     <!-- More -->
-    <string name="progress_learned">%1$d of %2$d learned</string>
-    <string name="progress_lesson">Lesson 4 covers K, R and S.</string>
-    <string name="progress_streak">%1$d day streak</string>
     <string name="donate_title">Buy me a coffee</string>
     <string name="donate_subtitle">Support development</string>
     <string name="more_decoding_drill">Decoding drill</string>
@@ -88,27 +88,29 @@
     <string name="chart_search_hint">Search character or code</string>
 
     <!-- Decoding drill -->
-    <string name="label_target">Target</string>
+    <string name="label_target">Message</string>
     <string name="badge_ready">Ready</string>
+    <string name="badge_get_ready">Get ready</string>
     <string name="badge_playing">Playing</string>
     <string name="badge_match">Match</string>
     <string name="action_play">Play</string>
     <string name="action_next">Next</string>
-    <string name="action_reveal">Reveal</string>
-    <string name="action_hide">Hide</string>
     <string name="label_your_copy">Your copy</string>
     <string name="copy_hint">Hold the pad below to copy</string>
+    <string name="decode_drill_hint">Watch the light. Hold the button while it\'s ON and release when it\'s OFF to copy the message.</string>
     <string name="hold_to_copy">Hold to copy</string>
     <string name="hold_to_copy_cd">Hold to copy the incoming message</string>
 
     <!-- Sending drill -->
     <string name="send_this_character">Send this character</string>
+    <string name="send_this_word">Send this word</string>
+    <string name="send_drill_hint">Key the highlighted letter on the button below. Short tap = dot, long tap = dash.</string>
+    <string name="action_random">Random</string>
     <string name="badge_waiting">Waiting</string>
     <string name="badge_correct">Correct</string>
     <string name="badge_wrong">Not that one</string>
     <string name="label_you_keyed">You keyed</string>
     <string name="action_clear">Clear</string>
-    <string name="action_hint">Hint</string>
     <string name="action_skip">Skip</string>
     <string name="hold_to_key">Hold to key</string>
     <string name="hold_to_key_cd">Hold to key the character</string>

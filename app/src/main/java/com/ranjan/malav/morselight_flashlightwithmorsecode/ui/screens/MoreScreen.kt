@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Coffee
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -32,11 +31,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ranjan.malav.morselight_flashlightwithmorsecode.data.Settings
-import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.BadgeTone
 import com.ranjan.malav.morselight_flashlightwithmorsecode.BuildConfig
 import com.ranjan.malav.morselight_flashlightwithmorsecode.R
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.CardSurface
-import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.StatusBadge
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SunkenCard
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseRadius
@@ -86,25 +83,6 @@ fun MoreContent(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
-        // Progress card (accent tint, no border per the tinted-card rule)
-        Box(
-            Modifier.fillMaxWidth().clip(RoundedCornerShape(MorseRadius.card)).background(c.accentSoft)
-                .padding(16.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Box(contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(progress = { 12f / 36f }, modifier = Modifier.size(64.dp),
-                        color = c.accent, trackColor = c.surfaceCard)
-                    Text("12", style = MaterialTheme.typography.titleMedium, color = c.accentOnSoft)
-                }
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(stringResource(R.string.progress_learned, 12, 36), style = MaterialTheme.typography.titleMedium, color = c.textHeading)
-                    Text(stringResource(R.string.progress_lesson), style = MaterialTheme.typography.bodyMedium, color = c.textMuted)
-                    StatusBadge(stringResource(R.string.progress_streak, 6), tone = BadgeTone.Success)
-                }
-            }
-        }
-
         // Donation banner (amber wash) with a coffee mark in a white circle.
         Row(
             Modifier.fillMaxWidth().clip(RoundedCornerShape(MorseRadius.card)).background(c.warningSoft)

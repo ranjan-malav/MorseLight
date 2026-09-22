@@ -23,12 +23,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
@@ -41,6 +48,8 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.torch.TorchController
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.CameraPreview
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SegmentedControl
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SoftPill
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.PillTone
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SunkenCard
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.TorchDisc
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.LabeledSlider
@@ -53,12 +62,30 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun ReceiveScreen(vm: ReceiveViewModel, torch: TorchController, modifier: Modifier = Modifier) {
     val ui by vm.ui.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    var camGranted by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED,
+        )
+    }
+    val permLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted -> camGranted = granted }
+
+    // Ask for CAMERA the first time the camera tab is opened (not at app launch).
+    LaunchedEffect(ui.mode) {
+        if (ui.mode == RxMode.Camera && !camGranted) permLauncher.launch(Manifest.permission.CAMERA)
+    }
+
     ReceiveContent(
         ui = ui,
         onSetMode = vm::setMode, onReset = vm::reset,
         onSensitivity = vm::setSensitivity, onDetectionArea = vm::setDetectionArea,
         onCalibrate = vm::recalibrate,
         onKeyDown = vm::keyDown, onKeyUp = vm::keyUp,
+        cameraPermissionGranted = camGranted,
+        onRequestCameraPermission = { permLauncher.launch(Manifest.permission.CAMERA) },
         cameraContent = { CameraPreview(torch, Modifier.fillMaxSize()) },
         modifier = modifier,
     )
@@ -81,6 +108,8 @@ fun ReceiveContent(
     onKeyDown: () -> Unit,
     onKeyUp: () -> Unit,
     cameraContent: @Composable () -> Unit,
+    cameraPermissionGranted: Boolean = true,
+    onRequestCameraPermission: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val c = MorseTheme.colors
@@ -117,7 +146,18 @@ fun ReceiveContent(
             }
         }
 
-        if (ui.mode == RxMode.Camera) {
+        if (ui.mode == RxMode.Camera && !cameraPermissionGranted) {
+            // Ask for CAMERA before showing the viewfinder — it's only needed for camera decode.
+            SunkenCard(Modifier.fillMaxWidth()) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(stringResource(R.string.camera_permission_title),
+                        style = MaterialTheme.typography.titleMedium, color = c.textHeading)
+                    Text(stringResource(R.string.camera_permission_body),
+                        style = MaterialTheme.typography.bodyMedium, color = c.textMuted)
+                    SoftPill(stringResource(R.string.action_allow_camera), onRequestCameraPermission, tone = PillTone.Accent)
+                }
+            }
+        } else if (ui.mode == RxMode.Camera) {
             // Live viewfinder with the detection-area rectangle, status label and a Calibrate button.
             Box(
                 Modifier.fillMaxWidth().height(180.dp).clip(RoundedCornerShape(MorseRadius.card))
