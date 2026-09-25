@@ -50,6 +50,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Package native debug symbols so Play can symbolicate native crashes/ANRs. NOTE: this
+            // app has no native code of its own, and the bundled .so files (CameraX/DataStore/…)
+            // ship pre-stripped with no symbol table, so nothing is currently extracted and Play's
+            // "no debug symbols" warning is expected + harmless. Kept as the recommended setting so
+            // symbols are captured automatically if native code is ever added.
+            ndk { debugSymbolLevel = "FULL" }
         }
     }
 
