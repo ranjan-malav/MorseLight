@@ -53,11 +53,13 @@ checklists below keep their original checkboxes as a historical record.
   live light-to-text decode are the last things worth a human eyeball).
 
 ### Optional — post-ship (Phase 8 + polish)
-- [ ] **Automate Play releases from CLI** — wire **Gradle Play Publisher** (`com.github.triplet.play`) or
-  fastlane `supply` once the upload key is configured. Needs a Google Cloud **service-account JSON** with
-  Play access (Play Console → Users & permissions → API access). Then `./gradlew publishReleaseBundle`
-  uploads the signed `.aab`, release notes and listing text. First upload of a new artifact and the Data
-  Safety form still need the console; the app already exists on Play so no first-app bootstrap is needed.
+- [~] **Automate Play releases from CLI — fastlane `supply` wired** (`fastlane/Appfile` + `Fastfile`,
+  `Gemfile`). Gradle Play Publisher was tried but **doesn't support AGP 9** (expects the removed
+  `BaseAppModuleExtension`), so fastlane (AGP-agnostic) is used instead. **To activate:** create a Google
+  Cloud **service-account JSON** with Play access (Play Console → *account-level* **API access**, not the
+  per-app Setup menu), save it as gitignored `play-service-account.json`, fill `keystore.properties`, then
+  `./gradlew :app:bundleRelease && bundle exec fastlane android internal`. Data Safety + content rating
+  still need the console; the app already exists on Play so no first-app bootstrap is needed.
 - [x] **LICENSE (MIT) + CONTRIBUTING.md** added (issue #3). Optional still: a `CHANGELOG`.
 - [ ] **Translations** — all UI strings are extracted to `strings.xml` (translation-ready); no non-English
   locales shipped yet.

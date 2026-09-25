@@ -27,3 +27,14 @@ upload_certificate.pem
 *.apk
 *.aab
 *.hprof
+
+# Google Play service-account key for Gradle Play Publisher (never commit)
+play-service-account.json
+
+# fastlane
+fastlane/report.xml
+fastlane/README.md
+fastlane/Preview.html
+.env
+vendor/bundle/
+Gemfile.lock

@@ -1,0 +1,52 @@
+# Play Store CLI releases via fastlane `supply` (Google Play Developer API).
+#
+# Prerequisites (one-time):
+#   1. Create a Google Cloud service account and download its JSON key.
+#   2. In Play Console -> (account level) API access, link the project and grant the
+#      service account release + store-listing permissions.
+#   3. Save the key as play-service-account.json in the repo root (gitignored), or set
+#      SUPPLY_JSON_KEY / SUPPLY_JSON_KEY_DATA.
+#   4. Configure the upload key (keystore.properties) so the .aab is release-signed.
+#
+# Build the bundle first:  ./gradlew :app:bundleRelease
+# Then:                    bundle exec fastlane android internal
+#
+# The Data Safety form and content rating still have to be done in the Play Console.
+
+default_platform(:android)
+
+AAB = "app/build/outputs/bundle/release/app-release.aab"
+
+platform :android do
+  desc "Upload the release App Bundle to the internal test track (as a draft)"
+  lane :internal do
+    upload_to_play_store(
+      track: "internal",
+      aab: AAB,
+      release_status: "draft",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+    )
+  end
+
+  desc "Promote the release from internal to production (staged rollout)"
+  lane :promote do
+    upload_to_play_store(
+      track: "internal",
+      track_promote_to: "production",
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+    )
+  end
+
+  desc "Push store listing text + release notes only (metadata/ folder), no binary"
+  lane :metadata do
+    upload_to_play_store(
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+    )
+  end
+end

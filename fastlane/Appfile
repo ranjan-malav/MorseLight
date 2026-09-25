@@ -1,0 +1,2 @@
+json_key_file("play-service-account.json") # gitignored Google Play service-account key (repo root)
+package_name("com.ranjan.malav.morselight_flashlightwithmorsecode")

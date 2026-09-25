@@ -71,6 +71,8 @@ kotlin {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
+// Play Store CLI releases are handled by fastlane `supply` (see fastlane/), not a Gradle plugin:
+// Gradle Play Publisher doesn't support AGP 9 yet (it expects the removed BaseAppModuleExtension).
 
 dependencies {
     // Compose
