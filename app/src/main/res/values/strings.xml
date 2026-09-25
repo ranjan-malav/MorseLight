@@ -86,6 +86,9 @@
     <string name="support_rate_sub">Leave a review on the Play Store</string>
     <string name="support_source">Source code</string>
     <string name="support_source_sub">MorseLight is open source</string>
+    <string name="support_share">Share app</string>
+    <string name="support_share_sub">Tell a friend about MorseLight</string>
+    <string name="share_text">Try MorseLight, an ad-free Morse code flashlight: %1$s</string>
     <string name="about_text">MorseLight %1$s. Timing follows ITU-R M.1677.</string>
 
     <!-- Reference chart -->

@@ -49,6 +49,7 @@ fun MoreScreen(
     onOpenReferenceChart: () -> Unit,
     onRate: () -> Unit,
     onSource: () -> Unit,
+    onShare: () -> Unit,
     onDonate: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -58,7 +59,7 @@ fun MoreScreen(
         onKeyTone = vm::setKeyTone, onLoop = vm::setLoop, onKeepAwake = vm::setKeepAwake,
         onOpenDecodingDrill = onOpenDecodingDrill, onOpenSendingDrill = onOpenSendingDrill,
         onOpenReferenceChart = onOpenReferenceChart, onRate = onRate, onSource = onSource,
-        onDonate = onDonate, modifier = modifier,
+        onShare = onShare, onDonate = onDonate, modifier = modifier,
     )
 }
 
@@ -73,6 +74,7 @@ fun MoreContent(
     onOpenReferenceChart: () -> Unit,
     onRate: () -> Unit,
     onSource: () -> Unit,
+    onShare: () -> Unit,
     onDonate: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -134,6 +136,8 @@ fun MoreContent(
                 Column {
                     NavRow(stringResource(R.string.support_rate), stringResource(R.string.support_rate_sub), onRate)
                     HorizontalDivider(color = c.borderSubtle)
+                    NavRow(stringResource(R.string.support_share), stringResource(R.string.support_share_sub), onShare)
+                    HorizontalDivider(color = c.borderSubtle)
                     NavRow(stringResource(R.string.support_source), stringResource(R.string.support_source_sub), onSource)
                 }
             }
@@ -186,6 +190,6 @@ private fun SwitchRow(title: String, subtitle: String, checked: Boolean, onChang
 @Composable
 private fun MorePreview() {
     MorseLightTheme {
-        MoreContent(Settings(), {}, {}, {}, {}, {}, {}, {}, {}, {})
+        MoreContent(Settings(), {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
     }
 }

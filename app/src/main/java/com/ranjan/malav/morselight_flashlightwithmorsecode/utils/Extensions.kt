@@ -26,3 +26,14 @@ fun Context.launchWeb(uri: Uri) {
         Toast.makeText(this, R.string.no_browser_app, Toast.LENGTH_SHORT).show()
     }
 }
+
+/** Share the Play Store link to the app via the system share sheet. */
+fun Context.shareApp() {
+    val playUrl = "https://play.google.com/store/apps/details?id=$packageName"
+    val send = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name))
+        putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text, playUrl))
+    }
+    startActivity(Intent.createChooser(send, getString(R.string.support_share)))
+}

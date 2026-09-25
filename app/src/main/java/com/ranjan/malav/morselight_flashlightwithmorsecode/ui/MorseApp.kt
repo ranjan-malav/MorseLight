@@ -60,6 +60,7 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.screens.SendViewMo
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseTheme
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.launchWeb
 import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.rateApp
+import com.ranjan.malav.morselight_flashlightwithmorsecode.utils.shareApp
 
 private sealed class Dest(val route: String, @StringRes val titleRes: Int) {
     data object Send : Dest("send", R.string.nav_send)
@@ -172,6 +173,7 @@ fun MorseApp(container: AppContainer) {
                     onOpenReferenceChart = { nav.navigate(Dest.Chart.route) },
                     onRate = { ctx.rateApp() },
                     onSource = { ctx.launchWeb("https://github.com/ranjan-malav/MorseLight".toUri()) },
+                    onShare = { ctx.shareApp() },
                     onDonate = { ctx.launchWeb("https://ko-fi.com/ranjan".toUri()) },
                 )
             }
