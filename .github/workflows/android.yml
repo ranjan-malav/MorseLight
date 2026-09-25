@@ -59,3 +59,11 @@ jobs:
           arch: x86_64
           disable-animations: true
           script: ./gradlew :app:connectedDebugAndroidTest --stacktrace
+
+      - name: Upload instrumented-test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: androidTest-report
+          path: app/build/reports/androidTests/connected/
+          if-no-files-found: ignore

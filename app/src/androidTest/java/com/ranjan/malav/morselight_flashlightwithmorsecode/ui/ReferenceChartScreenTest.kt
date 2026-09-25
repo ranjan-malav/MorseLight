@@ -16,12 +16,13 @@ class ReferenceChartScreenTest {
     @Test fun showsLettersAndFiltersBySearch() {
         compose.setContent { MorseLightTheme { ReferenceChartScreen() } }
 
-        // A morse code for S is "..." and for A is ".-"; both present initially.
-        compose.onNodeWithText("...").assertIsDisplayed() // S
-        compose.onNodeWithText(".-").assertIsDisplayed()  // A
+        // A (".-") is the first tile, so it's on screen on any display size. (Don't assert a
+        // later letter like S here — in the LazyVerticalGrid it may be scrolled off on a short
+        // screen and never composed, which is what broke this test on the CI emulator.)
+        compose.onNodeWithText(".-").assertIsDisplayed() // A
 
-        // Search narrows to a single character.
-        compose.onNodeWithText("Search character or code").performTextInput("Z")
-        compose.onNodeWithText("--..").assertIsDisplayed() // Z
+        // Searching filters the grid, bringing the match to the top where it's visible.
+        compose.onNodeWithText("Search character or code").performTextInput("S")
+        compose.onNodeWithText("...").assertIsDisplayed() // S
     }
 }
