@@ -53,6 +53,12 @@ checklists below keep their original checkboxes as a historical record.
   live light-to-text decode are the last things worth a human eyeball).
 
 ### Optional — post-ship (Phase 8 + polish)
+- [ ] **Automate Play releases from CLI** — wire **Gradle Play Publisher** (`com.github.triplet.play`) or
+  fastlane `supply` once the upload key is configured. Needs a Google Cloud **service-account JSON** with
+  Play access (Play Console → Users & permissions → API access). Then `./gradlew publishReleaseBundle`
+  uploads the signed `.aab`, release notes and listing text. First upload of a new artifact and the Data
+  Safety form still need the console; the app already exists on Play so no first-app bootstrap is needed.
+- [x] **LICENSE (MIT) + CONTRIBUTING.md** added (issue #3). Optional still: a `CHANGELOG`.
 - [ ] **Translations** — all UI strings are extracted to `strings.xml` (translation-ready); no non-English
   locales shipped yet.
 - [ ] **Full TalkBack pass** — content descriptions + button semantics are on the discs/hold-pads; a
@@ -301,6 +307,27 @@ Round of layout/UX fixes after testing on a tall OnePlus 12 display and a batter
   battery (the coroutine lives in the ViewModel, which survives backgrounding).
 - **Removed the unused `WAKE_LOCK` permission** — keep-awake uses `FLAG_KEEP_SCREEN_ON`, which needs none.
 
+### 7.7 Loop test, CI green, issue #3 (2026-09-25, committed `42f1887` + `72ec896`)
+On-device loop test (OnePlus 12R) + fixing the long-red CI + acting on the community issue:
+
+- **Background torch drain — real fix.** Loop transmit kept flashing the torch **with the screen off**;
+  the §7.6 `ON_STOP` guard used the NavHost's `LocalLifecycleOwner` (back-stack entry), whose `ON_STOP`
+  didn't fire on backgrounding. Now observes the **Activity** lifecycle via `LocalActivity`. Verified on
+  device: backgrounding mid-loop returns to Idle / torch off. Loop itself confirmed working (word-gap
+  separates repeats).
+- **CI was red for weeks — fixed.** The `build` job (unit + lint + assemble) passed; only the
+  `instrumented` (API-33 emulator) job failed. Root cause: `ReferenceChartScreenTest` asserted a later
+  letter (**S**) was displayed on first render, but in the `LazyVerticalGrid` it scrolls off the shorter
+  emulator screen and is never composed (passed on the tall OnePlus 12R). Test now asserts **A** initially
+  then **searches** to bring S on-screen (screen-independent). Also **upload the androidTest HTML report**
+  as a CI artifact on failure so future breaks are diagnosable.
+- **Issue #3 (community request) — mostly already addressed** by the rewrite: hold-to-key (press-and-hold
+  torch + manual pad + Sending drill), **WPM** speed scaling, **SOS as one unbroken prosign** (`...---...`),
+  the adaptive decoder resolving O-vs-TTT, "User Details" gone, help consolidated into **More** + the one
+  Receive sheet. **Added** the still-missing pieces: **LICENSE** (MIT), **CONTRIBUTING.md**, and a
+  **Share app** action in More → Support. Not added (by design / user-side): a toggle/steady-light mode,
+  the Play-listing → repo link, a github.io page.
+
 ## 4. Phases
 
 Each phase should end on a **green build + working app**, and get its own commit.
@@ -505,4 +532,5 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-21 | test | **Real-device test (OnePlus 6, API 30).** Verified torch physically flashes, sidetone, three-state colouring, no layout shift, 20 wpm cap, camera luminance stream, all screens render, no crashes. Found + fixed a bug: transmit continued after navigating away from Send (torch flashing with no Stop button) — now stopped on screen dispose. UI-parity fixes (slider/tabs/segmented/badge/ligatures) all confirmed on device. |
 | 2026-09-22 | test/7 | **wpm cap → 1–10** (past ~10 wpm dots are too fast to key/read by hand); slider + `MAX_WPM` + About copy updated. |
 | 2026-09-22 | 7 | **Post-device rework (§7.5), committed `e06d42a` and pushed.** Speed-agnostic **`AdaptiveDecoder`** replaces the fixed-WPM classifier on the receive path (pure adaptive, `E/T` ambiguity for uniform marks; +6 tests). **Camera permission deferred** — torch via `CameraManager.setTorchMode()` (no permission at launch), `CAMERA` requested only on Receive→Camera. **Camera receive UX**: live preview wired (was a placeholder), manual Calibrate locking a fixed ambient average, green/grey lum vs avg, help bottom sheets. **Sending drill**: words (letter-by-letter), Random button, persistent resume position. **Decoding drill**: visible message, 2 wpm, 3s countdown overlay, morse progress colouring. **More**: dropped the placeholder progress card, added a coffee mark to the donation banner. **Nav icons** Receive→Sensors / More→MoreHoriz; **launcher icon** replaced from the new brand mark. Torch, keep-awake, and deferred permission all re-verified on the OnePlus 6. |
+| 2026-09-25 | 7 | **Loop test + CI + issue #3 (§7.7), committed `42f1887` + `72ec896`.** On-device loop test (OnePlus 12R) confirmed loop works but caught the torch flashing in the background — fixed by stopping transmit on the **Activity** `ON_STOP` (the NavBackStackEntry one wasn't firing); verified returns to Idle. **CI green again:** the red `instrumented` job was `ReferenceChartScreenTest` asserting an off-screen grid tile on the short API-33 emulator — made screen-independent (assert A, then search for S); added an androidTest-report artifact on failure. **Issue #3:** most points already handled by the rewrite; added **LICENSE (MIT)**, **CONTRIBUTING.md**, and a **Share app** action. |
 | 2026-09-25 | 7 | **Layout + battery pass (§7.6), committed `1eaa339` and pushed.** OnePlus 12 (tall display): Receive-camera made fixed-height with the preview taking the flexible space (`weight`+`heightIn`) so the sliders never clip; smaller Decoded font; detection region is a centred **square** (min 8%) with the analyser measuring a matching square (+ `finally` close, fixes B5/B9). **One combined `ReceiveHelpSheet`** (Calibrate + Sensitivity + Detection area) opened from every help icon and a new **app-bar help action** on Receive. **Loop transmission** now separates repeats by a **7-unit word gap** scaled to the wpm (was a fixed 800 ms that merged messages). **Battery fix:** transmission stops on `ON_STOP` (backgrounded / screen off) — a looping transmit was flashing the torch with the screen off. Removed the unused **`WAKE_LOCK`** permission (keep-awake uses `FLAG_KEEP_SCREEN_ON`). |
