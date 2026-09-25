@@ -26,6 +26,7 @@ data class ReceiveUiState(
     val reading: Boolean = false,
     val calibrating: Boolean = false,
     val armed: Boolean = false, // camera detects only after a manual Calibrate
+    val keepAwake: Boolean = true,
 )
 
 /**
@@ -55,7 +56,7 @@ class ReceiveViewModel(
     init {
         viewModelScope.launch {
             settings.settings.collect { s ->
-                _ui.update { it.copy(sensitivity = s.perceptibility, detectionArea = s.reactSize) }
+                _ui.update { it.copy(sensitivity = s.perceptibility, detectionArea = s.reactSize, keepAwake = s.keepAwake) }
                 torch.setDetectionArea(s.reactSize)
             }
         }

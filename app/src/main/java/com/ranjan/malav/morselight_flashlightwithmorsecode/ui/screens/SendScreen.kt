@@ -32,6 +32,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.FilledPill
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.KeepScreenOn
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.MorseString
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.PillTone
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SoftPill
@@ -60,6 +61,8 @@ fun SendScreen(vm: SendViewModel, modifier: Modifier = Modifier) {
     // reliably on backgrounding here).
     val stopOwner = LocalActivity.current as? LifecycleOwner ?: LocalLifecycleOwner.current
     LifecycleEventEffect(Lifecycle.Event.ON_STOP, stopOwner) { vm.stopTransmit() }
+    // Keep the screen awake only while actively transmitting (honouring the preference).
+    KeepScreenOn(ui.keepAwake && ui.transmitting)
     SendContent(
         ui = ui,
         onMessageChange = vm::onMessageChange,

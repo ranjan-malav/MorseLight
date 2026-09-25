@@ -52,6 +52,7 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.torch.TorchController
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.CameraPreview
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SegmentedControl
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
+import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.KeepScreenOn
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SoftPill
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.PillTone
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.SunkenCard
@@ -87,6 +88,9 @@ fun ReceiveScreen(
     LaunchedEffect(ui.mode) {
         if (ui.mode == RxMode.Camera && !camGranted) permLauncher.launch(Manifest.permission.CAMERA)
     }
+    // Keep the screen awake the whole time the Receive screen is open (honouring the preference) —
+    // decoding is passive, so the user isn't touching the screen to keep it alive.
+    KeepScreenOn(ui.keepAwake)
 
     ReceiveContent(
         ui = ui,

@@ -1,11 +1,6 @@
 package com.ranjan.malav.morselight_flashlightwithmorsecode
 
 import android.os.Bundle
-import android.view.WindowManager
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -25,17 +20,11 @@ class MainActivity : ComponentActivity() {
 
         // No camera permission is requested here: the torch runs through CameraManager (permission
         // free). CAMERA is asked for only when the Receive-camera tab is opened (see ReceiveScreen).
+        // "Keep screen awake" is applied per-screen (Send while transmitting, Receive throughout)
+        // via KeepScreenOn — not app-wide — so the screen isn't held on while idle on other tabs.
         setContent {
             MorseLightTheme {
                 MorseApp(container)
-            }
-        }
-
-        // Honour the "Keep screen awake" preference.
-        lifecycleScope.launch {
-            container.settings.settings.map { it.keepAwake }.distinctUntilChanged().collect { awake ->
-                if (awake) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             }
         }
     }

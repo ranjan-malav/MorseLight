@@ -29,6 +29,7 @@ data class SendUiState(
     val tx: TransmitState = TransmitState(),
     val keyTone: Boolean = true,
     val loop: Boolean = false,
+    val keepAwake: Boolean = true,
 ) {
     val transmitting get() = tx.running
     val torchOn get() = tx.torchOn
@@ -57,7 +58,7 @@ class SendViewModel(
         viewModelScope.launch {
             settings.settings.collect { s ->
                 sidetone.setEnabled(s.keyTone)
-                _ui.update { it.copy(wpm = s.wpm, keyTone = s.keyTone, loop = s.loop) }
+                _ui.update { it.copy(wpm = s.wpm, keyTone = s.keyTone, loop = s.loop, keepAwake = s.keepAwake) }
             }
         }
     }
