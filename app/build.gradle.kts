@@ -24,7 +24,7 @@ android {
         applicationId = "com.ranjan.malav.morselight_flashlightwithmorsecode"
         minSdk = 26
         targetSdk = 36
-        versionCode = 12
+        versionCode = 13
         versionName = "4.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
