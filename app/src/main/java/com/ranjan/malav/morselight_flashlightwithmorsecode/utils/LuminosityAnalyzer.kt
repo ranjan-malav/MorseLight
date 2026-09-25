@@ -24,30 +24,33 @@ class LuminosityAnalyzer(
     }
 
     override fun analyze(image: ImageProxy) {
+        try {
+            val buffer = image.planes[0].buffer
+            val data = buffer.toByteArray()
 
-        val buffer = image.planes[0].buffer
-        val data = buffer.toByteArray()
-        val pixels = data.map { it.toInt() and 0xFF }
+            // Measure a centred SQUARE region — side = considerableArea% of the frame's shorter
+            // side — so it matches the square drawn in the viewfinder.
+            val side = considerableArea.coerceIn(1, 100) * minOf(image.width, image.height) / 100
+            val cx = image.width / 2
+            val cy = image.height / 2
+            val startingX = (cx - side / 2).coerceAtLeast(0)
+            val endingX = (cx + side / 2).coerceAtMost(image.width - 1)
+            val startingY = (cy - side / 2).coerceAtLeast(0)
+            val endingY = (cy + side / 2).coerceAtMost(image.height - 1)
 
-        val startingX = (50 - considerableArea / 2) * image.width / 100
-        val startingY = (50 - considerableArea / 2) * image.height / 100
-        val endingX = (50 + considerableArea / 2) * image.width / 100
-        val endingY = (50 + considerableArea / 2) * image.height / 100
-
-        var sum = 0.0
-        var counter = 0
-        for (y in startingY..endingY) {
-            for (x in startingX..endingX) {
-                sum += pixels[image.width * y + x]
-                counter++
+            var sum = 0.0
+            var counter = 0
+            for (y in startingY..endingY) {
+                val row = image.width * y
+                for (x in startingX..endingX) {
+                    sum += data[row + x].toInt() and 0xFF
+                    counter++
+                }
             }
+
+            if (counter > 0) listener(sum / counter)
+        } finally {
+            image.close()
         }
-
-        if (counter == 0) return
-        val luma = sum / counter
-
-        listener(luma)
-
-        image.close()
     }
 }

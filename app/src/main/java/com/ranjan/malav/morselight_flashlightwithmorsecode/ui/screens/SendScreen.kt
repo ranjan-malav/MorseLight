@@ -24,6 +24,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.Eyebrow
 import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.components.FilledPill
@@ -49,6 +51,10 @@ fun SendScreen(vm: SendViewModel, modifier: Modifier = Modifier) {
     // Stop transmitting if the user navigates away (the ViewModel survives in the nav back stack,
     // so its coroutine would otherwise keep driving the real torch with no reachable Stop button).
     DisposableEffect(Unit) { onDispose { vm.stopTransmit() } }
+    // Also stop when the app is backgrounded / the screen turns off — otherwise a looping transmit
+    // keeps flashing the torch with the screen off and drains the battery (the coroutine lives in
+    // the ViewModel, which survives backgrounding; onDispose above only fires on navigation).
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { vm.stopTransmit() }
     SendContent(
         ui = ui,
         onMessageChange = vm::onMessageChange,
@@ -107,7 +113,9 @@ fun SendContent(
             }
         }
 
-        // Torch disc fills the flexible middle, press-and-hold to key by hand.
+        // Torch disc lives in the flexible middle (weight): the space below the morse card grows on
+        // tall screens and shrinks on short ones, keeping the speed slider + action pills pinned at
+        // the bottom. The disc is a fixed size, so it never clips.
         Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 TorchDisc(

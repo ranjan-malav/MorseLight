@@ -6,6 +6,7 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.data.SettingsReposito
 import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.MorseCode
 import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.TransmitEngine
 import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.TransmitState
+import com.ranjan.malav.morselight_flashlightwithmorsecode.morse.unitMillis
 import com.ranjan.malav.morselight_flashlightwithmorsecode.torch.Sidetone
 import com.ranjan.malav.morselight_flashlightwithmorsecode.torch.TorchController
 import kotlinx.coroutines.Job
@@ -93,7 +94,9 @@ class SendViewModel(
         job = viewModelScope.launch {
             do {
                 engine.transmit(morse, wpm)
-                if (_ui.value.loop && isActive) delay(800)
+                // Separate loop repeats by a full word gap (7 units, scaled to the wpm) so the
+                // receiver reads them as distinct messages instead of one run-on string.
+                if (_ui.value.loop && isActive) delay((unitMillis(wpm) * 7).toLong())
             } while (_ui.value.loop && isActive)
         }
     }

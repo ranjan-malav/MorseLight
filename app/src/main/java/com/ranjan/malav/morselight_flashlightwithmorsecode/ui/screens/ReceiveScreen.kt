@@ -10,7 +10,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -60,7 +64,13 @@ import com.ranjan.malav.morselight_flashlightwithmorsecode.ui.theme.MorseTheme
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-fun ReceiveScreen(vm: ReceiveViewModel, torch: TorchController, modifier: Modifier = Modifier) {
+fun ReceiveScreen(
+    vm: ReceiveViewModel,
+    torch: TorchController,
+    helpOpen: Boolean = false,
+    onHelpOpenChange: (Boolean) -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
     val ui by vm.ui.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var camGranted by remember {
@@ -87,14 +97,10 @@ fun ReceiveScreen(vm: ReceiveViewModel, torch: TorchController, modifier: Modifi
         cameraPermissionGranted = camGranted,
         onRequestCameraPermission = { permLauncher.launch(Manifest.permission.CAMERA) },
         cameraContent = { CameraPreview(torch, Modifier.fillMaxSize()) },
+        helpOpen = helpOpen,
+        onHelpOpenChange = onHelpOpenChange,
         modifier = modifier,
     )
-}
-
-/** Help topics for the camera controls, shown in a bottom sheet. */
-private enum class RxHelp(@StringRes val titleRes: Int, @StringRes val bodyRes: Int) {
-    Sensitivity(R.string.sensitivity_help_title, R.string.sensitivity_help_body),
-    DetectionArea(R.string.detection_area_help_title, R.string.detection_area_help_body),
 }
 
 @Composable
@@ -110,10 +116,11 @@ fun ReceiveContent(
     cameraContent: @Composable () -> Unit,
     cameraPermissionGranted: Boolean = true,
     onRequestCameraPermission: () -> Unit = {},
+    helpOpen: Boolean = false,
+    onHelpOpenChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val c = MorseTheme.colors
-    var help by remember { mutableStateOf<RxHelp?>(null) }
 
     Column(
         modifier = modifier.fillMaxSize().padding(horizontal = 16.dp),
@@ -135,7 +142,7 @@ fun ReceiveContent(
                 }
                 Text(
                     ui.decoded.ifBlank { stringResource(R.string.nothing_copied) },
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     color = if (ui.decoded.isBlank()) c.textSubtle else c.textHeading,
                 )
                 Text(
@@ -158,17 +165,25 @@ fun ReceiveContent(
                 }
             }
         } else if (ui.mode == RxMode.Camera) {
-            // Live viewfinder with the detection-area rectangle, status label and a Calibrate button.
+            // Live viewfinder with a square detection region, status label and a Calibrate button.
+            // It takes the flexible space (weight) so it grows on tall screens and shrinks on short
+            // ones — the sliders below always stay on screen. `heightIn` keeps it usable when small.
             Box(
-                Modifier.fillMaxWidth().height(180.dp).clip(RoundedCornerShape(MorseRadius.card))
+                Modifier.fillMaxWidth().weight(1f).heightIn(min = 120.dp)
+                    .clip(RoundedCornerShape(MorseRadius.card))
                     .background(androidx.compose.ui.graphics.Color(0xFF05070B)),
-                contentAlignment = Alignment.Center,
             ) {
                 cameraContent()
+                // Square detection region, centred, sized as a % of the viewfinder height.
                 Box(
-                    Modifier.fillMaxWidth(ui.detectionArea / 100f).height(140.dp)
-                        .border(2.dp, c.accent, RoundedCornerShape(12.dp)),
-                    contentAlignment = Alignment.Center,
+                    Modifier.align(Alignment.Center).fillMaxHeight(ui.detectionArea / 100f).aspectRatio(1f)
+                        .border(2.dp, c.accent, RoundedCornerShape(10.dp)),
+                )
+                // Status label + Calibrate button, stacked at the bottom over the preview.
+                Column(
+                    Modifier.align(Alignment.BottomCenter).padding(bottom = 10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     Text(
                         when {
@@ -177,24 +192,26 @@ fun ReceiveContent(
                             ui.reading -> stringResource(R.string.rx_reading)
                             else -> stringResource(R.string.rx_waiting)
                         },
-                        style = MaterialTheme.typography.labelMedium, color = c.textOnAccent,
+                        style = MaterialTheme.typography.labelMedium, color = androidx.compose.ui.graphics.Color.White,
+                        modifier = Modifier.clip(RoundedCornerShape(percent = 50))
+                            .background(androidx.compose.ui.graphics.Color(0x99000000))
+                            .padding(horizontal = 10.dp, vertical = 3.dp),
                     )
-                }
-                // Aim at the light, then tap to re-measure the ambient baseline.
-                Row(
-                    Modifier.align(Alignment.BottomCenter).padding(bottom = 10.dp)
-                        .clip(RoundedCornerShape(percent = 50)).background(c.accent)
-                        .clickable(enabled = !ui.calibrating, onClick = onCalibrate)
-                        .padding(horizontal = 14.dp, vertical = 7.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    Icon(Icons.Outlined.CenterFocusStrong, contentDescription = null,
-                        tint = c.textOnAccent, modifier = Modifier.size(16.dp))
-                    Text(
-                        if (ui.calibrating) stringResource(R.string.rx_calibrating)
-                        else stringResource(R.string.rx_calibrate),
-                        style = MaterialTheme.typography.labelMedium, color = c.textOnAccent)
+                    // Aim at the light, then tap to re-measure the ambient baseline.
+                    Row(
+                        Modifier.clip(RoundedCornerShape(percent = 50)).background(c.accent)
+                            .clickable(enabled = !ui.calibrating, onClick = onCalibrate)
+                            .padding(horizontal = 14.dp, vertical = 7.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        Icon(Icons.Outlined.CenterFocusStrong, contentDescription = null,
+                            tint = c.textOnAccent, modifier = Modifier.size(16.dp))
+                        Text(
+                            if (ui.calibrating) stringResource(R.string.rx_calibrating)
+                            else stringResource(R.string.rx_calibrate),
+                            style = MaterialTheme.typography.labelMedium, color = c.textOnAccent)
+                    }
                 }
             }
             // Live brightness: current reading (green while above the threshold) vs the ambient average.
@@ -215,9 +232,9 @@ fun ReceiveContent(
             SunkenCard(Modifier.fillMaxWidth()) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     LabeledSlider(stringResource(R.string.sensitivity), stringResource(R.string.percent, ui.sensitivity), ui.sensitivity.toFloat(),
-                        { onSensitivity(it.toInt()) }, 0f..100f, 0, onHelp = { help = RxHelp.Sensitivity })
+                        { onSensitivity(it.toInt()) }, 0f..100f, 0, onHelp = { onHelpOpenChange(true) })
                     LabeledSlider(stringResource(R.string.detection_area), "${ui.detectionArea}", ui.detectionArea.toFloat(),
-                        { onDetectionArea(it.toInt()) }, 30f..90f, 0, onHelp = { help = RxHelp.DetectionArea })
+                        { onDetectionArea(it.toInt()) }, 8f..80f, 0, onHelp = { onHelpOpenChange(true) })
                 }
             }
         } else {
@@ -238,25 +255,35 @@ fun ReceiveContent(
         }
     }
 
-    help?.let { topic ->
-        RxHelpSheet(topic, onDismiss = { help = null })
-    }
+    if (helpOpen) ReceiveHelpSheet(onDismiss = { onHelpOpenChange(false) })
 }
 
+/** One combined help sheet for the whole camera-decode flow (opened from every help affordance). */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun RxHelpSheet(topic: RxHelp, onDismiss: () -> Unit) {
+private fun ReceiveHelpSheet(onDismiss: () -> Unit) {
     val c = MorseTheme.colors
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = c.surfaceCard) {
         Column(
-            Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
+                .padding(start = 24.dp, end = 24.dp, bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            Text(stringResource(topic.titleRes),
+            Text(stringResource(R.string.rx_help_title),
                 style = MaterialTheme.typography.titleLarge, color = c.textHeading)
-            Text(stringResource(topic.bodyRes),
-                style = MaterialTheme.typography.bodyMedium, color = c.textMuted)
+            HelpSection(R.string.calibrate_help_title, R.string.calibrate_help_body)
+            HelpSection(R.string.sensitivity_help_title, R.string.sensitivity_help_body)
+            HelpSection(R.string.detection_area_help_title, R.string.detection_area_help_body)
         }
+    }
+}
+
+@Composable
+private fun HelpSection(@StringRes titleRes: Int, @StringRes bodyRes: Int) {
+    val c = MorseTheme.colors
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(stringResource(titleRes), style = MaterialTheme.typography.titleMedium, color = c.textHeading)
+        Text(stringResource(bodyRes), style = MaterialTheme.typography.bodyMedium, color = c.textMuted)
     }
 }
 

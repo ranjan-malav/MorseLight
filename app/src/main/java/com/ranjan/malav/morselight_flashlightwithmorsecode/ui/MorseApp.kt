@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.FlashlightOn
 import androidx.compose.material.icons.outlined.Sensors
 import androidx.compose.material.icons.outlined.MoreHoriz
@@ -24,6 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -88,6 +92,8 @@ fun MorseApp(container: AppContainer) {
         }
     val isTab = tabs.any { it.dest.route == route }
     val c = MorseTheme.colors
+    // Receive help sheet: opened from the app-bar icon here and from the slider help icons below.
+    var receiveHelpOpen by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = c.bgApp,
@@ -102,6 +108,11 @@ fun MorseApp(container: AppContainer) {
                 navigationIcon = {
                     if (!isTab) IconButton(onClick = { nav.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), tint = c.textBody)
+                    }
+                },
+                actions = {
+                    if (route == Dest.Receive.route) IconButton(onClick = { receiveHelpOpen = true }) {
+                        Icon(Icons.AutoMirrored.Outlined.HelpOutline, stringResource(R.string.action_help_receive), tint = c.textBody)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = c.bgApp),
@@ -148,7 +159,7 @@ fun MorseApp(container: AppContainer) {
                 val vm: ReceiveViewModel = viewModel(factory = viewModelFactory {
                     initializer { ReceiveViewModel(container.torch, container.settings) }
                 })
-                ReceiveScreen(vm, container.torch)
+                ReceiveScreen(vm, container.torch, receiveHelpOpen, { receiveHelpOpen = it })
             }
             composable(Dest.More.route) {
                 val vm: MoreViewModel = viewModel(factory = viewModelFactory {
