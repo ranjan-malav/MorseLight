@@ -280,6 +280,27 @@ After the real-device pass, a round of usability + logic fixes (all committed in
 - **Verified on device:** keep-screen-awake applies the `FLAG_KEEP_SCREEN_ON` window flag; flashlight
   physically lights via `setTorchMode`; camera permission is asked only on the camera tab.
 
+### 7.6 Layout + battery pass (2026-09-25, OnePlus 12 + OnePlus 6, committed `1eaa339`)
+Round of layout/UX fixes after testing on a tall OnePlus 12 display and a battery report:
+
+- **Receive-camera is fixed-height, no scroll.** The viewfinder takes the flexible space (`weight(1f)`
+  + `heightIn(min = 120.dp)`) so it grows on tall screens and shrinks on short ones — the sliders below
+  (esp. **Detection area**) are never pushed off screen. Decoded font reduced (titleLarge → titleMedium).
+- **Detection region is a centred square** (`fillMaxHeight(pct).aspectRatio(1f)`), min size lowered
+  **30 → 8%** for targeting a small/distant light. `LuminosityAnalyzer` now averages a matching centred
+  **square** (side = area% of the frame's shorter side) and closes each `ImageProxy` in a `finally`
+  (fixes the frame-leak, audit B5/B9).
+- **Send** keeps the flexible `weight(1f)` middle (torch centred per the mockup); the space under the
+  morse card absorbs the height difference.
+- **One combined help sheet** (`ReceiveHelpSheet`: Calibrate + Sensitivity + Detection area). Every help
+  icon opens it, plus a **help action in the app bar** on the Receive tab (state hoisted in `MorseApp`).
+- **Loop transmission gap** fixed: a **7-unit word gap scaled to the wpm** between repeats (was a fixed
+  800 ms that merged messages at low speeds and broke decoding).
+- **Background battery fix:** transmission now **stops on `ON_STOP`** (app backgrounded / screen off), not
+  just on navigation — a looping transmit was flashing the torch with the screen off and draining the
+  battery (the coroutine lives in the ViewModel, which survives backgrounding).
+- **Removed the unused `WAKE_LOCK` permission** — keep-awake uses `FLAG_KEEP_SCREEN_ON`, which needs none.
+
 ## 4. Phases
 
 Each phase should end on a **green build + working app**, and get its own commit.
@@ -484,3 +505,4 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-21 | test | **Real-device test (OnePlus 6, API 30).** Verified torch physically flashes, sidetone, three-state colouring, no layout shift, 20 wpm cap, camera luminance stream, all screens render, no crashes. Found + fixed a bug: transmit continued after navigating away from Send (torch flashing with no Stop button) — now stopped on screen dispose. UI-parity fixes (slider/tabs/segmented/badge/ligatures) all confirmed on device. |
 | 2026-09-22 | test/7 | **wpm cap → 1–10** (past ~10 wpm dots are too fast to key/read by hand); slider + `MAX_WPM` + About copy updated. |
 | 2026-09-22 | 7 | **Post-device rework (§7.5), committed `e06d42a` and pushed.** Speed-agnostic **`AdaptiveDecoder`** replaces the fixed-WPM classifier on the receive path (pure adaptive, `E/T` ambiguity for uniform marks; +6 tests). **Camera permission deferred** — torch via `CameraManager.setTorchMode()` (no permission at launch), `CAMERA` requested only on Receive→Camera. **Camera receive UX**: live preview wired (was a placeholder), manual Calibrate locking a fixed ambient average, green/grey lum vs avg, help bottom sheets. **Sending drill**: words (letter-by-letter), Random button, persistent resume position. **Decoding drill**: visible message, 2 wpm, 3s countdown overlay, morse progress colouring. **More**: dropped the placeholder progress card, added a coffee mark to the donation banner. **Nav icons** Receive→Sensors / More→MoreHoriz; **launcher icon** replaced from the new brand mark. Torch, keep-awake, and deferred permission all re-verified on the OnePlus 6. |
+| 2026-09-25 | 7 | **Layout + battery pass (§7.6), committed `1eaa339` and pushed.** OnePlus 12 (tall display): Receive-camera made fixed-height with the preview taking the flexible space (`weight`+`heightIn`) so the sliders never clip; smaller Decoded font; detection region is a centred **square** (min 8%) with the analyser measuring a matching square (+ `finally` close, fixes B5/B9). **One combined `ReceiveHelpSheet`** (Calibrate + Sensitivity + Detection area) opened from every help icon and a new **app-bar help action** on Receive. **Loop transmission** now separates repeats by a **7-unit word gap** scaled to the wpm (was a fixed 800 ms that merged messages). **Battery fix:** transmission stops on `ON_STOP` (backgrounded / screen off) — a looping transmit was flashing the torch with the screen off. Removed the unused **`WAKE_LOCK`** permission (keep-awake uses `FLAG_KEEP_SCREEN_ON`). |
