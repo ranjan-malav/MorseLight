@@ -1,0 +1,11 @@
+MorseLight 4.0 — a complete redesign.
+
+• Send messages as Morse over your flashlight, with every dot and dash lighting up live
+• Tap out Morse by hand with hold-to-key
+• Decode a flashing light with your camera — calibrate once, then read
+• New adaptive decoder reads any sending speed
+• Practice with decoding & sending drills and a full reference chart
+• Sidetone, loop, keep-screen-awake, plus SOS & Signal
+• Rebuilt for the latest Android — faster and lighter
+
+Still 100% ad-free.

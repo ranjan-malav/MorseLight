@@ -15,8 +15,9 @@ Usage:
 
 Add --dry-run to upload/promote to have Play validate the edit and then discard it.
 
-Release notes come from fastlane/metadata/android/en-US/changelogs/<versionCode>.txt (the same
-files fastlane uses), falling back to default.txt. Build the bundle first:
+Release notes come from fastlane/metadata/android/<language>/changelogs/<versionCode>.txt (the same
+files fastlane uses), falling back to default.txt; every language folder present is sent. The store
+listing's default language is en-GB, so keep an en-GB copy. Build the bundle first:
     ./gradlew :app:bundleRelease
 """
 from __future__ import annotations
@@ -38,7 +39,7 @@ ROOT = Path(__file__).resolve().parent.parent
 PACKAGE = "com.ranjan.malav.morselight_flashlightwithmorsecode"
 DEFAULT_KEY = ROOT / "play-service-account.json"
 DEFAULT_AAB = ROOT / "app/build/outputs/bundle/release/app-release.aab"
-CHANGELOGS = ROOT / "fastlane/metadata/android/en-US/changelogs"
+METADATA = ROOT / "fastlane/metadata/android"   # <language>/changelogs/<versionCode>.txt
 SCOPES = ["https://www.googleapis.com/auth/androidpublisher"]
 
 
@@ -56,15 +57,22 @@ def version_name() -> str:
 
 
 def release_notes(version_code: int):
-    for name in (f"{version_code}.txt", "default.txt"):
-        f = CHANGELOGS / name
-        if f.exists():
-            text = f.read_text().strip()
-            if len(text) > 500:
-                sys.exit(f"{f} is {len(text)} chars; Play's limit is 500.")
-            return [{"language": "en-US", "text": text}]
-    print("  (no release notes file found; publishing without notes)")
-    return []
+    """One entry per language folder that has <versionCode>.txt (or default.txt)."""
+    notes = []
+    for lang_dir in sorted(p for p in METADATA.iterdir() if (p / "changelogs").is_dir()):
+        for name in (f"{version_code}.txt", "default.txt"):
+            f = lang_dir / "changelogs" / name
+            if f.exists():
+                text = f.read_text().strip()
+                if len(text) > 500:
+                    sys.exit(f"{f} is {len(text)} chars; Play's limit is 500.")
+                notes.append({"language": lang_dir.name, "text": text})
+                break
+    if notes:
+        print("  release notes:", ", ".join(n["language"] for n in notes))
+    else:
+        print("  (no release notes file found; publishing without notes)")
+    return notes
 
 
 def release_body(version_code: int, draft: bool, rollout: float | None):

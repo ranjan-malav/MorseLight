@@ -44,10 +44,12 @@ checklists below keep their original checkboxes as a historical record.
 - [x] **Upload key reset** — completed; `keystore.properties` filled (§7.8).
 - [x] **v13 (4.0.0) live on the internal track** — uploaded via the Play API with release notes, after
   stripping the advertising-ID permissions Play rejected (§7.8). Next upload needs **v14**.
-- [ ] **Test v13 from the internal track, then promote to production** (listing refresh below first).
-- [ ] **Play Console: refresh the listing** — new screenshots + graphics for the **signal-blue rebrand**
-  and the new launcher icon; confirm the **Data Safety** form still matches (camera permission is now
-  requested only in Receive→Camera; Crashlytics + Analytics data collection).
+- [ ] **Test v13 from the internal track, then promote to production**
+  (`python3 scripts/play_upload.py promote 13 --to production --rollout 0.1`).
+- [~] **Play listing refresh** — **done via API:** new title *"Morselight - Morse with Flash"* and the 8
+  new screenshots in the phone, 7" and 10" slots (§7.8; pending Play review). **Still manual:** the
+  **feature graphic** (still the 2021 teal one), and confirm the **Data Safety** form (camera only in
+  Receive→Camera; no advertising ID; Crashlytics + Analytics data collection).
 - [ ] **Verify Firebase Crashlytics + Analytics** report from a **release-signed** build.
 - [ ] **Real end-to-end flashing-light decode** — two phones: one sends, one reads with the camera
   (torch + sidetone + manual keying already verified on the OnePlus 6; the camera *preview image* and a
@@ -363,6 +365,16 @@ On-device loop test (OnePlus 12R) + fixing the long-red CI + acting on the commu
   `edits.insert` → `bundles.upload` → `tracks.update(internal, status=completed, en-US release notes)` →
   `commit`. Internal track now serves **13 (4.0.0)**. The rejected attempt's edit was aborted, so
   versionCode 13 wasn't consumed.
+- **Store listing refreshed via the API** (listing language is **en-GB**). Title → *"Morselight - Morse
+  with Flash"* (was "MorseLight - Learn Morse Code with Flashlight 2021"). The 2021 screenshots in the
+  phone, 7" and 10" slots were replaced by 8 new ones (Send transmitting/idle, Receive camera reading +
+  calibrate, manual key, both drills, reference chart; mixed light/dark). Source captures were 1440×3168
+  (2.2:1, over Play's 2:1 limit), so each had the status bar cropped (also hides the real clock/battery),
+  the 1dp nav-bar edge border trimmed, and the sides extended with edge pixels → 1512×3007. Saved under
+  `fastlane/metadata/android/en-GB/images/phoneScreenshots/` (tablet slots reuse the same files).
+- **Release notes now per language.** `play_upload.py` sends every `<language>/changelogs/<vc>.txt`;
+  added `en-GB` copies (the listing's language) alongside `en-US`, and re-published v13 on internal so
+  it carries both.
 
 ## 4. Phases
 
@@ -568,6 +580,7 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-21 | test | **Real-device test (OnePlus 6, API 30).** Verified torch physically flashes, sidetone, three-state colouring, no layout shift, 20 wpm cap, camera luminance stream, all screens render, no crashes. Found + fixed a bug: transmit continued after navigating away from Send (torch flashing with no Stop button) — now stopped on screen dispose. UI-parity fixes (slider/tabs/segmented/badge/ligatures) all confirmed on device. |
 | 2026-09-22 | test/7 | **wpm cap → 1–10** (past ~10 wpm dots are too fast to key/read by hand); slider + `MAX_WPM` + About copy updated. |
 | 2026-09-22 | 7 | **Post-device rework (§7.5), committed `e06d42a` and pushed.** Speed-agnostic **`AdaptiveDecoder`** replaces the fixed-WPM classifier on the receive path (pure adaptive, `E/T` ambiguity for uniform marks; +6 tests). **Camera permission deferred** — torch via `CameraManager.setTorchMode()` (no permission at launch), `CAMERA` requested only on Receive→Camera. **Camera receive UX**: live preview wired (was a placeholder), manual Calibrate locking a fixed ambient average, green/grey lum vs avg, help bottom sheets. **Sending drill**: words (letter-by-letter), Random button, persistent resume position. **Decoding drill**: visible message, 2 wpm, 3s countdown overlay, morse progress colouring. **More**: dropped the placeholder progress card, added a coffee mark to the donation banner. **Nav icons** Receive→Sensors / More→MoreHoriz; **launcher icon** replaced from the new brand mark. Torch, keep-awake, and deferred permission all re-verified on the OnePlus 6. |
+| 2026-09-26 | 6 | **Store listing refreshed via API.** New title "Morselight - Morse with Flash"; 8 new screenshots (status bar cropped, fitted to Play's 2:1) in phone + 7" + 10" slots, saved under `fastlane/metadata/android/en-GB/images/`. `play_upload.py` now sends release notes for every language folder; added en-GB notes and re-published v13 internal with en-GB + en-US. Feature graphic + Data Safety still manual. |
 | 2026-09-26 | 6 | **v13 on the internal track** (commit `7f8b773`). First upload rejected: Firebase Analytics merges in `AD_ID` + AdServices permissions, contradicting the "no advertising ID" Play declaration. Stripped them via `tools:node="remove"` and disabled Firebase ad-ID collection, rebuilt, and uploaded v13 via the Play API with release notes. Internal track now serves **13 (4.0.0)**. |
 | 2026-09-26 | 6-7 | **Release prep (§7.8).** Upload-key reset done; signed bundle verified and **v12 uploaded to the internal track**; bumped to **v13**. Added `CHANGELOG.md` + Play release notes. Native-symbols setting on (deps are pre-stripped, notice is harmless). fastlane wired but can't install locally (Xcode 27 needed); **service account validated** via the Play API from Python. **Keep-screen-awake fixed:** was app-wide; now Send-while-transmitting + all of Receive, reference-counted so navigation doesn't clear it — verified on device. |
 | 2026-09-25 | 7 | **Loop test + CI + issue #3 (§7.7), committed `42f1887` + `72ec896`.** On-device loop test (OnePlus 12R) confirmed loop works but caught the torch flashing in the background — fixed by stopping transmit on the **Activity** `ON_STOP` (the NavBackStackEntry one wasn't firing); verified returns to Idle. **CI green again:** the red `instrumented` job was `ReferenceChartScreenTest` asserting an off-screen grid tile on the short API-33 emulator — made screen-independent (assert A, then search for S); added an androidTest-report artifact on failure. **Issue #3:** most points already handled by the rewrite; added **LICENSE (MIT)**, **CONTRIBUTING.md**, and a **Share app** action. |
