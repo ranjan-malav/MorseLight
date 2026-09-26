@@ -54,12 +54,12 @@ checklists below keep their original checkboxes as a historical record.
   live light-to-text decode are the last things worth a human eyeball).
 
 ### Optional — post-ship (Phase 8 + polish)
-- [~] **Automate Play releases from CLI.** fastlane `supply` is wired (`fastlane/`, `Gemfile`) and the
-  **service account is validated** against the Play API (§7.8). Blocker: fastlane won't install locally
-  (Homebrew wants Xcode 27; system Ruby 2.6 too old). **The Python Play-API path works end to end** and
-  shipped v13 to internal; it's an inline script today, not committed. Options: commit it as a small
-  `scripts/play_upload.py`, update Xcode for fastlane, or run fastlane in **CI**. Data Safety + content
-  rating stay console-only.
+- [x] **Play releases from CLI — `scripts/play_upload.py`** (Play Developer API, `pip3 install --user -r
+  scripts/requirements.txt`). Commands: `validate`, `status`, `upload [--track] [--draft] [--rollout]`,
+  `promote <versionCode> --to production [--rollout 0.1]`; `--dry-run` has Play validate the edit and then
+  discards it. Reads release notes from the fastlane `changelogs/<versionCode>.txt`. Verified: validate,
+  status, and a production 10% promote dry run all pass. fastlane (`fastlane/`, `Gemfile`) remains wired
+  but can't install locally (Homebrew wants Xcode 27). Data Safety + content rating stay console-only.
 - [x] **LICENSE (MIT) + CONTRIBUTING.md + CHANGELOG.md** added.
 - [ ] **Translations** — all UI strings are extracted to `strings.xml` (translation-ready); no non-English
   locales shipped yet.
