@@ -41,9 +41,9 @@ or **optional post-ship**. This is the single source of truth for what's outstan
 checklists below keep their original checkboxes as a historical record.
 
 ### User-side — needed before release
-- [~] **Upload key reset** — request **submitted to Play** (2026-09-21), awaiting Google (~1–2 business
-  days). On approval: fill the gitignored `keystore.properties` from `keystore.properties.template`
-  with the new `morselight-upload.jks`, then `bundleRelease` and upload the signed `.aab`.
+- [x] **Upload key reset** — completed; `keystore.properties` filled; signed **v12 on the internal track**
+  (§7.8). Next upload is **v13** (already built).
+- [ ] **Test the internal build, then promote to production** (listing refresh below first).
 - [ ] **Play Console: refresh the listing** — new screenshots + graphics for the **signal-blue rebrand**
   and the new launcher icon; confirm the **Data Safety** form still matches (camera permission is now
   requested only in Receive→Camera; Crashlytics + Analytics data collection).
@@ -53,14 +53,11 @@ checklists below keep their original checkboxes as a historical record.
   live light-to-text decode are the last things worth a human eyeball).
 
 ### Optional — post-ship (Phase 8 + polish)
-- [~] **Automate Play releases from CLI — fastlane `supply` wired** (`fastlane/Appfile` + `Fastfile`,
-  `Gemfile`). Gradle Play Publisher was tried but **doesn't support AGP 9** (expects the removed
-  `BaseAppModuleExtension`), so fastlane (AGP-agnostic) is used instead. **To activate:** create a Google
-  Cloud **service-account JSON** with Play access (Play Console → *account-level* **API access**, not the
-  per-app Setup menu), save it as gitignored `play-service-account.json`, fill `keystore.properties`, then
-  `./gradlew :app:bundleRelease && bundle exec fastlane android internal`. Data Safety + content rating
-  still need the console; the app already exists on Play so no first-app bootstrap is needed.
-- [x] **LICENSE (MIT) + CONTRIBUTING.md** added (issue #3). Optional still: a `CHANGELOG`.
+- [~] **Automate Play releases from CLI.** fastlane `supply` is wired (`fastlane/`, `Gemfile`) and the
+  **service account is validated** against the Play API (§7.8). Blocker: fastlane won't install locally
+  (Homebrew wants Xcode 27; system Ruby 2.6 too old). Options: update Xcode, run fastlane in **CI**, or
+  upload via the already-working Python Play-API path. Data Safety + content rating stay console-only.
+- [x] **LICENSE (MIT) + CONTRIBUTING.md + CHANGELOG.md** added.
 - [ ] **Translations** — all UI strings are extracted to `strings.xml` (translation-ready); no non-English
   locales shipped yet.
 - [ ] **Full TalkBack pass** — content descriptions + button semantics are on the discs/hold-pads; a
@@ -330,6 +327,29 @@ On-device loop test (OnePlus 12R) + fixing the long-red CI + acting on the commu
   **Share app** action in More → Support. Not added (by design / user-side): a toggle/steady-light mode,
   the Play-listing → repo link, a github.io page.
 
+### 7.8 Release prep: signing, Play upload, keep-awake (2026-09-25/26)
+- **Upload key reset completed.** `keystore.properties` filled (gitignored, verified untracked); signed
+  `bundleRelease` verified (`jar verified`, signer = the new `morselight-upload` key). **v12 (4.0.0)
+  uploaded manually to the internal track**; `versionCode` bumped to **13** for the next upload.
+- **Release notes + changelog:** Play "What's new" in `fastlane/metadata/android/en-US/changelogs/{12,13}.txt`
+  (485/500 chars); `CHANGELOG.md` (Keep a Changelog) documents the 4.0.0 rewrite.
+- **Native debug symbols:** enabled `ndk { debugSymbolLevel = "FULL" }`, but the app has no native code
+  and the bundled CameraX/DataStore `.so` files ship **pre-stripped** (verified `stripped … no symbols`),
+  so nothing is extracted — Play's "no debug symbols" notice is expected and harmless.
+- **Play CLI:** Gradle Play Publisher **doesn't support AGP 9** (needs the removed
+  `BaseAppModuleExtension`), so **fastlane `supply`** is wired instead (`fastlane/Appfile` + `Fastfile`).
+  fastlane itself **can't install locally**: Homebrew requires **Xcode 27** (machine has 26.5), and the
+  system Ruby 2.6 can't build its native gems. The **service account is validated** directly against the
+  Play API from Python (opened + aborted an edit; read the internal track) — credentials and app
+  permissions work. Uploading can go via that Python path or fastlane in CI.
+- **Keep-screen-awake was app-wide — fixed.** `FLAG_KEEP_SCREEN_ON` was set on the whole activity
+  whenever the preference was on, so the screen never slept while the app was open (verified: set even
+  idle on More). Now per-screen via a `KeepScreenOn` composable: **Send** only while transmitting,
+  **Receive** the whole time that screen is open, everything else times out normally. First version
+  dropped on Receive because navigating Send → Receive let Send's `onDispose` clear the shared root-view
+  flag; now **reference-counted** per View. Verified on device. `View.keepScreenOn` exists since API 1,
+  so it behaves the same across the whole minSdk 26+ range.
+
 ## 4. Phases
 
 Each phase should end on a **green build + working app**, and get its own commit.
@@ -534,5 +554,6 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-21 | test | **Real-device test (OnePlus 6, API 30).** Verified torch physically flashes, sidetone, three-state colouring, no layout shift, 20 wpm cap, camera luminance stream, all screens render, no crashes. Found + fixed a bug: transmit continued after navigating away from Send (torch flashing with no Stop button) — now stopped on screen dispose. UI-parity fixes (slider/tabs/segmented/badge/ligatures) all confirmed on device. |
 | 2026-09-22 | test/7 | **wpm cap → 1–10** (past ~10 wpm dots are too fast to key/read by hand); slider + `MAX_WPM` + About copy updated. |
 | 2026-09-22 | 7 | **Post-device rework (§7.5), committed `e06d42a` and pushed.** Speed-agnostic **`AdaptiveDecoder`** replaces the fixed-WPM classifier on the receive path (pure adaptive, `E/T` ambiguity for uniform marks; +6 tests). **Camera permission deferred** — torch via `CameraManager.setTorchMode()` (no permission at launch), `CAMERA` requested only on Receive→Camera. **Camera receive UX**: live preview wired (was a placeholder), manual Calibrate locking a fixed ambient average, green/grey lum vs avg, help bottom sheets. **Sending drill**: words (letter-by-letter), Random button, persistent resume position. **Decoding drill**: visible message, 2 wpm, 3s countdown overlay, morse progress colouring. **More**: dropped the placeholder progress card, added a coffee mark to the donation banner. **Nav icons** Receive→Sensors / More→MoreHoriz; **launcher icon** replaced from the new brand mark. Torch, keep-awake, and deferred permission all re-verified on the OnePlus 6. |
+| 2026-09-26 | 6-7 | **Release prep (§7.8).** Upload-key reset done; signed bundle verified and **v12 uploaded to the internal track**; bumped to **v13**. Added `CHANGELOG.md` + Play release notes. Native-symbols setting on (deps are pre-stripped, notice is harmless). fastlane wired but can't install locally (Xcode 27 needed); **service account validated** via the Play API from Python. **Keep-screen-awake fixed:** was app-wide; now Send-while-transmitting + all of Receive, reference-counted so navigation doesn't clear it — verified on device. |
 | 2026-09-25 | 7 | **Loop test + CI + issue #3 (§7.7), committed `42f1887` + `72ec896`.** On-device loop test (OnePlus 12R) confirmed loop works but caught the torch flashing in the background — fixed by stopping transmit on the **Activity** `ON_STOP` (the NavBackStackEntry one wasn't firing); verified returns to Idle. **CI green again:** the red `instrumented` job was `ReferenceChartScreenTest` asserting an off-screen grid tile on the short API-33 emulator — made screen-independent (assert A, then search for S); added an androidTest-report artifact on failure. **Issue #3:** most points already handled by the rewrite; added **LICENSE (MIT)**, **CONTRIBUTING.md**, and a **Share app** action. |
 | 2026-09-25 | 7 | **Layout + battery pass (§7.6), committed `1eaa339` and pushed.** OnePlus 12 (tall display): Receive-camera made fixed-height with the preview taking the flexible space (`weight`+`heightIn`) so the sliders never clip; smaller Decoded font; detection region is a centred **square** (min 8%) with the analyser measuring a matching square (+ `finally` close, fixes B5/B9). **One combined `ReceiveHelpSheet`** (Calibrate + Sensitivity + Detection area) opened from every help icon and a new **app-bar help action** on Receive. **Loop transmission** now separates repeats by a **7-unit word gap** scaled to the wpm (was a fixed 800 ms that merged messages). **Battery fix:** transmission stops on `ON_STOP` (backgrounded / screen off) — a looping transmit was flashing the torch with the screen off. Removed the unused **`WAKE_LOCK`** permission (keep-awake uses `FLAG_KEEP_SCREEN_ON`). |
