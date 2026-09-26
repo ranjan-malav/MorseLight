@@ -41,9 +41,10 @@ or **optional post-ship**. This is the single source of truth for what's outstan
 checklists below keep their original checkboxes as a historical record.
 
 ### User-side — needed before release
-- [x] **Upload key reset** — completed; `keystore.properties` filled; signed **v12 on the internal track**
-  (§7.8). Next upload is **v13** (already built).
-- [ ] **Test the internal build, then promote to production** (listing refresh below first).
+- [x] **Upload key reset** — completed; `keystore.properties` filled (§7.8).
+- [x] **v13 (4.0.0) live on the internal track** — uploaded via the Play API with release notes, after
+  stripping the advertising-ID permissions Play rejected (§7.8). Next upload needs **v14**.
+- [ ] **Test v13 from the internal track, then promote to production** (listing refresh below first).
 - [ ] **Play Console: refresh the listing** — new screenshots + graphics for the **signal-blue rebrand**
   and the new launcher icon; confirm the **Data Safety** form still matches (camera permission is now
   requested only in Receive→Camera; Crashlytics + Analytics data collection).
@@ -55,8 +56,10 @@ checklists below keep their original checkboxes as a historical record.
 ### Optional — post-ship (Phase 8 + polish)
 - [~] **Automate Play releases from CLI.** fastlane `supply` is wired (`fastlane/`, `Gemfile`) and the
   **service account is validated** against the Play API (§7.8). Blocker: fastlane won't install locally
-  (Homebrew wants Xcode 27; system Ruby 2.6 too old). Options: update Xcode, run fastlane in **CI**, or
-  upload via the already-working Python Play-API path. Data Safety + content rating stay console-only.
+  (Homebrew wants Xcode 27; system Ruby 2.6 too old). **The Python Play-API path works end to end** and
+  shipped v13 to internal; it's an inline script today, not committed. Options: commit it as a small
+  `scripts/play_upload.py`, update Xcode for fastlane, or run fastlane in **CI**. Data Safety + content
+  rating stay console-only.
 - [x] **LICENSE (MIT) + CONTRIBUTING.md + CHANGELOG.md** added.
 - [ ] **Translations** — all UI strings are extracted to `strings.xml` (translation-ready); no non-English
   locales shipped yet.
@@ -349,6 +352,17 @@ On-device loop test (OnePlus 12R) + fixing the long-red CI + acting on the commu
   dropped on Receive because navigating Send → Receive let Send's `onDispose` clear the shared root-view
   flag; now **reference-counted** per View. Verified on device. `View.keepScreenOn` exists since API 1,
   so it behaves the same across the whole minSdk 26+ range.
+- **Advertising-ID permissions stripped (Play rejected the first v13 upload).** Firebase Analytics
+  (`play-services-measurement`) merges in `com.google.android.gms.permission.AD_ID`,
+  `ACCESS_ADSERVICES_ATTRIBUTION` and `ACCESS_ADSERVICES_AD_ID`, contradicting the Play Console declaration
+  that the app doesn't use the advertising ID (it's ad-free). Removed with `tools:node="remove"` in the
+  manifest and set `google_analytics_adid_collection_enabled=false`. Analytics + Crashlytics unaffected;
+  only ad attribution dropped. The Data Safety answer ("no advertising ID") now matches the binary.
+  The manually uploaded v12 still carries those permissions; v13 supersedes it on the internal track.
+- **v13 uploaded to the internal track via the Play API** (Python, same validated service account):
+  `edits.insert` → `bundles.upload` → `tracks.update(internal, status=completed, en-US release notes)` →
+  `commit`. Internal track now serves **13 (4.0.0)**. The rejected attempt's edit was aborted, so
+  versionCode 13 wasn't consumed.
 
 ## 4. Phases
 
@@ -554,6 +568,7 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-21 | test | **Real-device test (OnePlus 6, API 30).** Verified torch physically flashes, sidetone, three-state colouring, no layout shift, 20 wpm cap, camera luminance stream, all screens render, no crashes. Found + fixed a bug: transmit continued after navigating away from Send (torch flashing with no Stop button) — now stopped on screen dispose. UI-parity fixes (slider/tabs/segmented/badge/ligatures) all confirmed on device. |
 | 2026-09-22 | test/7 | **wpm cap → 1–10** (past ~10 wpm dots are too fast to key/read by hand); slider + `MAX_WPM` + About copy updated. |
 | 2026-09-22 | 7 | **Post-device rework (§7.5), committed `e06d42a` and pushed.** Speed-agnostic **`AdaptiveDecoder`** replaces the fixed-WPM classifier on the receive path (pure adaptive, `E/T` ambiguity for uniform marks; +6 tests). **Camera permission deferred** — torch via `CameraManager.setTorchMode()` (no permission at launch), `CAMERA` requested only on Receive→Camera. **Camera receive UX**: live preview wired (was a placeholder), manual Calibrate locking a fixed ambient average, green/grey lum vs avg, help bottom sheets. **Sending drill**: words (letter-by-letter), Random button, persistent resume position. **Decoding drill**: visible message, 2 wpm, 3s countdown overlay, morse progress colouring. **More**: dropped the placeholder progress card, added a coffee mark to the donation banner. **Nav icons** Receive→Sensors / More→MoreHoriz; **launcher icon** replaced from the new brand mark. Torch, keep-awake, and deferred permission all re-verified on the OnePlus 6. |
+| 2026-09-26 | 6 | **v13 on the internal track** (commit `7f8b773`). First upload rejected: Firebase Analytics merges in `AD_ID` + AdServices permissions, contradicting the "no advertising ID" Play declaration. Stripped them via `tools:node="remove"` and disabled Firebase ad-ID collection, rebuilt, and uploaded v13 via the Play API with release notes. Internal track now serves **13 (4.0.0)**. |
 | 2026-09-26 | 6-7 | **Release prep (§7.8).** Upload-key reset done; signed bundle verified and **v12 uploaded to the internal track**; bumped to **v13**. Added `CHANGELOG.md` + Play release notes. Native-symbols setting on (deps are pre-stripped, notice is harmless). fastlane wired but can't install locally (Xcode 27 needed); **service account validated** via the Play API from Python. **Keep-screen-awake fixed:** was app-wide; now Send-while-transmitting + all of Receive, reference-counted so navigation doesn't clear it — verified on device. |
 | 2026-09-25 | 7 | **Loop test + CI + issue #3 (§7.7), committed `42f1887` + `72ec896`.** On-device loop test (OnePlus 12R) confirmed loop works but caught the torch flashing in the background — fixed by stopping transmit on the **Activity** `ON_STOP` (the NavBackStackEntry one wasn't firing); verified returns to Idle. **CI green again:** the red `instrumented` job was `ReferenceChartScreenTest` asserting an off-screen grid tile on the short API-33 emulator — made screen-independent (assert A, then search for S); added an androidTest-report artifact on failure. **Issue #3:** most points already handled by the rewrite; added **LICENSE (MIT)**, **CONTRIBUTING.md**, and a **Share app** action. |
 | 2026-09-25 | 7 | **Layout + battery pass (§7.6), committed `1eaa339` and pushed.** OnePlus 12 (tall display): Receive-camera made fixed-height with the preview taking the flexible space (`weight`+`heightIn`) so the sliders never clip; smaller Decoded font; detection region is a centred **square** (min 8%) with the analyser measuring a matching square (+ `finally` close, fixes B5/B9). **One combined `ReceiveHelpSheet`** (Calibrate + Sensitivity + Detection area) opened from every help icon and a new **app-bar help action** on Receive. **Loop transmission** now separates repeats by a **7-unit word gap** scaled to the wpm (was a fixed 800 ms that merged messages). **Battery fix:** transmission stops on `ON_STOP` (backgrounded / screen off) — a looping transmit was flashing the torch with the screen off. Removed the unused **`WAKE_LOCK`** permission (keep-awake uses `FLAG_KEEP_SCREEN_ON`). |
