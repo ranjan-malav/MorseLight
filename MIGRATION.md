@@ -44,11 +44,15 @@ checklists below keep their original checkboxes as a historical record.
 - [x] **Upload key reset** — completed; `keystore.properties` filled (§7.8).
 - [x] **v13 (4.0.0) live on the internal track** — uploaded via the Play API with release notes, after
   stripping the advertising-ID permissions Play rejected (§7.8). Next upload needs **v14**.
-- [ ] **Test v13 from the internal track, then promote to production**
-  (`python3 scripts/play_upload.py promote 13 --to production --rollout 0.1`).
-- [x] **Play listing refresh** — done via API (§7.8; pending Play review): new title *"Morselight - Morse
-  with Flash"*, **store icon** (SOS mark), **feature graphic** (wordmark + "MORSE" transmission), and the
-  8 new screenshots in the phone, 7" and 10" slots. Assets live in `fastlane/metadata/android/en-GB/images/`.
+- [x] **v13 promoted to production — staged at 10%** (2026-09-26; v11 still serves the other 90%).
+- [ ] **Watch the rollout, then widen it.** Check Play Console → Android vitals + Crashlytics for new
+  crashes/ANRs; if clean after a few days, `python3 scripts/play_upload.py promote 13 --to production
+  --rollout 0.5`, then without `--rollout` for 100%. To halt, use Play Console → Release → Halt rollout.
+- [x] **Play listing refresh** — done via API (§7.8; pending Play review): title *"MorseLight - Morse with
+  Flash"*, rewritten **short + full description**, **store icon** (SOS mark), **feature graphic** (wordmark +
+  "MORSE" transmission), and 8 new screenshots in the phone, 7" and 10" slots. All listing assets and
+  text live in `fastlane/metadata/android/en-GB/` (`title.txt`, `short_description.txt`,
+  `full_description.txt`, `images/`).
 - [ ] **Confirm the Data Safety form** in the console (camera only in Receive→Camera; no advertising ID;
   Crashlytics + Analytics data collection).
 - [ ] **Verify Firebase Crashlytics + Analytics** report from a **release-signed** build.
@@ -378,6 +382,13 @@ On-device loop test (OnePlus 12R) + fixing the long-red CI + acting on the commu
   **Feature graphic** replaced with `feature-2c-transmission.png` (1024×500; the MorseLight wordmark over
   "MORSE" in sent/pending colours). The source had an unused alpha channel (every pixel opaque), which
   Play rejects, so it was flattened to 24-bit RGB losslessly; saved as `images/featureGraphic.png`.
+- **Listing text rewritten.** The 2021 copy said speed was "in settings", asked users to e-mail the
+  developer, and omitted most features. New short description (75/80): *"Send, decode and learn Morse
+  code with your flashlight and camera. Ad-free."* New full description (1221/4000) in Send / Receive /
+  Learn / Privacy / Open source sections, every claim matching a shipped feature. Title casing fixed to
+  **MorseLight**. Stored as `title.txt`, `short_description.txt`, `full_description.txt`.
+- **v13 promoted to production at a 10% staged rollout** via `play_upload.py promote 13 --to production
+  --rollout 0.1` (dry-run validated first). Release notes go out in en-GB + en-US.
 - **Release notes now per language.** `play_upload.py` sends every `<language>/changelogs/<vc>.txt`;
   added `en-GB` copies (the listing's language) alongside `en-US`, and re-published v13 on internal so
   it carries both.
@@ -586,6 +597,7 @@ Worth fixing while rewriting — not blockers, but easy wins once the code is in
 | 2026-09-21 | test | **Real-device test (OnePlus 6, API 30).** Verified torch physically flashes, sidetone, three-state colouring, no layout shift, 20 wpm cap, camera luminance stream, all screens render, no crashes. Found + fixed a bug: transmit continued after navigating away from Send (torch flashing with no Stop button) — now stopped on screen dispose. UI-parity fixes (slider/tabs/segmented/badge/ligatures) all confirmed on device. |
 | 2026-09-22 | test/7 | **wpm cap → 1–10** (past ~10 wpm dots are too fast to key/read by hand); slider + `MAX_WPM` + About copy updated. |
 | 2026-09-22 | 7 | **Post-device rework (§7.5), committed `e06d42a` and pushed.** Speed-agnostic **`AdaptiveDecoder`** replaces the fixed-WPM classifier on the receive path (pure adaptive, `E/T` ambiguity for uniform marks; +6 tests). **Camera permission deferred** — torch via `CameraManager.setTorchMode()` (no permission at launch), `CAMERA` requested only on Receive→Camera. **Camera receive UX**: live preview wired (was a placeholder), manual Calibrate locking a fixed ambient average, green/grey lum vs avg, help bottom sheets. **Sending drill**: words (letter-by-letter), Random button, persistent resume position. **Decoding drill**: visible message, 2 wpm, 3s countdown overlay, morse progress colouring. **More**: dropped the placeholder progress card, added a coffee mark to the donation banner. **Nav icons** Receive→Sensors / More→MoreHoriz; **launcher icon** replaced from the new brand mark. Torch, keep-awake, and deferred permission all re-verified on the OnePlus 6. |
+| 2026-09-26 | 6 | **v13 → production, 10% staged rollout.** Listing text rewritten (short + full description reflect the 4.0 feature set; title casing → "MorseLight - Morse with Flash"); stored in `fastlane/metadata/android/en-GB/`. Next: watch vitals/Crashlytics, then widen to 50% → 100%. |
 | 2026-09-26 | 6 | **Store listing refreshed via API.** New title "Morselight - Morse with Flash"; new store icon (SOS mark) and feature graphic; 8 new screenshots (status bar cropped, fitted to Play's 2:1) in phone + 7" + 10" slots, saved under `fastlane/metadata/android/en-GB/images/`. `play_upload.py` now sends release notes for every language folder; added en-GB notes and re-published v13 internal with en-GB + en-US. Data Safety still manual. |
 | 2026-09-26 | 6 | **v13 on the internal track** (commit `7f8b773`). First upload rejected: Firebase Analytics merges in `AD_ID` + AdServices permissions, contradicting the "no advertising ID" Play declaration. Stripped them via `tools:node="remove"` and disabled Firebase ad-ID collection, rebuilt, and uploaded v13 via the Play API with release notes. Internal track now serves **13 (4.0.0)**. |
 | 2026-09-26 | 6-7 | **Release prep (§7.8).** Upload-key reset done; signed bundle verified and **v12 uploaded to the internal track**; bumped to **v13**. Added `CHANGELOG.md` + Play release notes. Native-symbols setting on (deps are pre-stripped, notice is harmless). fastlane wired but can't install locally (Xcode 27 needed); **service account validated** via the Play API from Python. **Keep-screen-awake fixed:** was app-wide; now Send-while-transmitting + all of Receive, reference-counted so navigation doesn't clear it — verified on device. |

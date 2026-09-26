@@ -1,0 +1,26 @@
+MorseLight turns your phone's flashlight into a Morse code transmitter and its camera into a receiver. Signal a friend across a field, at a campsite, or anywhere without a network: no internet needed.
+
+SEND
+• Type a message and send it with the flashlight, watching each dot and dash light up as it goes
+• Tap out Morse by hand: hold the torch button to key it yourself
+• One-tap SOS and Signal
+• Speed from 1 to 10 words per minute, with standard ITU timing
+• Optional sidetone, loop transmission and keep-screen-awake
+
+RECEIVE
+• Decode a flashing light with your camera: point it, calibrate once, then read
+• Or tap along with the light and let the app decode it
+• An adaptive decoder works out the sender's speed by itself, so you don't need to agree one in advance
+
+LEARN
+• Decoding drill: copy a message flashed on screen
+• Sending drill: key letters and words, with your progress saved
+• A searchable chart of every letter and number
+
+PRIVACY
+• Ad-free
+• The flashlight needs no special permission, and the camera is only requested when you open camera decoding
+• Works without an internet connection
+
+OPEN SOURCE
+MorseLight is free and open source. Report issues or contribute at github.com/ranjan-malav/MorseLight
