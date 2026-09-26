@@ -38,3 +38,4 @@ fastlane/Preview.html
 .env
 vendor/bundle/
 Gemfile.lock
+.bundle/
