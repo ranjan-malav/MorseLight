@@ -1,0 +1,46 @@
+:root{
+--font-core:"Plus Jakarta Sans",ui-sans-serif,-apple-system,"Segoe UI",sans-serif;
+--font-display:"Plus Jakarta Sans",ui-sans-serif,-apple-system,sans-serif;
+--font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+
+/* iOS-derived ramp, kept on whole pixels */
+--text-caption-2:11px;
+--text-caption-1:12px;
+--text-footnote:13px;
+--text-subhead:15px;
+--text-body-size:17px;
+--text-title-3:20px;
+--text-title-2:22px;
+--text-title-1:28px;
+--text-display-2:34px;
+--text-display-1:44px;
+
+--lh-tight:1.15; /* @kind other */
+--lh-snug:1.3; /* @kind other */
+--lh-normal:1.45; /* @kind other */
+--lh-relaxed:1.6; /* @kind other */
+
+--weight-regular:400;
+--weight-medium:500;
+--weight-semibold:600;
+--weight-bold:700;
+--weight-extrabold:800;
+
+--tracking-display:-0.02em;
+--tracking-title:-0.01em;
+--tracking-body:0em;
+--tracking-caps:0.06em;
+
+/* composed roles */
+--type-display:var(--weight-extrabold) var(--text-display-1)/var(--lh-tight) var(--font-display);
+--type-title-1:var(--weight-bold) var(--text-title-1)/var(--lh-snug) var(--font-display);
+--type-title-2:var(--weight-bold) var(--text-title-2)/var(--lh-snug) var(--font-core);
+--type-title-3:var(--weight-semibold) var(--text-title-3)/var(--lh-snug) var(--font-core);
+--type-body:var(--weight-regular) var(--text-body-size)/var(--lh-normal) var(--font-core);
+--type-subhead:var(--weight-medium) var(--text-subhead)/var(--lh-normal) var(--font-core);
+--type-footnote:var(--weight-regular) var(--text-footnote)/var(--lh-normal) var(--font-core);
+--type-caption:var(--weight-medium) var(--text-caption-1)/var(--lh-snug) var(--font-core);
+--type-label:var(--weight-semibold) var(--text-footnote)/var(--lh-snug) var(--font-core);
+--type-metric:var(--weight-bold) var(--text-display-2)/1.05 var(--font-core);
+--type-mono:var(--weight-medium) var(--text-footnote)/var(--lh-normal) var(--font-mono);
+}

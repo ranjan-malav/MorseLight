@@ -1,0 +1,25 @@
+:root{
+--space-0:0px;--space-1:2px;--space-2:4px;--space-3:6px;--space-4:8px;--space-5:12px;--space-6:16px;--space-7:20px;--space-8:24px;--space-9:32px;--space-10:40px;--space-11:48px;--space-12:64px;--space-13:80px;
+
+/* balanced density defaults */
+--gap-inline:8px;
+--gap-stack:12px;
+--gap-group:20px;
+--gap-section:32px;
+
+--pad-control-x:16px;
+--pad-control-y:10px;
+--pad-card:20px;
+--pad-card-lg:24px;
+--pad-screen:24px;
+
+--control-h-sm:32px;
+--control-h-md:40px;
+--control-h-lg:48px;
+--hit-min:44px;
+
+--sidebar-w:248px;
+--topbar-h:60px;
+--content-max:1120px;
+--measure:66ch;
+}

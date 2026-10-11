@@ -1,16 +1,41 @@
-*.iml
+# Gradle / build
 .gradle
-/local.properties
-/.idea/
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
+
+# Kotlin 2.x build output
+.kotlin/
+
+# IDE
+*.iml
+/.idea/
+.DS_Store
+
+# Local config — never commit
 local.properties
+
+# Signing — never commit
+*.jks
+*.keystore
+keystore.properties
+*.pem
+upload_certificate.pem
+
+# Build artifacts / diagnostics
+*.apk
+*.aab
+*.hprof
+
+# Google Play service-account key for Gradle Play Publisher (never commit)
+play-service-account.json
+
+# fastlane
+fastlane/report.xml
+fastlane/README.md
+fastlane/Preview.html
+.env
+vendor/bundle/
+Gemfile.lock
+.bundle/

@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.ranjan.malav.morselight_flashlightwithmorsecode">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-feature
         android:name="android.hardware.camera.any"
         android:required="false" />
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- The app is ad-free and its Play declaration says it doesn't use the advertising ID.
+         Firebase Analytics (play-services-measurement) merges these in; strip them. -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" tools:node="remove" />
 
     <application
         android:name=".app.MorseLightApp"
@@ -16,23 +20,16 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MorseLight">
-        <activity
-            android:name=".screens.MorseDetailActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name=".screens.MorseTutorialActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan"
-            tools:ignore="LockedOrientationActivity" />
+        android:enableOnBackInvokedCallback="true"
+        android:theme="@style/Theme.MorseLight.Starter">
+        <!-- Don't collect the advertising ID in Firebase Analytics (no ads, no ad attribution). -->
+        <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="portrait"
+            android:exported="true"
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

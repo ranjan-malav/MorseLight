@@ -1,0 +1,23 @@
+:root{
+--ease-standard:cubic-bezier(.2,0,0,1); /* @kind other */
+--ease-emphasized:cubic-bezier(.32,.72,0,1); /* @kind other */
+--ease-exit:cubic-bezier(.4,0,1,1); /* @kind other */
+--ease-spring:cubic-bezier(.34,1.32,.64,1); /* @kind other */
+
+--dur-instant:90ms; /* @kind other */
+--dur-fast:140ms; /* @kind other */
+--dur-base:220ms; /* @kind other */
+--dur-slow:320ms; /* @kind other */
+--dur-sheet:420ms; /* @kind other */
+
+--press-scale:.97; /* @kind other */
+--lift-y:-1px; /* @kind other */
+}
+@media (prefers-reduced-motion:reduce){:root{
+--dur-instant:0ms; /* @kind other */
+--dur-fast:0ms; /* @kind other */
+--dur-base:0ms; /* @kind other */
+--dur-slow:0ms; /* @kind other */
+--dur-sheet:0ms; /* @kind other */
+--press-scale:1; /* @kind other */
+}}
